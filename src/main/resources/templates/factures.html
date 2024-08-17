@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+<meta charset="UTF-8">
+<title>Factures</title>
+<link rel="stylesheet" href="/ERPPro/css/factures.css">
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+	
+	
+	<div class="row" style="display: flex;margin-top: 20px">
+	<h3>Factures</h3>
+		<div class="col-Lg-3" style="margin-left: auto;">
+			<button onclick="addInvoice()" class="btn btn-primary btn-sm mb-3" style="margin-right: 25px">Ajouter Facture</button>
+		</div>
+	</div>
+	<div class="card">
+    <div class="card-header">
+       <i class="menu-icon uil uil-invoice"></i> Liste des factures
+    </div>
+    <div class="rounded-rectangle">
+    <p style="color: #2d3539;margin-top: 10px"><strong>filters:</strong></p>
+    
+     <select id="clientId" onchange="applyFilter()" class="selectfilter">
+    <option value="0">Select Client</option>
+    <option th:each="client : ${clients}" th:value="${client.idU}" th:text="${client.libelle}"></option>
+</select>
+
+<select id="factureType" onchange="applyFilter()" class="selectfilter">
+    <option value="null">Select Facture Type</option>
+    <option  th:value="National" th:text="National"></option>
+    <option  th:value="Export" th:text="Export"></option>
+</select>
+
+<input type="date" id="startDate" onchange="applyFilter()" class="selectfilter datepicker"  data-date-format="mm/dd/yyyy">
+<input type="date" id="endDate" onchange="applyFilter()" class="selectfilter datepicker"  data-date-format="mm/dd/yyyy">
+
+    <div class="inputs">
+	   <label style="color: #2d3539">Recherche:</label>  
+	   <input id="inputsearch" type="text" onkeyup="search()" style="margin-top: 7px">
+   </div>
+    </div>
+    
+    
+    
+    
+    <div class="rounded-rectangle1">
+    <label style="margin-left: 10px">Filters :</label>
+    <div class="form-check form-check-inline" style="margin-left: 10px">
+  <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1" onclick="handleCheckboxClick(1)">
+  <label class="form-check-label" for="inlineCheckbox1">Facture</label>
+</div>
+
+<div class="form-check form-check-inline">
+  <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2" onclick="handleCheckboxClick(2)">
+  <label class="form-check-label" for="inlineCheckbox2">Proforma</label>
+</div>
+
+<div class="form-check form-check-inline">
+  <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3" onclick="handleCheckboxClick(3)">
+  <label class="form-check-label" for="inlineCheckbox3">Archivée</label>
+</div>
+    </div>
+    
+    
+    
+   
+    
+    
+    <div class="card-body">
+    
+     
+       <table class="table table-striped table-bordered" id="facturetable">
+		<thead class="table-dark">
+			<tr>
+				<th>Number</th>
+				<th>Date emission</th>
+				<th>Client</th>
+				<th>Etat</th>
+				<th>Type</th>
+				<th>Total</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody id="invoiceTableBody">
+		 <th:block th:each="facture: ${factures}">
+			<tr>
+				<td th:text = "${facture.number}"></td>
+				
+				<td th:text="${#dates.format(facture.dateemission, 'yyyy/MM/dd')}"></td>
+				<td th:text = "${facture.client.libelle}"></td>
+				
+				<td>
+    				<span th:text="${facture.status}"
+      th:class="${facture.status.toString() == 'Proforma' || facture.status.toString() == 'Proforma_validee' || facture.status.toString() == 'Proforma_envoyee_validee' || facture.status.toString() == 'Proforma_envoyee' || facture.status.toString() == 'Proforma_envoyee_Refusee' ? 'badge badge-danger' : 'badge badge-success'}"></span>
+				</td>
+				<td th:text = "${facture.type}"></td>
+				
+				
+							<td style="color:#65b05e">
+    			<span   th:if="${facture.type.toString() == 'Export'}" th:utext="${#numbers.formatDecimal(facture.totalttc, 1, 'DEFAULT', 2, 'DEFAULT')} + '&nbsp;&#x20ac;'"></span>
+    			<span   th:if="${facture.type.toString() == 'National'}" th:utext="${#numbers.formatDecimal(facture.totalttc, 1, 'DEFAULT', 2, 'DEFAULT')} + '&nbsp;TND'"></span>
+				</td>
+				<td class="button-wrapper">
+				
+				
+
+					 
+					 
+					<button th:if="${!facture.signed}" th:onclick="'updateInvoice(' + ${facture.idF} + ')'" class="btnpreview">
+					   <i class="fa-solid fa-pen"></i> Modifier
+					</button>
+					
+
+										 
+				
+					<button th:onclick="'pdf(' + ${facture.idF} + ')'" class="btnpdf"><i class="fa-solid fa-file-pdf"></i>PDF</button>
+					<button th:if="${facture.status.toString() == 'Facture_valide'}" th:onclick="'SendInvoice(' + ${facture.idF} + ')'" class="btnpreview">
+					   <i class="fa-regular fa-envelope"></i>Envoyer
+					</button>
+						<button th:if="${facture.status.toString() == 'Proforma_validee'}" th:onclick="'SendProforma(' + ${facture.idF} + ')'" class="btnpreview">
+					   <i class="fa-regular fa-envelope"></i>Envoyer
+					</button>
+					
+					<button id="btnval" th:if="${facture.status.toString() == 'Proforma'}" th:onclick="'ValiderProforma(' + ${facture.idF} + ')'" class="btnpreview">
+					   <i class="fa-solid fa-check"></i>Valider
+					</button>
+					
+					<button id="btnvalfact"
+        th:if="${!facture.signed && !facture.traited && facture.status.toString() == 'Facture'}"
+        th:onclick="'sign(' + ${facture.idF} + ')'"
+        class="btnsign">
+    <i class="fa-solid fa-signature"></i> Valider
+</button>
+
+<button th:if="${facture.status.toString() == 'Proforma_envoyee_validee'}" th:onclick="'Facturer(' + ${facture.idF} + ')'" class="btnpreview">
+					   <i class="fa-solid fa-file-invoice"></i>Facturer
+					</button>
+					 <button th:unless="${facture.archived}" th:onclick="'ArchiveFacture(' + ${facture.idF} + ')'" class="btnarchive"><i class="fa-solid fa-box-archive"></i>Archiver</button>
+		
+
+				
+					<button  th:if="${facture.status.toString() == 'Facture_envoye'}" th:onclick="'cancelinvoice(' + ${facture.idF} + ')'" class="btnsupp">
+										   <i class="fa-solid fa-trash"></i> Annuler
+					</button>
+					
+					<button  th:if="${facture.status.toString() == 'Facture_valide'}" th:onclick="'cancelinvoiceNotSend(' + ${facture.idF} + ')'" class="btnsupp">
+										   <i class="fa-solid fa-trash"></i> Annuler
+					</button>
+					      <button th:if="${ facture.status.toString() == 'Facture_envoye'}"  th:onclick="'toggleAvoirs(' + ${facture.idF} + ')'" class="btn btn-info btn-sm"><i class="fa-solid fa-list"></i> Avoirs</button>
+				</td>
+				
+			</tr>
+			<th:block th:if="${facture.avoirs != null}" th:each="avoir : ${facture.avoirs}">
+			<tr  th:attr="data-group='avoirs-' + ${facture.idF}" style="display:none">
+						<td th:text = "${avoir.number}"></td>
+				
+				<td th:text="${#dates.format(avoir.dateemission, 'yyyy/MM/dd')}"></td>
+				<td th:text = "${facture.client.libelle}"></td>
+				<td>
+    				<span th:text="${avoir.status}" class='badge badge-warning'></span>
+				</td>
+				<td th:text = "${facture.type}"></td>
+				
+				
+							<td style="color:#65b05e">
+    			<span   th:if="${facture.type.toString() == 'Export'}" th:utext="${#numbers.formatDecimal(avoir.montant, 1, 'DEFAULT', 2, 'DEFAULT')} + '&nbsp;&#x20ac;'"></span>
+    			<span   th:if="${facture.type.toString() == 'National'}" th:utext="${#numbers.formatDecimal(avoir.montant, 1, 'DEFAULT', 2, 'DEFAULT')} + '&nbsp;TND'"></span>
+				</td>
+				<td class="button-wrapper">
+				
+				
+
+					 
+					 
+					<button th:unless="${avoir.status.toString()=='Avoir_envoye'}" th:onclick="'updateAvoir(' + ${avoir.idC} + ')'" class="btnpreview">
+					   <i class="fa-solid fa-pen"></i> Modifier
+					</button>
+					
+
+										 
+				
+					<button th:onclick="'pdfAvoir(' + ${avoir.idC} + ')'" class="btnpdf"><i class="fa-solid fa-file-pdf"></i>PDF</button>
+					<button th:if="${avoir.status.toString() == 'Avoir_valide'}" th:onclick="'SendAvoir(' + ${avoir.idC} + ')'" class="btnpreview">
+					   <i class="fa-regular fa-envelope"></i>Envoyer</button>
+					
+
+		<button id="btnvalavoir"
+        th:if="${avoir.status.toString() == 'Avoir'}"
+        th:onclick="'ValiderAvoir(' + ${avoir.idC} + ')'"
+        class="btnsign">
+    <i class="fa-solid fa-signature"></i> Valider
+</button>
+
+				
+					
+					
+					<button  th:if="${avoir.status.toString() == 'Avoir_valide'}" th:onclick="'cancelAvoirValide(' + ${avoir.idC} + ')'" class="btnsupp">
+										   <i class="fa-solid fa-trash"></i> Annuler
+					</button>
+					
+					<button  th:if="${avoir.status.toString() == 'Avoir'}" th:onclick="'cancelAvoir(' + ${avoir.idC} + ')'" class="btnsupp">
+										   <i class="fa-solid fa-trash"></i> Annuler
+					</button>
+				</td>
+			
+						
+			</tr>
+			 </th:block>
+  </th:block>
+			
+		</tbody>
+	
+	</table>
+	
+	<div th:if = "${totalPages > 1}">
+		<div class="row col-sm-12">
+			<div class="col-sm-2" id="divrows" >
+				Total Rows : [[${totalItems}]]
+			</div>
+			<div class="col-auto" id="divnumbers">
+				<span th:each="i:${#numbers.sequence(1,totalPages)}">
+					<a th:if="${currentPage != i}" href="" th:onclick="'movePageination(event, ' + ${i} + ')'">[[${i}]]</a>
+					<span th:unless="${currentPage != i}">[[${i}]]</span> 
+					&nbsp;
+				 	&nbsp;
+				</span>
+			</div>
+			<div class="col-sm-1" id="divnext">
+				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${currentPage+1} + ')'">Next</a>
+				<span th:unless="${currentPage < totalPages}">Next</span>
+			</div>
+			<div class="col-sm-1"  id="divlast">
+				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${totalPages} + ')'">Last</a>
+				<span th:unless="${currentPage < totalPages}">Last</span>
+			</div>
+		
+		</div>
+		
+    </div>
+</div>
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary text-center">
+        <h5 class="modal-title w-100" id="exampleModalLongTitle" style="color: #fff">Date emission</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body inputdatecontainer">
+        <input type="date" id="dateemm">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" onclick="ValiderFacture()" class="btn btn-primary">Signer</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="alert alert-success alert-dismissible fade bottom-right" role="alert" >
+  <div style="text-align: center;">
+    <strong>Succès!</strong><br><span class="alert-text"> Utilisateur ajouté avec succès !.</span>
+  </div>
+  <button type="button" class="close" onclick="hideCustomAlert()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+  
+    
+<script>
+function hideCustomAlert(){
+	 const alert = document.querySelector(".alert");
+	 alert.classList.remove("show");
+}
+
+function toggleAvoirs(invoiceId) {
+	console.log("here")
+    const avoirRows = document.querySelectorAll(`#invoiceTableBody [data-group='avoirs-${invoiceId}']`);
+   
+    avoirRows.forEach(row => {
+    	 console.log(row.style.display)
+        row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+    	
+    });
+    document.getElementById("facturetable").offsetHeight;
+}
+</script>
+  
+  <script th:inline="javascript">
+  var token=sessionStorage.getItem('token');
+ function generateTd(factureId) {
+	 
+	 var type="";
+	 var number =0;
+	 var signed=0;
+	 var archived=0;
+	 var traited=0;
+	 var status="";
+	
+	 var td = document.createElement('td');
+	 td.className = "button-wrapper";
+	 fetch('/ERPPro/user/getFactureById/'+factureId, {
+         method: 'GET',
+         headers: {
+         	 'Authorization': `Bearer ${token}`
+         	    },
+        
+     })
+     .then(response => response.json())
+     .then(data => {
+
+    	 
+    	 
+         type=data.type;
+         number=data.number;
+         signed=data.signed;
+         archived=data.archived
+         traited=data.traited
+         status=data.status
+
+   
+    
+		
+	  
+	
+      
+      
+      
+
+      // Create buttons
+     	if(!signed){
+			var updateButton = document.createElement('button');
+		      
+			updateButton.innerHTML = '<i class="fa-solid fa-pen"></i>Modifier';
+			updateButton.className = 'btnpreview';
+			updateButton.onclick = function() {
+				updateInvoice(factureId); 
+		      };
+		      td.appendChild(updateButton);
+	}
+      
+
+      var pdfButton = document.createElement('button');
+      pdfButton.innerHTML = '<i class="fa-solid fa-file-pdf"></i>PDF';
+      pdfButton.className = 'btnpdf';
+     
+      pdfButton.onclick = function() {
+          pdf(factureId); 
+      };
+      
+     
+          
+      td.appendChild(pdfButton);
+     
+      if(status=="Facture_valide"){
+    	  var emailButton = document.createElement('button');
+    		      
+    		      emailButton.innerHTML = '<i class="fa-regular fa-envelope"></i>Envoyer';
+    		      emailButton.className = 'btnpreview';
+    		      emailButton.onclick = function() {
+    					SendInvoice(factureId); 
+    			      };
+    			      td.appendChild(emailButton);
+    			}
+    		else if (status=="Proforma_validee"){
+    	  var emailButton = document.createElement('button');
+    		      
+    		      emailButton.innerHTML = '<i class="fa-regular fa-envelope"></i>Envoyer';
+    		      emailButton.className = 'btnpreview';
+    		      emailButton.onclick = function() {
+    		    	  SendProforma(factureId); 
+    			      };
+    			      td.appendChild(emailButton);
+    			}
+
+      if(( window.role=="Manager" ||  window.role=="Admin")&& status=="Proforma" ){
+  		var signButton = document.createElement('button');
+  	      
+  	      signButton.innerHTML = '<i class="fa-solid fa-signature"></i>Valider';
+  	      signButton.className = 'btnpreview';
+  	      signButton.onclick = function() {
+  	    	ValiderProforma(factureId); 
+  	      };
+  	      td.appendChild(signButton);
+  }
+      
+      
+
+      if(( window.role=="Manager" ||  window.role=="Admin") && status=="Facture" && !traited && !signed ){
+    	  console.log("hadha role===="+window.role);
+    		var signButton = document.createElement('button');
+    	      
+    	      signButton.innerHTML = '<i class="fa-solid fa-signature"></i>Valider';
+    	      signButton.className = 'btnsign';
+    	      signButton.onclick = function() {
+    	    	  sign(factureId); 
+    	      };
+    	      td.appendChild(signButton);
+    }
+      if( status=="Proforma_envoyee_validee"){
+  		var factButton = document.createElement('button');
+  	      
+  		factButton.innerHTML = '<i class="fa-solid fa-file-invoice"></i>Facturer';
+  		factButton.className = 'btnpreview';
+  		factButton.onclick = function() {
+  			Facturer(factureId); 
+  	      };
+  	      td.appendChild(factButton);
+  }
+			
+      
+     
+	if(!archived){
+		 var archiveButton = document.createElement('button');
+	      
+		   	archiveButton.innerHTML = '<i class="fa-solid fa-box-archive"></i>Archiver';
+		   	archiveButton.className = 'btnarchive';
+		   	archiveButton.onclick = function() {
+		   		ArchiveFacture(factureId); 
+		      };
+		      td.appendChild(archiveButton);
+		}
+	
+	
+
+
+
+	
+		
+		var cancelButton = document.createElement('button');
+	      
+		cancelButton.innerHTML = '<i class="fa-solid fa-trash"></i>Annuler';
+		cancelButton.className = 'btnsupp';
+		if(status=="Facture_envoye"){
+			
+		cancelButton.onclick = function() {
+			cancelinvoice(factureId); 
+		
+	      };
+	      td.appendChild(cancelButton);
+		}
+		else if(status=="Facture_valide"){
+			cancelButton.onclick = function() {
+				cancelinvoiceNotSend(factureId);
+				 
+		      };
+		      td.appendChild(cancelButton);
+			}
+	      
+
+	      if(status=="Facture_envoye"){
+	 		 var avoirsButton = document.createElement('button');
+	 	      
+	 		avoirsButton.innerHTML = '<i class="fa-solid fa-list"></i>Avoirs';
+	 		avoirsButton.className = 'btn btn-info btn-sm';
+	 		avoirsButton.onclick = function() {
+	 		   	toggleAvoirs(factureId); 
+	 		      };
+	 		      td.appendChild(avoirsButton);
+	 		}
+
+
+	    
+		
+
+
+
+	
+  
+     })
+
+     
+      
+
+      return td;
+  
+  }
+
+
+ function generateTdAvoir(avoir,facture) {
+	 
+	 var type=facture.type;
+	 var number =avoir.number;
+	
+	
+	 var status=avoir.status;
+	
+	 var td = document.createElement('td');
+	 
+	 var avoirid=avoir.idC
+	 
+	
+   
+
+	    
+	
+    
+		
+	  
+	
+      
+      
+      
+
+      // Create buttons
+     	if(status=="Avoir"){
+			var updateButton = document.createElement('button');
+		      
+			updateButton.innerHTML = '<i class="fa-solid fa-pen"></i>Modifier';
+			updateButton.className = 'btnpreview';
+			updateButton.onclick = function() {
+				updateAvoir(avoirid); 
+		      };
+		      td.appendChild(updateButton);
+	}
+      
+
+      var pdfButton = document.createElement('button');
+      pdfButton.innerHTML = '<i class="fa-solid fa-file-pdf"></i>PDF';
+      pdfButton.className = 'btnpdf';
+     
+      pdfButton.onclick = function() {
+          pdfAvoir(avoirid); 
+      };
+      
+     
+          
+      td.appendChild(pdfButton);
+
+  	if(status=="Avoir_valide"){
+		
+  var emailButton = document.createElement('button');
+	      
+	      emailButton.innerHTML = '<i class="fa-regular fa-envelope"></i>Envoyer';
+	      emailButton.className = 'btnpreview';
+	      emailButton.onclick = function() {
+	    	  SendAvoir(avoirid); 
+		      };
+		      td.appendChild(emailButton);
+		}
+     
+  
+
+	
+
+	if( ( window.role=="Manager" ||  window.role=="Admin") && status=="Avoir" ){
+		var signButton = document.createElement('button');
+	      
+	      signButton.innerHTML = '<i class="fa-solid fa-signature"></i>Valider';
+	      signButton.className = 'btnsign';
+	      signButton.onclick = function() {
+	    	  ValiderAvoir(avoirid); 
+	      };
+	      td.appendChild(signButton);
+}
+
+	if(status=="Avoir_valide"){
+		
+		var cancelButton = document.createElement('button');
+	      
+		cancelButton.innerHTML = '<i class="fa-solid fa-trash"></i>Annuler';
+		cancelButton.className = 'btnsupp';
+		
+			
+		cancelButton.onclick = function() {
+			cancelAvoirValide(avoirid); 
+	      };
+		
+		
+	      td.appendChild(cancelButton);
+
+
+	    
+		}
+
+if(status=="Avoir"){
+		
+		var cancelButton = document.createElement('button');
+	      
+		cancelButton.innerHTML = '<i class="fa-solid fa-trash"></i>Annuler';
+		cancelButton.className = 'btnsupp';
+		
+			
+		cancelButton.onclick = function() {
+			cancelAvoir(avoirid); 
+	      };
+		
+		
+	      td.appendChild(cancelButton);
+
+
+	    
+		}
+
+
+
+	
+  
+    
+     
+      
+
+      return td;
+  
+  }
+ 
+
+  function updateFactureTable(factures) {
+	  
+      var tableBody = document.getElementById('invoiceTableBody');
+
+      tableBody.style.opacity = 0;
+      tableBody.innerHTML = ''; // Clear existing rows
+
+      for (var i = 0; i < factures.length; i++) {
+          var facture = factures[i];
+          var newRow = tableBody.insertRow(tableBody.rows.length);
+
+          // Add cells and populate with facture details
+          // Example:
+          var numberCell = newRow.insertCell(0);
+          numberCell.innerHTML = facture.number;
+
+          var dateCell = newRow.insertCell(1);
+          var dateObject = new Date(facture.dateemission);
+          var formattedDate = dateObject.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+          dateCell.innerHTML = formattedDate;
+
+          var clientCell = newRow.insertCell(2);
+          clientCell.innerHTML = facture.client.libelle;
+
+          var statusText = facture.status;
+          var statusClass="";
+          if(facture.status =="Facture" || facture.status =="Facture_envoye" || facture.status =="Facture_valide"){
+        	  statusClass ='badge badge-success';
+              }
+          else if(facture.status =="Avoir"){
+        	  statusClass ='badge badge-warning';
+              }
+              else{
+            	  statusClass ='badge badge-danger';
+                  }
+           
+          var StatusCell = newRow.insertCell(3);
+          var statusSpan = document.createElement('span');
+          statusSpan.textContent = statusText;
+          statusSpan.className = statusClass;
+          StatusCell.appendChild(statusSpan);
+
+          var typeCell = newRow.insertCell(4);
+          typeCell.innerHTML = facture.type;
+
+          var totalCell = newRow.insertCell(5);
+       
+          
+          if(facture.type.toString() == "National"){
+        	  totalCell.innerHTML = facture.totalttc.toFixed(3)+"&nbsp;TND";
+        	
+              }
+          else {
+        	  totalCell.innerHTML = facture.totalttc.toFixed(3)+'&nbsp;&#x20ac;';
+        	  
+              }
+          
+          totalCell.style.color = '#65b05e';
+         
+          
+          newRow.appendChild(generateTd(facture.idF));
+			if(facture.avoirs != null){
+          for (var j = 0; j < facture.avoirs.length; j++) {
+              var avoir = facture.avoirs[j];
+              var newRow1 = tableBody.insertRow(tableBody.rows.length);
+
+              // Add cells and populate with facture details
+              // Example:
+              var numberCell = newRow1.insertCell(0);
+              numberCell.innerHTML = avoir.number;
+
+              var dateCell = newRow1.insertCell(1);
+              var dateObject = new Date(avoir.dateemission);
+              var formattedDate = dateObject.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+              dateCell.innerHTML = formattedDate;
+
+              var clientCell = newRow1.insertCell(2);
+              clientCell.innerHTML = facture.client.libelle;
+
+              var statusText = avoir.status;
+              var statusClass="";
+              statusClass ='badge badge-warning';
+             
+               
+              var StatusCell = newRow1.insertCell(3);
+              var statusSpan = document.createElement('span');
+              statusSpan.textContent = statusText;
+              statusSpan.className = statusClass;
+              StatusCell.appendChild(statusSpan);
+
+              var typeCell = newRow1.insertCell(4);
+              typeCell.innerHTML = facture.type;
+
+              var totalCell = newRow1.insertCell(5);
+           
+              
+              if(facture.type.toString() == "National"){
+            	  totalCell.innerHTML = avoir.montant.toFixed(3)+"&nbsp;TND";
+            	
+                  }
+              else {
+            	  totalCell.innerHTML = avoir.montant.toFixed(3)+'&nbsp;&#x20ac;';
+            	  
+                  }
+              
+              totalCell.style.color = '#65b05e';
+              newRow1.appendChild(generateTdAvoir(avoir,facture));
+          }
+
+			}
+          
+         
+
+          
+      }
+      tableBody.addEventListener('transitionend', function() {
+    	    tableBody.style.transition = '';
+    	}, { once: true });
+      setTimeout(function() {
+    	    tableBody.style.cssText = 'opacity: 1; transition: opacity 1s ease-in-out;';
+    	}, 100);
+  }
+  </script>
+  
+  <script>
+    function createPaginationElement(pageNumber, isCurrentPage) {
+        if (isCurrentPage) {
+            var spanElement = document.createElement('span');
+            spanElement.innerText = pageNumber;
+            return spanElement;
+        } else {
+            var linkElement = document.createElement('a');
+            linkElement.href = '';
+            linkElement.innerText = pageNumber;
+            linkElement.setAttribute('onclick', 'movePageination(event,' + pageNumber + ');');
+
+            // Add non-breaking spaces
+            
+
+            return linkElement;
+        }
+    }
+	function updatePagination(totalPages,currentpage,list){
+		
+		 var divRows = document.getElementById('divrows');
+		 var divNumber = document.getElementById('divnumbers');
+		 var divNext = document.getElementById('divnext');
+		 var divLast = document.getElementById('divlast');
+		 if(divRows != null){
+		 divRows.innerText = "Total Rows : "+list.length
+		 divNumber.innerHTML ="";
+		 for (var i = 1; i <= totalPages; i++) {
+			 
+	            var isCurrentPage = (i === currentpage);
+	            var paginationElement = createPaginationElement(i, isCurrentPage);
+	            
+	            // Append the element to the container
+	            divNumber.appendChild(paginationElement);
+	            if(i != totalPages){
+	            	 var space1 = document.createTextNode('\u00a0'+'\u00a0'+'\u00a0'+'\u00a0'+'\u00a0'); // &nbsp;    
+	 	            divNumber.appendChild(space1);
+		            }
+	           
+	            
+	      
+	            
+	        }
+
+	     if(currentpage < totalPages){
+	    	 var linkElementNext = document.createElement('a');
+	    	 linkElementNext.href = '';
+	    	 linkElementNext.innerText = "Next";
+	    	 linkElementNext.setAttribute('onclick', 'movePageination(event,' + (currentpage+1) + ');');
+	    	 divNext.innerHTML ="";
+	            // Append the element to the container
+	          divNext.appendChild(linkElementNext);
+	          
+
+	    	 var linkElementLast = document.createElement('a');
+	    	 linkElementLast.href = '';
+	    	 linkElementLast.innerText = "Last";
+	    	 linkElementLast.setAttribute('onclick', 'movePageination(event,' + totalPages + ');');
+	    	 divLast.innerHTML ="";
+	            // Append the element to the container
+	          divLast.appendChild(linkElementLast);
+		     }
+	     else{
+
+	    	
+	    	 var spanElementNext = document.createElement('span');
+	    	 spanElementNext.innerText = "Next";
+	    	 divNext.innerHTML ="";
+	          
+	         divNext.appendChild(spanElementNext);
+
+	         var spanElementLast = document.createElement('span');
+	         spanElementLast.innerText = "Last";
+	    	 divLast.innerHTML ="";
+	            // Append the element to the container
+	          divLast.appendChild(spanElementLast);
+		     
+		     }
+		 }
+		}
+
+	function updatePag(pageNumber){
+		var list = window.factureslistSign 
+			
+		
+		
+		
+		fetch('/ERPPro/user/pageList/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.json())
+        .then(data => {
+        	
+        	
+        	updateFactureTable(data)
+        	
+        	
+        })
+        
+
+	 fetch('/ERPPro/user/pagetotal/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.text())
+        .then(data => {
+        	
+        	updatePagination(data,pageNumber,list)
+        	
+        })
+		}
+	
+	function updatePagWithoutArchive(pageNumber,list){
+		
+	
+		fetch('/ERPPro/user/pageList/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.json())
+        .then(data => {
+        	
+        	updateFactureTable(data)
+        	
+        })
+        
+
+	 fetch('/ERPPro/user/pagetotal/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.text())
+        .then(data => {
+        	updatePagination(data,pageNumber,list)
+        	
+        })
+		}
+
+	function movePageination(e,pageNumber){
+		e.preventDefault();
+		updatePag(pageNumber)
+		 
+	        
+		}
+    </script>
+
+  <script th:inline="javascript">
+
+ 
+  
+    function applyFilter() {
+    	
+    	
+        var archived = false;
+        if(document.getElementById('inlineCheckbox3').checked){
+        	archived = true;
+        	window.factureslistBeforeSearch1=window.factureslistSearch
+            }
+        var clientId = document.getElementById('clientId').value;
+        var factureType = document.getElementById('factureType').value;
+        var startDate = document.getElementById('startDate').value;
+        var endDate = document.getElementById('endDate').value;
+        if ((startDate !== '' && endDate === '') || (startDate === '' && endDate !== '')) {
+           
+            console.log('Both startDate and endDate should be modified together.');
+            
+            return;
+        }
+       
+       
+        fetch('/ERPPro/user/facturesfilter?clientId=' + clientId + '&factureType=' + factureType + '&startDate=' + startDate + '&endDate=' + endDate + "&archived=" + archived, {
+            method: 'GET',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+        } )
+       
+            .then(response => response.json())
+            .then(data => {
+            	
+             
+               
+            	window.factureslist=data
+            	window.factureslistSign=data
+            	window.factureslistSearch=data
+            	
+            	if(archived == false)
+            	window.factureslistWithoutArchive=data
+            	
+            	search();
+            	updatePag(1)
+            })
+           
+            
+    }
+</script>
+<script>
+    function preview(id) {
+
+
+        fetch('/ERPPro/user/previewFacture/'+id, {
+            method: 'GET',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const pdfUrl = URL.createObjectURL(blob);
+
+            // Open a new window or tab and load the PDF content
+            window.open(pdfUrl, '_blank');
+        });
+        
+     
+        
+    }
+
+
+    function pdf(id) {
+
+
+        fetch('/ERPPro/user/previewFacture/'+id, {
+            method: 'GET',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+          
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const pdfUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            a.href = pdfUrl;
+            a.download = 'facture' + id + '.pdf';
+
+            document.body.appendChild(a);
+
+            a.click();
+
+            document.body.removeChild(a);
+
+        });
+        
+     
+        
+    }
+
+    function pdfAvoir(id) {
+
+
+        fetch('/ERPPro/user/previewAvoir/'+id, {
+            method: 'GET',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const pdfUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            a.href = pdfUrl;
+            a.download = 'facture' + id + '.pdf';
+
+            document.body.appendChild(a);
+
+            a.click();
+
+            document.body.removeChild(a);
+
+        });
+        
+     
+        
+    }
+
+   
+    function SendInvoice(id){
+    	var alert = document.querySelector(".alert");
+   	 fetch('/ERPPro/user/SendInvoiceMail/'+id, {
+	        method: 'POST', 
+	        headers: {
+	            'Content-Type': 'application/json',
+	            'Authorization': `Bearer ${token}`
+	        },
+	        body: JSON.stringify(window.factureslistSign)
+	      
+	    })
+	     .then(response => response.json())
+    	    .then(data => {
+        	
+				
+					 msgtitle="Succès!";
+				     msg="mail envoyé avec succès";
+				     alert.querySelector('strong').textContent=msgtitle;
+				     alert.querySelector('.alert-text').textContent=msg;
+				    
+				     alert.classList.add("show");
+
+				     // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+				     setTimeout(function () {
+				         alert.classList.remove("show");
+				     }, 5000);
+				     window.factureslistSign=data
+				      	window.factureslistSearch=data
+				      	window.factureslistWithoutArchive=data
+				      	
+				      	updatePag(1)
+        	    })
+	    .catch(error => {
+
+	        console.error('Error:', error);
+	    });
+    
+       }
+
+    function SendProforma(id){
+    	var alert = document.querySelector(".alert");
+   	 fetch('/ERPPro/user/SendProformaMail/'+id, {
+   		method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(window.factureslistSign)
+	      
+	    })
+	     .then(response => response.json())
+    	    .then(data => {
+        	  
+				
+					 msgtitle="Succès!";
+				     msg="mail envoyé avec succès";
+				     alert.querySelector('strong').textContent=msgtitle;
+				     alert.querySelector('.alert-text').textContent=msg;
+				    
+				     alert.classList.add("show");
+
+				     // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+				     setTimeout(function () {
+				         alert.classList.remove("show");
+				     }, 5000);
+				     window.factureslistSign=data
+				      	window.factureslistSearch=data
+				      	window.factureslistWithoutArchive=data
+				      	
+				      	updatePag(1)
+        	    })
+	    .catch(error => {
+
+	        console.error('Error:', error);
+	    });
+    
+       }
+
+    function SendAvoir(id){
+    	var alert = document.querySelector(".alert");
+   	 fetch('/ERPPro/user/SendAvoirMail/'+id, {
+   		method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(window.factureslistSign)
+	      
+	    })
+	     .then(response => response.json())
+    	    .then(data => {
+        	  
+				
+					 msgtitle="Succès!";
+				     msg="mail envoyé avec succès";
+				     alert.querySelector('strong').textContent=msgtitle;
+				     alert.querySelector('.alert-text').textContent=msg;
+				    
+				     alert.classList.add("show");
+
+				     // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+				     setTimeout(function () {
+				         alert.classList.remove("show");
+				     }, 5000);
+				     window.factureslistSign=data
+				      	window.factureslistSearch=data
+				      	window.factureslistWithoutArchive=data
+				      	
+				      	updatePag(1)
+        	    })
+	    .catch(error => {
+
+	        console.error('Error:', error);
+	    });
+    
+       }
+
+    
+   function GenerateFactureQrCode(id){
+    	 fetch('/ERPPro/user/FactureQRCode/'+id, {
+    	        method: 'GET',
+    	        headers: {
+    	            'Content-Type': 'application/json',
+    	            'Authorization': `Bearer ${token}`
+    	        }
+    	    })
+    	    .then(response => response.blob())
+    	    .then(blob => {
+    	        // Convert the byte array to a Blob object
+    	        const blobUrl = URL.createObjectURL(blob);
+    	        
+    	        const link = document.createElement('a');
+    	        link.href = blobUrl;
+    	        link.download = 'qrcode.png'; // Specify the filename for the downloaded image
+    	        document.body.appendChild(link);
+    	        
+    	        // Programmatically click the link to trigger the download
+    	        link.click();
+    	        
+    	        // Clean up: revoke the Blob URL
+    	        URL.revokeObjectURL(blobUrl);
+    	    })
+    	    .catch(error => console.error('Error:', error));
+        }
+    
+
+
+    
+</script>
+
+<script>
+function ClearFilters(list){
+	updatePag(1)
+	//updatePagWithoutArchive(1,list);
+}
+function handleCheckboxClick(checkboxNumber) {
+	
+	if (checkboxNumber === 3) {
+	 if(document.getElementById('inlineCheckbox3').checked){
+		  
+		  applyFilter();
+		
+		  console.log(window.factureslistSearch)
+		  
+		  
+		  }
+	  else{
+		  console.log(window.factureslistBeforeSearch)
+		  document.getElementById('inlineCheckbox1').checked = false;
+		  document.getElementById('inlineCheckbox2').checked = false;
+		  window.factureslist=window.factureslistWithoutArchive;
+		  window.factureslistSign=window.factureslistWithoutArchive;
+		  window.factureslistSearch=window.factureslistBeforeSearch1
+		  console.log(window.factureslistSearch)
+			  ClearFilters(window.factureslistWithoutArchive)
+		  search()
+		  }
+	}
+  // Check if option 1 is clicked
+  if (checkboxNumber === 1) {
+	  
+
+	 
+    // Uncheck option 2 if it is checked
+    if (document.getElementById('inlineCheckbox2').checked) {
+    	window.factureslistSign= window.factureslist
+   	 window.factureslistSearch=window.factureslistBeforeSearch
+   	 
+   	
+       ClearFilters(window.factureslist)
+   	search()
+      document.getElementById('inlineCheckbox2').checked = false;
+    }
+    if(document.getElementById('inlineCheckbox1').checked){
+    	
+    	
+    	signedFactures();
+    	
+
+        }
+    else{
+    	
+    	window.factureslistSign= window.factureslist
+    	 window.factureslistSearch=window.factureslistBeforeSearch
+    	 
+    	
+        ClearFilters(window.factureslist)
+    	search()
+    	
+        }
+  }
+
+  // Check if option 2 is clicked
+  if (checkboxNumber === 2) {
+    // Uncheck option 1 if it is checked
+    if (document.getElementById('inlineCheckbox1').checked) {
+    	window.factureslistSign= window.factureslist
+   	 window.factureslistSearch=window.factureslistBeforeSearch
+   	 
+   	
+       ClearFilters(window.factureslist)
+   	search()
+      document.getElementById('inlineCheckbox1').checked = false;
+    }
+
+    if(document.getElementById('inlineCheckbox2').checked){
+    	NotsignedFactures()
+    
+        }
+    else{
+    	window.factureslistSign= window.factureslist
+    	 window.factureslistSearch=window.factureslistBeforeSearch;
+        ClearFilters(window.factureslist)
+        search()
+        
+        }
+  }
+  
+}
+</script>
+<script>
+
+function ArchiveFacture(id){
+	
+	fetch('/ERPPro/user/updateArchivedFacture/'+id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(window.factureslistSign)
+    })
+    .then(response => response.json())
+    .then(data => {
+    	
+    	window.factureslistSign=data
+    	window.factureslistSearch=data
+    	window.factureslistWithoutArchive=data
+    	
+    	updatePag(1)
+    	
+    })
+}
+
+function Facturer(id){
+	fetch('/ERPPro/user/Facturer/'+id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(window.factureslistSign)
+    })
+    .then(response => response.json())
+    .then(data => {
+    	
+    	window.factureslistSign=data
+      	window.factureslistSearch=data
+      	window.factureslistWithoutArchive=data
+      	
+      	updatePag(1)
+    	
+    })
+	
+}
+
+
+function ValiderProforma(id){
+	fetch('/ERPPro/user/validateProforma/'+id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(window.factureslistSign)
+    })
+    .then(response => response.json())
+    .then(data => {
+        
+    	
+    	window.factureslistSign=data
+      	window.factureslistSearch=data
+      	window.factureslistWithoutArchive=data
+      	
+      	updatePag(1)
+    	
+    })
+	
+}
+
+
+
+function ValiderAvoir(id){
+	fetch('/ERPPro/user/ValidateAvoir/'+id+"/"+sessionStorage.getItem("id"), {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(window.factureslistSign)
+    })
+    .then(response => response.json())
+    .then(data => {
+    	
+    	window.factureslistSign=data
+      	window.factureslistSearch=data
+      	window.factureslistWithoutArchive=data
+      	
+      	updatePag(1)
+    	
+    })
+	
+}
+
+function cancelAvoir(id){
+	fetch('/ERPPro/user/CancelAvoir/'+id, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(window.factureslistSign)
+    })
+    .then(response => response.json())
+    .then(data => {
+    	
+    	window.factureslistSign=data
+      	window.factureslistSearch=data
+      	window.factureslistWithoutArchive=data
+      	
+      	updatePag(1)
+    	
+    })
+	
+}
+
+function cancelAvoirValide(id){
+	fetch('/ERPPro/user/CancelAvoirValide/'+id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(window.factureslistSign)
+    })
+    .then(response => response.json())
+    .then(data => {
+    	
+    	window.factureslistSign=data
+      	window.factureslistSearch=data
+      	window.factureslistWithoutArchive=data
+      	
+      	updatePag(1)
+    	
+    })
+	
+}
+</script>
+ 
+ <script>
+	function OldPreview(type,txtnumber,date){
+		
+		
+		const currentDate = new Date();
+		currentDate.setDate(currentDate.getDate() + 1);
+		var year = currentDate.getFullYear();
+		var month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1
+		var day = String(currentDate.getDate()).padStart(2, '0');
+
+		const formattedDate = `${year}-${month}-${day}`;
+
+		
+		const originalDate = new Date(date);
+
+		
+		originalDate.setDate(originalDate.getDate() - 1);
+		 year = originalDate.getFullYear();
+		 month = String(originalDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1
+		 day = String(originalDate.getDate()).padStart(2, '0');
+
+		const formattedDate1 = `${year}-${month}-${day}`;
+		console.log(formattedDate)
+
+		
+
+		
+		
+		const apiKey = 'cb25d835090034f6252b074dc521b38be4771eded99ff8fb974bbb445ef233bc';
+		
+		title="";
+		if(type == "Export"){
+			title="factureEuro"
+			}
+		else if(type == "National"){
+			title="factureTND"
+		}
+		fetch('https://api.hellosign.com/v3/signature_request/list?query=title:'+title+" AND created:{"+formattedDate1+"+TO+"+formattedDate+"}", {
+			  method: 'GET',
+			  headers: {
+			    'Authorization': `Basic ${btoa(`${apiKey}:`)}`, 
+			    'Content-Type': 'application/json', 
+			  },
+			 
+			})
+			  .then(response => response.json())
+			  .then(data => {
+				  for (const request of data.signature_requests) {
+					  
+					    	
+					      const txtnumberField = request.custom_fields.find(field => field.name === 'txtnumber');
+					      
+					      if (txtnumberField && txtnumberField.value === txtnumber) {
+					         ;
+					         const apiKey = 'cb25d835090034f6252b074dc521b38be4771eded99ff8fb974bbb445ef233bc';
+					         
+					         // Make a request to HelloSign API to get the signature request details
+					         fetch('https://api.hellosign.com/v3/signature_request/files/'+request.signature_request_id+'?file_type=pdf', {
+					           method: 'GET',
+					           headers: {
+					        	  'Authorization': `Basic ${btoa(`${apiKey}:`)}`, 
+					             'Content-Type': 'application/json',
+					           },
+					         })
+					         .then(response => {
+					        	    if (!response.ok) {
+					        	      throw new Error(`HTTP error! Status: ${response.status}`);
+					        	    }
+					        	    return response.blob(); // Convert response to a Blob
+					        	  })
+					        	  .then(blob => {
+					        		  const pdfUrl = URL.createObjectURL(blob);
+
+					                  // Open a new window or tab and load the PDF content
+					                  window.open(pdfUrl, '_blank');
+					        	  })
+					         .catch(error => {
+					           console.error('Error fetching signature request details:', error);
+					         });
+					      }
+					     
+					    
+					  }
+				  })
+			    
+		}
+
+
+
+
+	function OldPDF(type,txtnumber,date){
+		const currentDate = new Date();
+		currentDate.setDate(currentDate.getDate() + 1);
+		var year = currentDate.getFullYear();
+		var month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1
+		var day = String(currentDate.getDate()).padStart(2, '0');
+
+		const formattedDate = `${year}-${month}-${day}`;
+
+		
+		const originalDate = new Date(date);
+
+		
+		originalDate.setDate(originalDate.getDate() - 1);
+		 year = originalDate.getFullYear();
+		 month = String(originalDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1
+		 day = String(originalDate.getDate()).padStart(2, '0');
+
+		const formattedDate1 = `${year}-${month}-${day}`;
+		console.log(formattedDate)
+
+		
+
+		
+		
+		const apiKey = 'cb25d835090034f6252b074dc521b38be4771eded99ff8fb974bbb445ef233bc';
+		
+		title="";
+		if(type == "Export"){
+			title="factureEuro"
+			}
+		else if(type == "National"){
+			title="factureTND"
+		}
+		fetch('https://api.hellosign.com/v3/signature_request/list?query=title:'+title+" AND created:{"+formattedDate1+"+TO+"+formattedDate+"}", {
+			  method: 'GET',
+			  headers: {
+			    'Authorization': `Basic ${btoa(`${apiKey}:`)}`, 
+			    'Content-Type': 'application/json', 
+			  },
+			 
+			})
+			  .then(response => response.json())
+			  .then(data => {
+				  for (const request of data.signature_requests) {
+					  
+					    	
+					      const txtnumberField = request.custom_fields.find(field => field.name === 'txtnumber');
+					      
+					      if (txtnumberField && txtnumberField.value === txtnumber) {
+					         ;
+					         const apiKey = 'cb25d835090034f6252b074dc521b38be4771eded99ff8fb974bbb445ef233bc';
+					         
+					         // Make a request to HelloSign API to get the signature request details
+					         fetch('https://api.hellosign.com/v3/signature_request/files/'+request.signature_request_id+'?file_type=pdf', {
+					           method: 'GET',
+					           headers: {
+					        	  'Authorization': `Basic ${btoa(`${apiKey}:`)}`, 
+					             'Content-Type': 'application/json',
+					           },
+					         })
+					         .then(response => {
+					        	    if (!response.ok) {
+					        	      throw new Error(`HTTP error! Status: ${response.status}`);
+					        	    }
+					        	    return response.blob(); // Convert response to a Blob
+					        	  })
+					        	  .then(blob => {
+					        		  const pdfUrl = URL.createObjectURL(blob);
+
+					                  // Open a new window or tab and load the PDF content
+					                  const link = document.createElement('a');
+link.href = URL.createObjectURL(blob);
+link.download = title+'.pdf';
+link.click(); // Trigger the download
+					        	  })
+					         .catch(error => {
+					           console.error('Error fetching signature request details:', error);
+					         });
+					      }
+					     
+					    
+					  }
+				  })
+			    
+		}
+ </script>
+
+
+<script>
+var idf=0
+function downloadSignedFacture(data,id){
+	
+	 fetch('/ERPPro/user/downloadFacturepre', {
+         method: 'POST',
+         headers: {
+             'Content-Type': 'application/json',
+             'Authorization': `Bearer ${token}`
+         },
+         body: JSON.stringify(data)
+       
+     })
+     .then(response => response.blob())
+     .then(blob => {
+         const pdfUrl = URL.createObjectURL(blob);
+         const a = document.createElement('a');
+         
+         a.href = pdfUrl;
+         a.download = 'facture' + id + '.pdf';
+
+         document.body.appendChild(a);
+
+         a.click();
+
+         document.body.removeChild(a);
+
+     });
+}
+
+
+function sign(id) {
+	/*
+	 fetch('/ERPPro/user/SignFacture/'+id, {
+         method: 'POST',
+         headers: {
+             'Content-Type': 'application/json'
+         },
+         body: JSON.stringify(window.factureslistSign)
+       
+     })
+     .then(response => response.json())
+  .then(data => {
+	  console.log(data.factures)
+	  downloadSignedFacture(data,id)
+    	window.factureslistSign=data.factures
+    	window.factureslistSearch=data.factures
+    	window.factureslistWithoutArchive=data.factures
+    	
+    	updatePag(1)
+
+     });*/
+
+	const modal = document.getElementById('exampleModalCenter');
+
+	 fetch('/ERPPro/user/LastInvoiceDate/'+id, {
+        method: 'GET',
+        headers: {
+        	 'Authorization': `Bearer ${token}`
+        	    },
+       
+      
+    })
+    .then(response => response.json())
+ .then(data => {
+	 window.utilDate=data
+	 idf=id
+	 fetch('/ERPPro/user/getMaxInvoiceDate', {
+	        method: 'GET',
+	        headers: {
+	        	 'Authorization': `Bearer ${token}`
+	        	    },
+	       
+	      
+	    })
+	    .then(response => response.text())
+	 .then(text => {
+		 const data1 = text ? JSON.parse(text) : null;
+		 if(data1 && data1.data === null){
+			 window.maxDate=data1.data
+			 
+			 $(modal).modal('show');
+			 }
+		 else{
+			 window.maxDate=null}
+		
+		
+		 })
+	
+	
+	 })
+  
+	
+	
+}
+
+function ValiderFacture(){
+	const modal = document.getElementById('exampleModalCenter');
+	const str = document.getElementById('dateemm').value
+	const list =window.factureslistSign
+	const dataF = {
+			  date: str,
+			  factures: list
+			};
+	 fetch('/ERPPro/user/validateFacture/'+idf+"/"+sessionStorage.getItem("id"), {
+       method: 'POST',
+       headers: {
+           'Content-Type': 'application/json',
+           'Authorization': `Bearer ${token}`
+       },
+       body: JSON.stringify(dataF)
+     
+   })
+   .then(response => response.json())
+.then(data => {
+	  
+	  
+  	window.factureslistSign=data
+  	window.factureslistSearch=data
+  	window.factureslistWithoutArchive=data
+  	
+  	updatePag(1)
+	  $('#exampleModalCenter').modal('hide');
+
+   });
+}
+function cancelinvoice(id){
+	window.location.href = '/ERPPro/user/addAvoir/'+id;
+}
+
+function cancelinvoiceNotSend(id){
+	 fetch('/ERPPro/user/CancelInvoice/'+id, {
+	        method: 'PUT',
+	       
+
+	       headers: {
+	           'Content-Type': 'application/json',
+	           'Authorization': `Bearer ${token}`
+	       },
+	       body: JSON.stringify(window.factureslistSign)
+	     
+	   })
+	   .then(response => response.json())
+	.then(data => {
+		  
+		  downloadSignedFacture(data,idf)
+	  	window.factureslistSign=data.factures
+	  	window.factureslistSearch=data.factures
+	  	window.factureslistWithoutArchive=data.factures
+	  	
+	  	updatePag(1)
+		 
+
+	   });
+	
+}
+
+function deleteInvoice(id){
+
+
+	 fetch('/ERPPro/user/DeleteFacture/'+id, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(window.factureslistSign)
+      
+    })
+    .then(response => response.json())
+ .then(data => {
+	  
+	 
+   	window.factureslistSign=data
+   	window.factureslistSearch=data
+   	window.factureslistWithoutArchive=data
+   	
+   	updatePag(1)
+
+    });
+	
+}
+
+function addInvoice(){
+	window.location.href = '/ERPPro/user/addfacture';
+}
+ function updateInvoice(id){
+	 window.location.href = '/ERPPro/user/updatefacture/'+id;
+	 }
+
+ function updateAvoir(id){
+	 window.location.href = '/ERPPro/user/updateAvoir/'+id;
+	 }
+
+
+</script>
+
+  <script>
+        
+		function signedFactures(){
+			
+			window.factureslistBeforeSearch=window.factureslistSearch
+			
+        // Fetch API to send the list to the controller
+        fetch('/ERPPro/user/facturesFilterSigned', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(window.factureslist)
+        })
+        .then(response => response.json())
+        .then(data => {
+        	
+        	
+        	
+        	window.factureslistSign=data
+        	console.log(window.factureslistSign)
+        	window.factureslistSearch=data
+        	
+        	updatePag(1)
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+		}
+
+
+		function NotsignedFactures(){
+			window.factureslistBeforeSearch=window.factureslistSearch
+	        // Fetch API to send the list to the controller
+	        fetch('/ERPPro/user/facturesFilterNotSigned', {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	                'Authorization': `Bearer ${token}`
+	            },
+	            body: JSON.stringify(window.factureslist)
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	        	
+	        	window.factureslistSign=data;
+	        	window.factureslistSearch=data
+	        	updatePag(1);
+	        })
+	        .catch(error => {
+	            console.error('Error:', error);
+	        });
+			}
+
+
+		function ArchivedFactures(){
+			window.factureslistBeforeSearch=window.factureslistSearch
+	        // Fetch API to send the list to the controller
+	        fetch('/ERPPro/user/facturesFilterArchived', {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	                'Authorization': `Bearer ${token}`
+	                
+	            },
+	            body: JSON.stringify(window.factureslist)
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	        	
+	        	window.factureslistSign=data;
+	        	window.factureslistSearch=data
+	        	updatePag(1);
+	        })
+	        .catch(error => {
+	            console.error('Error:', error);
+	        });
+			}
+    </script>
+    <script>
+	function search(){
+		
+		
+		var search = document.getElementById('inputsearch').value;
+		 fetch('/ERPPro/user/SearchFacture?search=' + search, {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	                'Authorization': `Bearer ${token}`
+	            },
+	            body: JSON.stringify(window.factureslistSearch)
+	        })
+	    
+         .then(response => response.json())
+         .then(data => {
+        	
+          
+         	
+        	 window.factureslist=data
+         	window.factureslistSign=data
+         	if(!document.getElementById('inlineCheckbox3').checked)
+            	window.factureslistWithoutArchive=data
+         	updatePag(1)
+         })
+		}
+    </script>
+    
+  
+    
+    <script th:inline="javascript">
+jQuery(document).ready(function ($) {
+	console.log("reqdy")
+	/*<![CDATA[*/
+	// var factureList = /*[[${factures}]]*/ null;
+	 var facturesList = /*[[${Allfactures}]]*/ null;
+	 
+	 
+	
+	 
+
+	 window.factureslist = facturesList;
+	 window.factureslistWithoutArchive = facturesList;
+	 window.factureslistSign = facturesList;
+	 window.factureslistSearch = facturesList;
+	 window.factureslistBeforeSearch = facturesList;
+	 window.factureslistBeforeSearch1 = facturesList;
+	
+	    /*]]>*/
+	    const modal = document.getElementById('exampleModalCenter');
+	  
+	  console.log(window.role)
+	 
+})
+
+document.addEventListener('DOMContentLoaded', function() {
+
+	if(sessionStorage.getItem("email") ==null){
+  		window.location.href = '/ERPPro/home/login'
+  		}
+  	else{
+  		fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+  	        method: 'GET',
+  	     
+  	       
+  	    })
+  	    .then(response => response.text())
+  	    .then(data => {
+  	       
+  	        if(data =="Client"){
+  	    
+
+  	        	window.location.href = '/ERPPro/home/login'
+  	           
+  	            }
+  	     
+  	    })
+  		}
+    const factureTable = document.getElementById('facturetable');
+
+    factureTable.addEventListener('click', function(event) {
+        const target = event.target;
+        if (target.tagName === 'BUTTON') {
+            const action = target.getAttribute('data-action');
+            const id = target.getAttribute('data-id');
+
+            if (action && id) {
+                window[action](id);
+            }
+        }
+    });
+
+    fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+        method: 'GET',
+        headers: {
+        	 'Authorization': `Bearer ${token}`
+        	    },
+       
+    })
+    .then(response => response.text())
+    .then(data => {
+       window.role=data
+       
+        if(data =="Manager" || data =="Admin"){
+        	
+           
+            document.getElementById('btnval').style.display = 'block'
+            document.getElementById('btnvalfact').style.display = 'block'
+            	document.getElementById('btnvalavoir').style.display = 'block'
+           
+            }
+        else{
+        	document.getElementById('btnval').style.display = 'none'
+                document.getElementById('btnvalfact').style.display = 'none'
+                	document.getElementById('btnvalavoir').style.display = 'none'
+            	
+        	
+            }
+      
+	
+      
+    })
+    .catch(error => {
+        console.error('Error downloading file:', error);
+    });
+    
+})
+
+</script>
+
+<script>
+$(document).ready(function() {
+    $('#exampleModalCenter').on('shown.bs.modal', function (e) {
+    	 const minDate = new Date(window.utilDate);
+    	 
+		 var formattedDate = minDate.toISOString().slice(0, 10);
+		 const minDateString = minDate.toISOString().split('T')[0];
+		 if(window.maxDate != null){
+		 
+		 const maxDate = new Date(window.maxDate);
+		 const maxDateString = maxDate.toISOString().split('T')[0];
+		 document.getElementById('dateemm').setAttribute('max', maxDateString);
+		 }
+		 
+		 document.getElementById('dateemm').value=formattedDate
+		 
+		 document.getElementById('dateemm').setAttribute('min', minDateString);
+		    // Execute your function when the modal is shown
+		    console.log('Modal is shown');
+		    // Add your code here
+    });
+});
+</script>
+
+
+
+	
+
+ 
+    
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+	
+	
+	
+	
+</div>
+
+</body>
+</html>

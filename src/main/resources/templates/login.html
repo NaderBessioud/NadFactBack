@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Login</title> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+<link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+<link rel="stylesheet" th:href="@{/vendors/font-awesome/css/font-awesome.min.css}">
+<link rel="stylesheet" href="/ERPPro/css/login.css">
+  <link rel=" shortcut icon" type="image/png" href="/ERPPro/images/logo2.png">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+
+</head>
+<body>
+
+	<div class="container">
+	
+		<div class="forms">
+			<div class="form login">
+				<span class="title">Login</span>
+				
+				<form th:action="@{/login1}" method="post" id="login_form" th:object="${usr}">
+					<div class="input-field">
+						<input type="text" placeholder="Enter your email" required name="username" th:field=*{email}>
+						<i class="uil uil-envelope icon"></i>
+					</div>
+					
+					<div class="input-field">
+						<input type="password" placeholder="Enter your password" class="password" required name="password" th:field=*{password}>
+						<i class="uil uil-lock icon"></i>
+						<i class="uil uil-eye-slash showHidePW"></i>
+					</div>
+					
+					<div class="checkbox-text">
+						<div class="checkbox-content">
+							<i style="color:black;font-size: 24px;cursor: pointer" class="uil uil-camera" onclick="facialreco()"></i>
+						</div>
+						
+						<a href="#" class="text" id="forgotlink">Forgot password?</a>
+					</div>
+					
+					<div class="input-field button">
+						<input type="button" value="Login Now" onclick="login(event)">
+						
+					</div>
+					
+				</form>
+				<div class="login-signup">
+					<span class="text">Not a member?
+						<a href="#" class="text signup-link">Signup Now</a>
+					</span>
+				</div>
+			</div>
+			
+			<div class="form signup" style="overflow-y: auto;">
+				<span class="title">Registration</span>
+				
+				<form th:action="@{/register}" th:object="${user}" method="post" id="registrationform">
+				 <div class="profile-pic" style=" color: transparent;transition: all 0.3s ease;display: flex; justify-content: center;align-items: center;position: relative;transition: all 0.3s ease;width: 180px;left: 20%;margin-top: 10px
+       ">
+						  <label class="-label" for="file">
+						    <span class="glyphicon glyphicon-camera spanpro" ></span>
+						    <span class="spanpro">Change Image</span>
+						  </label>
+						  <input id="file" type="file" onchange="uploadFile()" style="display: none;" />
+						  <img src="https://cdn.pixabay.com/photo/2017/08/06/21/01/louvre-2596278_960_720.jpg" id="output" width="200" class="imgpro" />
+						</div>
+						<input hidden type="text" id="newuserimg" th:field="*{image}">
+					<div class="input-field">
+						<input type="text" placeholder="Enter your firstname" required th:field="*{firstname}">
+						<i class="uil uil-user"></i>
+					</div>
+					
+					<div class="input-field">
+						<input type="text" placeholder="Enter your lastname" required th:field="*{lastname}">
+						<i class="uil uil-user"></i>
+					</div>
+					
+					<div class="input-field">
+						<input type="text" placeholder="Enter your email" required id="emailinput" th:field="*{email}">
+						<i class="uil uil-envelope icon"></i>
+					</div>
+					
+					<div class="input-field">
+						<input type="password" placeholder="Create your password" class="password" required th:field="*{password}" id="passinput" >
+						<i class="uil uil-lock icon"></i>
+						
+					</div>
+					
+					<div class="input-field">
+						<input type="password" placeholder="Confirm your password" class="password" id="passcinput"  required>
+						<i class="uil uil-lock icon"></i>
+						<i class="uil uil-eye-slash showHidePW"></i>
+					</div>
+					<div class="input-field">
+				<select class="roleselect" id="roleselect" th:field="*{role}" required>
+		        <option value="" selected disabled>Votre role</option>
+		        <option value="Employee">Employee</option>
+		        <option value="Manager">Manager</option>
+		        
+		    </select>
+					</div>
+					
+					
+					
+					<div class="input-field button">
+						<input type="submit" value="Signup Now" id="btnregistration">
+						
+					</div>
+					
+				</form>
+				<div class="login-signup">
+					<span class="text">Not a member?
+						<a href="#" class="text login-link">Signin Now</a>
+					</span>
+				</div>
+				
+			</div>
+		
+		</div>
+	</div>
+	
+	<div class="alert alert-danger alert-dismissible fade bottom-right " role="alert">
+	  <div style="text-align: center;">
+	    <strong>a</strong><br><span class="alert-text">a</span>
+	  </div>
+	  <button type="button" class="close" onclick="hideCustomAlert()" aria-label="Close">
+	    <span aria-hidden="true">&times;</span>
+	  </button>
+	</div>
+	
+	
+<!-- Modal -->
+<div class="modal fade" id="emailmodal" tabindex="-1" role="dialog" aria-labelledby="emailmodal" aria-hidden="true" >
+  <div class="modal-dialog modal-dialog-centered custom-modal" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Réinitialisez votre mot de passe</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+       <p>Entrer votre email pour recevoir un token pour réinitialisez votre mot de passe.</p>
+        <form action="/reset_password" method="post">
+		    <div class="form-group">
+			   
+			    <input type="email" class="form-control" id="emailresetpass" aria-describedby="emailHelp" placeholder="Entrer email">
+
+			  </div>
+		    <input type="submit" value="Envoyer" onclick="SendEmailResetPassword(event)">
+		  </form>
+		  <p>Retourner au <a href="/login">Login page</a></p>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="tokenmodal" tabindex="-1" role="dialog" aria-labelledby="emailmodal" aria-hidden="true" >
+  <div class="modal-dialog modal-dialog-centered custom-modal" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Réinitialisez votre mot de passe</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+       <p>Entrer le token que vous avez recu par email.</p>
+        <form action="/reset_password" method="post">
+		    <div class="form-group">
+			   
+			    <input type="text" class="form-control" id="tokeninput" aria-describedby="emailHelp" placeholder="Entrer token">
+
+			  </div>
+		    <input type="submit" value="Entrer" onclick="IsTokenValid(event)">
+		  </form>
+		 
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="updatemodal" tabindex="-1" role="dialog" aria-labelledby="emailmodal" aria-hidden="true" >
+  <div class="modal-dialog modal-dialog-centered custom-modal" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Réinitialisez votre mot de passe</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+       <p>Entrer le token que vous avez recu par email.</p>
+        <form action="/reset_password" method="post" id="update-form">
+        <input type="hidden" id="emailInputUpdate" name="email">
+		    <div class="form-group">
+			    <label for="exampleInputPassword1">Password</label>
+			    <input type="password" class="form-control" id="exampleInputPassword1" placeholder=" new Password" name="password">
+			  </div>
+  
+			  <div class="form-group">
+			    <label for="confirmpass">Password</label>
+			    <input type="password" class="form-control" id="confirmpass" placeholder="confirm Password">
+			  </div>
+		    <input type="submit" value="Entrer" onclick="updatePassword(event)">
+		  </form>
+		 
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+
+	
+	
+ <script th:src="@{/js/login.js}"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const alert = document.querySelector(".alert");
+        var messageHeader="";
+        var message="";
+        fetch('/ERPPro/home/downloadImage?name=anonymous.png', {
+            method: 'GET',
+           
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log(data); 
+            document.getElementById('output').src =data
+        })
+        .catch(error => {
+            console.error('Error downloading file:', error);
+        });
+    	 
+    
+        var urlSearchParams = new URLSearchParams(window.location.search);
+        if (urlSearchParams.has('error')) {
+           
+            /*<![CDATA[*/
+            // Get the error message from Thymeleaf variable
+            var exceptionMessage = /*[[${session['SPRING_SECURITY_LAST_EXCEPTION']?.message}]]*/ null;
+            
+            // Check if the error message is not null or empty
+            if (exceptionMessage && exceptionMessage.trim() !== '') {
+                // Display the error message using JavaScript
+                if(exceptionMessage =="Bad credentials"){
+                    messageHeader="Erreur d'authentification !";
+                    message="Veuillez vérifier vos identifiants."
+                        }
+                else if(exceptionMessage =="User is disabled"){
+                    console.log("disabled")
+                	messageHeader="Attention !";
+                    console.log(messageHeader)
+                    message="Votre compte est désactivé. Veuillez contacter le support."
+                    }
+                console.log(messageHeader)
+                
+                alert.querySelector('strong').textContent=messageHeader;
+                console.log(alert.querySelector('strong').textContent)
+                alert.querySelector('.alert-text').textContent=message;
+                console.log(alert)
+                alert.classList.add("show");
+                console.log(alert.classList)
+
+                // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+                setTimeout(function () {
+                    alert.classList.remove("show");
+                }, 5000);
+            }
+                // Add your logic to display the error message as needed
+            }
+            /*]]>*/
+
+
+        
+        
+    });
+</script>
+<script>
+function hideCustomAlert(){
+	 const alert = document.querySelector(".alert");
+	 alert.classList.remove("show");
+}</script>
+<script>
+
+function login(event){
+	event.preventDefault();
+	
+	var alert = document.querySelector(".alert");
+	var formData = new FormData(document.getElementById('login_form'));
+	fetch('/ERPPro/home/login', {
+        method: 'POST',
+        body: formData
+      
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data != null){
+            
+        if(data.msg=="Bad Credentials"){
+        	  alert.querySelector('strong').textContent="Attention!!!";
+             
+              alert.querySelector('.alert-text').textContent="Veuillez verrifier vos information";
+              alert.classList.remove("alert-success");
+              alert.classList.add("alert-danger");
+              alert.classList.add("show");
+              console.log(alert.classList)
+
+              // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+              setTimeout(function () {
+                  alert.classList.remove("show");
+              }, 5000);
+          }
+        else if(data.msg=="Not Exist"){
+
+        	alert.querySelector('strong').textContent="Attention!!!";
+            
+            alert.querySelector('.alert-text').textContent="Cet utilisateur n'existe pas";
+            alert.classList.remove("alert-success");
+            alert.classList.add("alert-danger");
+            alert.classList.add("show");
+            console.log(alert.classList)
+
+            // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+            setTimeout(function () {
+                alert.classList.remove("show");
+            }, 5000);
+            }
+        else{
+        	sessionStorage.setItem("email",data.user.email);
+        	sessionStorage.setItem("id",data.user.idU);
+        	sessionStorage.setItem("token",data.token);
+        	sessionStorage.setItem("image",data.user.image);
+        	fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+                method: 'GET',
+               
+               
+            })
+            .then(response => response.text())
+            .then(data => {
+               
+                if(data =="Client"){
+                	
+                	window.location.href = '/ERPPro/client/FactureClient/'+sessionStorage.getItem("id")
+                    	
+                   
+                    }
+                else{
+                	window.location.href = '/ERPPro/user/dashbord'
+
+                	
+                    	
+                	
+                    }
+              
+              
+            })
+            .catch(error => {
+                console.error('Error downloading file:', error);
+            });
+        	
+            }
+        } 
+
+    });
+}
+
+async function checkEmail(){
+		
+		msgtitle=""
+		msg=""
+		var alert = document.querySelector(".alert");
+		
+		 var emailInput = document.getElementById('emailinput');
+		 var email =emailInput.value;
+		 console.log(email !="")
+		 
+		 if(email !=""){
+			 try {
+			   const response = await fetch('/ERPPro/home/EmailCheck?email=' + email, {
+	                method: 'GET',
+	            });
+			   const isEmailUnique = await response.json();
+			        console.log(isEmailUnique)
+		            if (isEmailUnique) {
+		                // Email is unique, proceed with your logic
+		               
+		               
+		                msgtitle="Attention!";
+		                msg="Email existe déja";
+		                alert.querySelector('strong').textContent=msgtitle;
+		                alert.querySelector('.alert-text').textContent=msg;
+		                alert.classList.remove("alert-success");
+		                alert.classList.add("alert-danger");
+		                alert.classList.add("show");
+
+		                // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+		                setTimeout(function () {
+		                    alert.classList.remove("show");
+		                }, 5000);
+		                
+		                return false;
+		            } else {
+		            	
+		                // Email is not unique, handle accordingly
+		            	return true;
+		            }
+		       
+			 }
+			 catch (error) {
+		            console.error('Error checking email:', error);
+		            return false;
+		        }
+		 }
+
+		 else{
+		 
+		   return false;
+		 }
+		
+		}
+
+	function CheckPassword(){
+		var pass =document.getElementById('passinput').value;
+		var passc =document.getElementById('passcinput').value;
+		const alert = document.querySelector(".alert");
+		console.log(alert)
+		if(pass != "" && passc != ""){
+			if(pass != passc){
+
+				 
+	                msgtitle="Attention!";
+	                msg="Les champs du mot de passe et de confirmation ne correspondent pas";
+	                alert.querySelector('strong').textContent=msgtitle;
+	                alert.querySelector('.alert-text').textContent=msg;
+	                alert.classList.remove("alert-success");
+	                alert.classList.add("alert-danger");
+	                alert.classList.add("show");
+
+	                // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+	                setTimeout(function () {
+	                    alert.classList.remove("show");
+	                }, 5000);
+	             
+	                return false;
+				}
+			else{
+				 
+				return true;}
+		}
+		}
+		
+</script>
+
+<script>
+var image ="anonymous.png";
+function downloadImage(name){
+	fetch('/ERPPro/home/downloadImage?name='+name, {
+        method: 'GET',
+       
+    })
+    .then(response => response.text())
+    .then(data => {
+     
+        document.getElementById('output').src =data
+    })
+    .catch(error => {
+        console.error('Error downloading file:', error);
+    });
+}
+
+function uploadFile() {
+    // Get the selected file
+    var fileInput = document.getElementById('file');
+    var file = fileInput.files[0];
+
+    // Create a FormData object to append the file
+    var formData = new FormData();
+    formData.append('imageFile', file);
+
+    // Perform an asynchronous request (e.g., using Fetch API or XMLHttpRequest)
+    fetch('/ERPPro/home/uploadImage', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+       
+        image=data
+        downloadImage(data)
+    })
+    .catch(error => {
+        console.error('Error uploading file:', error);
+    });
+}
+
+
+
+
+</script>
+
+<script>
+var email;
+function SendEmailResetPassword(){
+	event.preventDefault();
+	   email = document.getElementById('emailresetpass').value;
+	   fetch('/ERPPro/home/ResetPassword?email='+email, {
+	        method: 'GET',
+	        
+	    })
+	    .then(response => response.text())
+	    .then(data => {
+	       if(data){
+	    	   $('#emailmodal').modal('hide');
+	    	   $('#tokenmodal').modal('show');
+		       }
+	       else{
+		       alert("email incorrect")}
+	    })
+	    .catch(error => {
+	        console.error('Error uploading file:', error);
+	    });
+}
+
+function IsTokenValid(){
+	event.preventDefault();
+	var token = document.getElementById('tokeninput').value;
+	  fetch('/ERPPro/home/IsTokenValid?token='+token, {
+	        method: 'GET',
+	        
+	    })
+	    .then(response => response.text())
+	    .then(data => {
+	       if(data){
+	    	   $('#tokenmodal').modal('hide');
+	    	   $('#updatemodal').modal('show');
+	    	   document.getElementById('emailInputUpdate').value = email;
+		       }
+	       else{
+		       alert("Token incorrect")
+		       }
+	    })
+	    .catch(error => {
+	        console.error('Error uploading file:', error);
+	    });
+}
+
+function updatePassword(){
+
+	event.preventDefault();
+	var formData = new FormData(document.getElementById('update-form'));
+	
+	  fetch('/ERPPro/home/UpdatePass', {
+	        method: 'PUT',
+	        body:formData
+	        
+	    })
+	    .then(response => {
+            if (response.ok) {
+                console.log("password update")
+                $('#updatemodal').modal('hide');
+ 	    	   
+            } else {
+               
+                throw new Error('Network response was not ok');
+            }
+        })
+	    .catch(error => {
+	        console.error('Error uploading file:', error);
+	    });
+}
+
+
+function facialreco(){
+
+	fetch('http://127.0.0.1:5000/api/facialreco')
+	  .then(response => response.text())
+	  .then(data => {
+		  var formData = new FormData();
+		  formData.append('email', data);
+		  fetch('/ERPPro/facialauthentication', {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json'
+	            },
+	            body: formData
+	        })
+	        
+	  })
+	  .catch(error => {
+	    console.error('Error fetching data:', error);
+	  });
+}
+</script>
+
+<script>
+
+  document.getElementById("btnregistration").addEventListener("click", function (event) {
+	  		event.preventDefault();
+	  	
+	  		document.getElementById("newuserimg").value=image
+	  		
+	  		checkEmail().then(isEmailValid => {
+	  	   console.log(isEmailValid)
+		  	  
+        if (isEmailValid && CheckPassword()) {
+            // Validation passed, submit the form
+        	   document.getElementById("registrationform").submit();
+        
+        } else {
+            
+            // Validation failed, show an error message or take appropriate action
+            console.log("Validation failed. Please check your input.");
+        }
+	  
+    });
+  });
+
+
+
+  document.getElementById('forgotlink').addEventListener('click', function() {
+      $('#emailmodal').modal('show');
+  });
+ 
+</script>
+
+</body>
+</html>

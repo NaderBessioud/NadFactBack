@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+<meta charset="UTF-8">
+<title>Services</title>
+<link rel="stylesheet" href="/ERPPro/css/Produit.css">
+  <link rel=" shortcut icon" type="image/png" href="/ERPPro/images/logo2.png">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+	
+	
+	<div class="row" style="display: flex;margin-top: 20px">
+	<h3>Services</h3>
+		<div class="col-Lg-3" style="margin-left: auto;">
+			<button data-toggle="modal" data-target="#exampleModalScrollable" class="btn btn-primary btn-sm mb-3" style="margin-right: 25px">Ajouter Service</button>
+		</div>
+	</div>
+	<div class="card">
+    <div class="card-header">
+       <i class="menu-icon uil uil-invoice"></i> Liste des Services
+    </div>
+    
+    
+    
+    
+    
+   
+    
+    
+    
+   
+    
+    
+    <div class="card-body">
+    
+     
+       <table class="table table-striped table-bordered" id="facturetable">
+		<thead class="table-dark">
+			<tr>
+				<th>Libelle</th>
+				
+				<th>Prix TND</th>
+				<th>Prix Euro</th>
+				<th>Action</th>
+				
+			</tr>
+		</thead>
+		<tbody id="invoiceTableBody">
+		 <th:block th:each="prod: ${produits}">
+			<tr>
+				<td th:text = "${prod.libelle}"></td>
+				
+				<td th:text="${prod.putnd}"></td>
+				<td th:text = "${prod.pueuro}"></td>
+				<td>
+				<button th:unless="${prod.archived}" th:onclick="'ArchiveService(' + ${prod.idP} + ')'" class="btnpreview"><i class="fa-solid fa-box-archive"></i>Archiver</button>
+				 <button th:if="${prod.archived}" th:onclick="'DesarchiverService(' + ${prod.idP} + ')'" class="btnpreview"><i class="fa-solid fa-box-open"></i>Desarchiver</button></td>
+			
+
+			</tr>
+
+  </th:block>
+			
+		</tbody>
+	
+	</table>
+	
+	<div th:if = "${totalPages > 1}">
+		<div class="row col-sm-12">
+			<div class="col-sm-2" id="divrows" >
+				Total Rows : [[${totalItems}]]
+			</div>
+			<div class="col-auto" id="divnumbers">
+				<span th:each="i:${#numbers.sequence(1,totalPages)}">
+					<a th:if="${currentPage != i}" href="" th:onclick="'movePageination(event, ' + ${i} + ')'">[[${i}]]</a>
+					<span th:unless="${currentPage != i}">[[${i}]]</span> 
+					&nbsp;
+				 	&nbsp;
+				</span>
+			</div>
+			<div class="col-sm-1" id="divnext">
+				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${currentPage+1} + ')'">Next</a>
+				<span th:unless="${currentPage < totalPages}">Next</span>
+			</div>
+			<div class="col-sm-1"  id="divlast">
+				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${totalPages} + ')'">Last</a>
+				<span th:unless="${currentPage < totalPages}">Last</span>
+			</div>
+		
+		</div>
+		
+    </div>
+</div>
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable custom-modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary text-center">
+        <h3 class="modal-title w-100" id="exampleModalScrollableTitle" style="color: #fff">Nouveau Service</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+    
+        <div class="card2 card-1" style="border:none">
+               
+                <div class="card-body" style="padding-top: 10px">
+                    
+                    <form method="POST" id="prod-form" th:action="@{/user/addProd}" th:object="${prod}">
+	                   
+                      
+						
+						
+                     <div class="input-group" style="width: 400px">
+                            <input class="input--style-1" type="text" placeholder="Libelle" id="clientlib" th:field="*{libelle}"  required >
+                             <i class="fa-brands fa-product-hunt input-icon"></i>
+                        </div>
+                    
+                    	 <div style="display: flex">
+                            
+                               <div class="input-group" style="width: 300px">
+                            <input class="input--style-1" type="number" placeholder="prix tnd" id="putnd" th:field="*{putnd}" required>
+                          <i class="fa-solid fa-money-bill input-icon"></i>
+                        
+                            </div>
+                            
+                         
+                               <div class="input-group" style="width: 300px;margin-left:100px">
+                            <input class="input--style-1" type="number" placeholder="prix euro" id="pueuro"  th:field="*{pueuro}" required>
+                             <i class="fa-solid fa-euro-sign input-icon"></i>
+                        </div>
+                            
+                            </div>
+                            
+  
+                            
+                     
+                       
+                      
+                      <div class="p-t-20" style="float: right" >
+                            <button class="btn btn--radius btn--green" onclick="addProd(event)"   id="btnsubmit">Ajouter</button>
+                            
+                        </div>
+                       
+                    </form>
+                </div>
+            </div>
+      </div>
+   
+    </div>
+  </div>
+</div>
+<div class="alert alert-success alert-dismissible fade bottom-right" role="alert" >
+  <div style="text-align: center;">
+    <strong>Succès!</strong><br><span class="alert-text"> Service ajouté avec succès !.</span>
+  </div>
+  <button type="button" class="close" onclick="hideCustomAlert()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+  
+    
+<script>
+function hideCustomAlert(){
+	 const alert = document.querySelector(".alert");
+	 alert.classList.remove("show");
+}
+
+
+</script>
+  
+  <script th:inline="javascript">
+  var token=sessionStorage.getItem('token');
+
+
+
+  function generateTd(serviceid) {	 
+		 var archived=0;
+		 var td = document.createElement('td');
+		 fetch('/ERPPro/user/ProduitById/'+serviceid, {
+	         method: 'GET',
+	         headers: {
+	         	 'Authorization': `Bearer ${token}`
+	         	    },
+	        
+	     })
+	     .then(response => response.json())
+	     .then(data => {
+	    	 archived=data.archived
+
+
+	      // Create buttons
+	      var ActiverButton = document.createElement('button');
+			ActiverButton.className = 'btnpreview';
+		      if(!archived){
+		    	  ActiverButton.innerHTML = '<i class="fa-solid fa-box-archive"></i>Archiver';
+		  		ActiverButton.onclick = function() {
+		  			ArchiveService(serviceid); 
+		            };
+			      }
+		      else{
+		    	  ActiverButton.innerHTML = '<i class="fa-solid fa-box-open"></i>Desarchiver';
+		  		ActiverButton.onclick = function() {
+		  			DesarchiverService(serviceid); 
+		            };
+			      }
+		      td.appendChild(ActiverButton);
+		 
+
+	     })
+	      return td;
+	     
+	  
+	  }
+ 
+
+  function updateFactureTable(produits) {
+	  
+      var tableBody = document.getElementById('invoiceTableBody');
+
+      tableBody.style.opacity = 0;
+      tableBody.innerHTML = ''; // Clear existing rows
+
+      for (var i = 0; i < produits.length; i++) {
+          var prod = produits[i];
+          var newRow = tableBody.insertRow(tableBody.rows.length);
+
+          // Add cells and populate with facture details
+          // Example:
+          var numberCell = newRow.insertCell(0);
+          numberCell.innerHTML = prod.libelle;
+
+          var dateCell = newRow.insertCell(1);
+         
+          dateCell.innerHTML = prod.putnd;
+
+          var clientCell = newRow.insertCell(2);
+          clientCell.innerHTML = prod.pueuro;
+          newRow.appendChild(generateTd(prod.idP));
+         
+          
+	
+          
+         
+
+          
+      }
+      tableBody.addEventListener('transitionend', function() {
+    	    tableBody.style.transition = '';
+    	}, { once: true });
+      setTimeout(function() {
+    	    tableBody.style.cssText = 'opacity: 1; transition: opacity 1s ease-in-out;';
+    	}, 100);
+  }
+
+  function ArchiveService(id){
+	  const alert = document.querySelector(".alert");
+	  fetch('/ERPPro/user/ArchiveService/'+id, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          },
+          
+      })
+      .then(response => response.json())
+      .then(data => {
+    	  window.factureslistSign=data
+    	  updatePag(1)
+    	  alert.querySelector('.alert-text').textContent="Service archivé";
+  		alert.classList.add("show");
+
+      // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+      setTimeout(function () {
+          alert.classList.remove("show");
+      }, 5000);
+      	
+      })
+		
+	  }
+
+  function DesarchiverService(id){
+	  const alert = document.querySelector(".alert");
+	  fetch('/ERPPro/user/DesrchiveService/'+id, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          },
+          
+      })
+      .then(response => response.json())
+      .then(data => {
+    	  window.factureslistSign=data
+    	  updatePag(1) 
+    	  alert.querySelector('.alert-text').textContent="Service désarchivé";
+    		alert.classList.add("show");
+
+    	      // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+    	      setTimeout(function () {
+    	          alert.classList.remove("show");
+    	      }, 5000);
+      	
+      })
+		
+	  }
+
+  
+  </script>
+  
+  <script>
+    function createPaginationElement(pageNumber, isCurrentPage) {
+        if (isCurrentPage) {
+            var spanElement = document.createElement('span');
+            spanElement.innerText = pageNumber;
+            return spanElement;
+        } else {
+            var linkElement = document.createElement('a');
+            linkElement.href = '';
+            linkElement.innerText = pageNumber;
+            linkElement.setAttribute('onclick', 'movePageination(event,' + pageNumber + ');');
+
+            // Add non-breaking spaces
+            
+
+            return linkElement;
+        }
+    }
+	function updatePagination(totalPages,currentpage,list){
+		
+		 var divRows = document.getElementById('divrows');
+		 var divNumber = document.getElementById('divnumbers');
+		 var divNext = document.getElementById('divnext');
+		 var divLast = document.getElementById('divlast');
+		 if(divRows != null){
+		 divRows.innerText = "Total Rows : "+list.length
+		 divNumber.innerHTML ="";
+		 for (var i = 1; i <= totalPages; i++) {
+			 
+	            var isCurrentPage = (i === currentpage);
+	            var paginationElement = createPaginationElement(i, isCurrentPage);
+	            
+	            // Append the element to the container
+	            divNumber.appendChild(paginationElement);
+	            if(i != totalPages){
+	            	 var space1 = document.createTextNode('\u00a0'+'\u00a0'+'\u00a0'+'\u00a0'+'\u00a0'); // &nbsp;    
+	 	            divNumber.appendChild(space1);
+		            }
+	           
+	            
+	      
+	            
+	        }
+
+	     if(currentpage < totalPages){
+	    	 var linkElementNext = document.createElement('a');
+	    	 linkElementNext.href = '';
+	    	 linkElementNext.innerText = "Next";
+	    	 linkElementNext.setAttribute('onclick', 'movePageination(event,' + (currentpage+1) + ');');
+	    	 divNext.innerHTML ="";
+	            // Append the element to the container
+	          divNext.appendChild(linkElementNext);
+	          
+
+	    	 var linkElementLast = document.createElement('a');
+	    	 linkElementLast.href = '';
+	    	 linkElementLast.innerText = "Last";
+	    	 linkElementLast.setAttribute('onclick', 'movePageination(event,' + totalPages + ');');
+	    	 divLast.innerHTML ="";
+	            // Append the element to the container
+	          divLast.appendChild(linkElementLast);
+		     }
+	     else{
+
+	    	
+	    	 var spanElementNext = document.createElement('span');
+	    	 spanElementNext.innerText = "Next";
+	    	 divNext.innerHTML ="";
+	          
+	         divNext.appendChild(spanElementNext);
+
+	         var spanElementLast = document.createElement('span');
+	         spanElementLast.innerText = "Last";
+	    	 divLast.innerHTML ="";
+	            // Append the element to the container
+	          divLast.appendChild(spanElementLast);
+		     
+		     }
+		 }
+		}
+
+	function updatePag(pageNumber){
+		console.log( window.factureslistSign)
+		var list = window.factureslistSign 
+			
+		
+		
+		
+		fetch('/ERPPro/user/ServpageList/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+           
+        })
+        .then(response => response.json())
+        .then(data => {
+        	
+        	
+        	updateFactureTable(data)
+        	
+        	
+        })
+        
+
+	 fetch('/ERPPro/user/serpagetotal/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            
+        })
+        .then(response => response.text())
+        .then(data => {
+        	
+        	updatePagination(data,pageNumber,list)
+        	
+        })
+		}
+	
+	function updatePagWithoutArchive(pageNumber,list){
+		
+	
+		fetch('/ERPPro/user/ServpageList/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+          
+        })
+        .then(response => response.json())
+        .then(data => {
+        	
+        	updateFactureTable(data)
+        	
+        })
+        
+
+	 fetch('/ERPPro/user/serpagetotal/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            
+        })
+        .then(response => response.text())
+        .then(data => {
+        	updatePagination(data,pageNumber,list)
+        	
+        })
+		}
+
+	function movePageination(e,pageNumber){
+		e.preventDefault();
+		updatePag(pageNumber)
+		 
+	        
+		}
+
+	function addProd(e){
+		e.preventDefault();
+		const alert = document.querySelector(".alert");
+		var formData = new FormData(document.getElementById('prod-form'));
+		   fetch('/ERPPro/user/addProd', {
+	            method: 'POST',
+	            headers: {
+	            	 'Authorization': `Bearer ${token}`
+	            	    },
+	            body: formData
+	        })
+	        .then(response => response.json())
+	        .then(data => {	
+
+	        	
+	        	 $('#exampleModalScrollable').modal('hide');
+	        	 $('.modal-backdrop').remove();
+	        	updatePag(1)
+	        	
+	        	
+	        		alert.classList.add("show");
+
+	            // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+	            setTimeout(function () {
+	                alert.classList.remove("show");
+	            }, 5000);
+	        
+		})
+	        .catch(error => {
+	            // Handle errors if needed
+	            console.error('Error adding user:', error);
+	        });
+		}
+    </script>
+    
+    <script th:inline="javascript">
+    jQuery(document).ready(function ($) {
+
+    	if(sessionStorage.getItem("email") ==null){
+      		window.location.href = '/ERPPro/home/login'
+      		}
+      	else{
+      		fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+      	        method: 'GET',
+      	     
+      	       
+      	    })
+      	    .then(response => response.text())
+      	    .then(data => {
+      	       
+      	        if(data =="Client"){
+      	    
+
+      	        	window.location.href = '/ERPPro/home/login'
+      	           
+      	            }
+      	     
+      	    })
+      		}
+    	/*<![CDATA[*/
+    	// var factureList = /*[[${factures}]]*/ null;
+    	 var produitlist = /*[[${AllProduit}]]*/ '[]';
+    	 
+    	 
+    	
+    	 console.log(produitlist)
+
+    	 window.factureslistSign = produitlist;
+    	
+    	 
+    	
+    	    /*]]>*/
+        })
+    </script>
+
+
+
+
+
+ 
+
+
+    
+  
+
+
+
+
+
+
+	
+
+ 
+    
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+	
+	
+	
+	
+</div>
+
+</body>
+</html>

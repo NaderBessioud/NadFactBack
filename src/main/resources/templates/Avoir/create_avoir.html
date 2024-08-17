@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+<meta charset="UTF-8">
+<title>Users</title>
+<link rel="stylesheet" href="/ERPPro/css/createavoir.css">
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <i class="fas fa-file-invoice"></i>
+                <h2 id="h2title">Ajouter un Avoir</h2>
+            </div>
+            <form id="addAvoirForm" th:action="@{/user/avoir}" th:object="${avoir}" method="POST">
+               <input type="text"  id="id" hidden th:field=*{idC}>
+            
+                <div class="form-group">
+                    <label for="client">Client</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        </div>
+                        <input type="text" class="form-control" id="client" name="client" placeholder="Enter client name" disabled="disabled">
+                   
+                    </div>
+                </div>
+                <div class="form-group" id="divcour">
+                    <label for="cours">Cours</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-book"></i></span>
+                        </div>
+                        <input type="text" class="form-control" id="cours" name="cours" placeholder="Enter cours" required th:field=*{cours}>
+                    </div>
+                </div>
+                <div class="form-group" id="divdate">
+                    <label for="date">Date</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        </div>
+                        <input type="date" class="form-control" id="date" name="date" required>
+                    </div>
+                </div>
+             
+                <div class="form-group">
+                    <label for="montant">Montant</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                        </div>
+                        <input type="number" class="form-control" id="montant" name="montant" placeholder="Enter montant" th:field=*{montant} required>
+                    </div>
+                </div>
+                <button type="button" id="actionbtn" class="btn btn-primary" onclick="enregister(event)">Ajouter </button>
+            </form>
+        </div>
+    </div>   
+    <script>
+    var token=sessionStorage.getItem('token');
+    function enregister(event){
+ 	   event.preventDefault();
+ 	  var formData = new FormData(document.getElementById('addAvoirForm'));
+ 	  
+ 	 var montant = document.getElementById("montant").value 
+   		if(window.type == "Export"){
+   			var date = document.getElementById("date").value
+   			  			
+   			const dateString = String(date);
+   			const parts = dateString.split('-');
+   			date=parts[2]+"//"+parts[1]+"//"+parts[0]
+   			formData.append("datecv",date)
+   			formData.append("montant",montant)
+   			
+   	  		}
+   		else{
+   	   		
+   			formData.append("montant",montant)
+   			
+   	  		}
+  		
+	  		if(window.idf != null){
+	  			 fetch('/ERPPro/user/avoir/'+window.idf, {
+	  		         method: 'POST',
+	  		       headers: {
+	  		    	 'Authorization': `Bearer ${token}`
+	  		    	    },  
+	  		         body: formData
+	  		     })
+	  		     .then(response => response.json())
+	  		     .then(data => {
+	  		         
+	  		    	if (data.redirect) {
+	  		          window.location.href = data.redirect;
+	  		      }
+
+	  		     });
+		  		}
+	  		else{
+	  			 fetch('/ERPPro/user/updateavoir', {
+	  		         method: 'POST',
+	  		       headers: {
+		  		    	 'Authorization': `Bearer ${token}`
+		  		    	    },  // Use 'GET' or 'POST' depending on your endpoint
+	  		         body: formData
+	  		     })
+	  		     .then(response => response.json())
+	  		     .then(data => {
+	  		    	if (data.redirect) {
+	  		          window.location.href = data.redirect;
+	  		      }
+			  		         
+	  		        
+
+	  		     });
+		  		}
+   	
+   		
+   		
+  		
+ 	   }
+    </script>
+    </script>
+      <script th:inline="javascript">
+jQuery(document).ready(function ($) {
+	if(sessionStorage.getItem("email") ==null){
+		window.location.href = '/ERPPro/home/login'
+		}
+	else{
+		fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+	        method: 'GET',
+	     
+	       
+	    })
+	    .then(response => response.text())
+	    .then(data => {
+	       
+	        if(data =="Client"){
+	    
+
+	        	window.location.href = '/ERPPro/home/login'
+	           
+	            }
+	     
+	    })
+		}
+
+	
+	/*<![CDATA[*/
+	// var factureList = /*[[${idu}]]*/ null;
+	 var idf = /*[[${factureid}]]*/ null;
+	 var client = /*[[${Client}]]*/ null;
+	 var type = /*[[${type}]]*/ null;
+	 var avoiru = /*[[${avoiru}]]*/ null;
+	 
+	    /*]]>*/
+	    console.log(idf)
+	    
+	    window.idf=idf
+	    window.type=type	  
+	    document.getElementById("client").value = client;
+	    var divCours = document.getElementById('divdate');
+	  	var divcv  = document.getElementById('divcour');
+	  		  	
+	    	if(type == "Export"){
+	      		
+	      		divCours.style.display = 'block';
+	      		divcv.style.display = 'block';
+	          	}
+	      	else {
+	      		divCours.style.display = 'none';
+	      		divcv.style.display = 'none';
+	      	
+	          	}
+          	if(avoiru != null){
+          		console.log(avoiru.idC)
+          		document.getElementById("h2title").innerText="modifier Avoir";
+          		document.getElementById('actionbtn').innerText = "Modifier";
+          		
+          		document.getElementById("montant").value = avoiru.montant;
+          		
+          		document.getElementById("id").value = avoiru.idC;
+          		if(type == "Export"){
+          			const date1 = new Date(avoiru.datecv);
+        	    	const formattedDate = date1.toISOString().split('T')[0];
+          			
+          			document.getElementById("cours").value = avoiru.cours;
+          			document.getElementById("date").value = formattedDate;
+    	          	}
+    	      
+          		
+          		
+				
+              	}	   
+	
+})
+</script>
+     
+</div>
+</body>

@@ -1,0 +1,1218 @@
+
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+<meta charset="UTF-8">
+<title>Users</title>
+<link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+<link rel="stylesheet" href="/ERPPro/css/Userlist.css">
+  <link rel=" shortcut icon" type="image/png" href="/ERPPro/images/logo2.png">
+
+
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+	
+	
+	<div class="row" style="display: flex;margin-top: 20px">
+	<h3>Utilisateurs</h3>
+		<div class="col-Lg-3" style="margin-left: auto;">
+			<button  class="btn btn-primary btn-sm mb-3" style="margin-right: 25px" data-toggle="modal" data-target="#exampleModalScrollable" >Ajouter utilisateur</button>
+		</div><!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="#exampleModalScrollable" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable custom-modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary text-center">
+        <h3 class="modal-title w-100" id="exampleModalScrollableTitle" style="color: #fff">Nouveau utilisateur</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+    
+        <div class="card2 card-1" style="border:none">
+               
+                <div class="card-body" style="padding-top: 10px">
+                    
+                    <form method="POST" id="user-form" th:action="@{/admin/addUser}" th:object="${userp}">
+	                   
+                       <div class="profile-pic" style=" color: transparent;transition: all 0.3s ease;display: flex; justify-content: center;align-items: center;position: relative;transition: all 0.3s ease;width: 180px;left: 35%;
+       ">
+						  <label class="-label" for="file">
+						    <span class="glyphicon glyphicon-camera spanpro" ></span>
+						    <span class="spanpro">Change Image</span>
+						  </label>
+						  <input id="file" type="file" onchange="uploadFile()" style="display: none;"/>
+						  <img src="https://cdn.pixabay.com/photo/2017/08/06/21/01/louvre-2596278_960_720.jpg" id="output" width="200" class="imgpro" />
+						</div>
+						<input hidden type="text" id="newuserimg" th:field="*{image}">
+                     <div class="input-group" style="width: 600px">
+                            <input class="input--style-1" type="text" placeholder="EMAIL" id="newuseremail" th:field="*{email}"  required >
+                            <i class="uil uil-envelope input-icon"></i>
+                        </div>
+                    
+                    	 <div style="display: flex">
+                            
+                               <div class="input-group" style="width: 300px">
+                            <input class="input--style-1" type="text" placeholder="Prenom" id="userprenom" th:field="*{firstname}"required>
+                            <i class="uil uil-user input-icon"></i>
+                        
+                            </div>
+                            
+                         
+                               <div class="input-group" style="width: 300px;margin-left:100px">
+                            <input class="input--style-1" type="text" placeholder="Nom"  th:field="*{lastname}" id="usernom"  required>
+                            <i class="uil uil-user input-icon"></i>
+                        </div>
+                            
+                            </div>
+                            
+                             <div style="display: flex">
+                            
+                               <div class="input-group" style="width: 300px">
+                            <input class="input--style-1 password" type="password" placeholder="Password" th:field="*{password}" id="passinput"   required>
+                            <i class="uil uil-lock  input-icon"></i>
+                            <i class="uil uil-eye-slash showHidePW iconpass"></i>
+                        
+                            </div>
+                            
+                         
+                               <div class="input-group" style="width: 300px;margin-left:100px">
+                            <input class="input--style-1 password" type="password" placeholder="Confirm Password"  required id="passcinput">
+                             <i class="uil uil-lock  input-icon"></i>
+                            <i class="uil uil-eye-slash showHidePW iconpass"></i>
+                            
+                        </div>
+                            
+                            </div>
+                            
+                             <div  >
+                            <select class="selectrole" id="roleselect" th:field="*{role}" required>
+		        <option value="" selected disabled>Role</option>
+		        <option value="Employee">Employee</option>
+		        <option value="Manager">Manager</option>
+		        <option value="Admin">Admin</option>
+		        
+		        
+		    </select>
+                            
+                </div>    
+                       
+                      
+                      <div class="p-t-20" style="float: right" >
+                            <button class="btn btn--radius btn--green"  onclick="addUser(event)" id="btnsubmit">Ajouter</button>
+                            
+                        </div>
+                       
+                    </form>
+                </div>
+            </div>
+      </div>
+   
+    </div>
+  </div>
+</div>
+<button hidden data-toggle="modal" data-target="#ModalUpdate" id="openmodalupdate"></button>
+<!-- Modal -->
+<div class="modal fade" id="ModalUpdate" tabindex="-1" role="dialog" aria-labelledby="#ModalUpdate" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable custom-modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary text-center">
+        <h3 class="modal-title w-100" id="ModalUpdateTitle" style="color: #fff">utilisateur<span id="nomprenom"></span></h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+    
+        <div class="card2 card-1" style="border:none">
+               
+                <div class="card-body" style="padding-top: 10px">
+                    
+                    <form method="POST" id="user-formu" th:action="@{/admin/updateUser}" th:object="${userp}">
+	                   
+                       <div class="profile-pic" style=" color: transparent;transition: all 0.3s ease;display: flex; justify-content: center;align-items: center;position: relative;transition: all 0.3s ease;width: 180px;left: 35%;
+       ">
+						  <label class="-label" for="file">
+						    <span class="glyphicon glyphicon-camera spanpro" ></span>
+						    <span class="spanpro">Change Image</span>
+						  </label>
+						  <input id="file" type="file" onchange="uploadFile()" style="display: none;"/>
+						  <img src="https://cdn.pixabay.com/photo/2017/08/06/21/01/louvre-2596278_960_720.jpg" id="outputu" width="200" class="imgpro" />
+						</div>
+						<input hidden type="text" id="newuserimgu" th:field="*{image}">
+                     <div class="input-group" style="width: 600px">
+                            <input class="input--style-1" type="text" placeholder="EMAIL" id="newuseremailu" th:field="*{email}"  required >
+                            <i class="uil uil-envelope input-icon"></i>
+                            <input class="input--style-1" type="text"  id="iduseru" th:field="*{idU}"  hidden >
+                            
+                        </div>
+                    
+                    	 <div style="display: flex">
+                            
+                               <div class="input-group" style="width: 300px">
+                            <input class="input--style-1" type="text" placeholder="Prenom" id="userprenomu" th:field="*{firstname}"required>
+                            <i class="uil uil-user input-icon"></i>
+                        
+                            </div>
+                            
+                         
+                               <div class="input-group" style="width: 300px;margin-left:100px">
+                            <input class="input--style-1" type="text" placeholder="Nom"  th:field="*{lastname}" id="usernomu" required>
+                            <i class="uil uil-user input-icon"></i>
+                        </div>
+                            
+                            </div>
+                            
+                             <div style="display: flex">
+                            
+                               <div class="input-group" style="width: 300px">
+                            <input class="input--style-1 password" type="password" placeholder="Password" th:field="*{password}" id="passinputu"   required>
+                            <i class="uil uil-lock  input-icon"></i>
+                            <i class="uil uil-eye-slash showHidePW iconpass"></i>
+                        
+                            </div>
+                            
+                         
+                               <div class="input-group" style="width: 300px;margin-left:100px">
+                            <input class="input--style-1 password" type="password" placeholder="Confirm Password"  required id="passcinputu">
+                             <i class="uil uil-lock  input-icon"></i>
+                            <i class="uil uil-eye-slash showHidePW iconpass"></i>
+                            
+                        </div>
+                            
+                            </div>
+                            
+                               <div >
+                            <select class="selectrole" id="roleselecut" th:field="*{role}" required>
+		        <option value="" selected disabled>Role</option>
+		        <option value="Employee">Employee</option>
+		        <option value="Manager">Manager</option>
+		        <option value="Admin">Admin</option>
+		        
+		        
+		    </select>
+                            
+                </div>    
+                            
+                    
+                       
+                      
+                      <div class="p-t-20" style="float: right" >
+                            <button class="btn btn--radius btn--green"  onclick="updateUser(event)" id="btnsubmit">Modifier</button>
+                            
+                        </div>
+                       
+                    </form>
+                </div>
+            </div>
+      </div>
+   
+    </div>
+  </div>
+</div>
+	</div>
+	<div class="card">
+    <div class="card-header">
+        Liste des utilisateurs
+    </div>
+  
+    
+    
+    
+    
+    <div class="rounded-rectangle1">
+    <label style="margin-left: 10px">Filters :</label>
+    <div class="form-check form-check-inline" style="margin-left: 10px">
+  <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1" onclick="handleCheckboxClick(1)">
+  <label class="form-check-label" for="inlineCheckbox1">Activé</label>
+</div>
+
+<div class="form-check form-check-inline">
+  <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2" onclick="handleCheckboxClick(2)">
+  <label class="form-check-label" for="inlineCheckbox2">Désactivé</label>
+</div>
+
+<div class="inputs">
+	   <label style="color: #2d3539">Recherche:</label>  
+	   <input id="inputsearch" type="text" onkeyup="search()" style="margin-top: 7px">
+   </div>
+
+    </div>
+    
+    
+    
+   
+    
+    
+    <div class="card-body">
+    
+     
+       <table class="table table-striped table-bordered" id="usertable">
+		<thead class="table-dark">
+			<tr>
+				<th>Nom</th>
+				<th>Date creation</th>
+				<th>Email</th>
+				<th>Role</th>
+				<th>Etat</th>
+				<th>Action</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each = "user: ${users}">
+				
+				<td>
+				 <div class="profile-container">
+				 <div class="image-container">
+				<img th:src="${user.user.image}" alt="Profile Image" class="profile-imageus">
+				</div>
+				<div class="text-container">
+				<span th:text="${user.name}"></span>
+				
+				</div>
+				</div>
+				</td>
+				
+				<td th:text="${#dates.format(user.user.datecreation, 'yyyy/MM/dd')}"></td>
+				
+				<td th:text="${user.user.email}"></td>
+				<td th:text = "${user.user.role}"></td>
+				<td >
+				<span th:text="${user.user.active ? 'activeé' : 'désactivé'}"
+          					th:class="${user.user.active ? 'badge badge-success' : 'badge badge-danger'}"></span>
+				</td>
+				<td>
+	
+					 <button th:unless="${user.user.active}" th:onclick="'ActiveUser(' + ${user.user.idU} + ')'" class="btnpreview"><i class="fa-solid fa-user-check"></i></i>Activer</button>
+					 <button th:if="${user.user.active}" th:onclick="'DesactiveUser(' + ${user.user.idU} + ')'" class="btnpreview"><i class="fa-solid fa-user-lock"></i>Desactiver</button>
+					  <button  th:onclick="'UserDetails(' + ${user.user.idU} + ')'" class="btnpdf"><i class="fa-solid fa-pen"></i>Modifier</button>
+				</td>
+				
+			</tr>
+			
+		</tbody>
+	
+	</table>
+	
+	<div th:if = "${totalPages > 1}">
+		<div class="row col-sm-12">
+			<div class="col-sm-2" id="divrows" >
+				Total Rows : [[${totalItems}]]
+			</div>
+			<div class="col-auto" id="divnumbers">
+				<span th:each="i:${#numbers.sequence(1,totalPages)}">
+					<a th:if="${currentPage != i}" href="" th:onclick="'movePageination(event, ' + ${i} + ')'">[[${i}]]</a>
+					<span th:unless="${currentPage != i}">[[${i}]]</span> 
+					&nbsp;
+				 	&nbsp;
+				</span>
+			</div>
+			<div class="col-sm-1" id="divnext">
+				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${currentPage+1} + ')'">Next</a>
+				<span th:unless="${currentPage < totalPages}">Next</span>
+			</div>
+			<div class="col-sm-1"  id="divlast">
+				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${totalPages} + ')'">Last</a>
+				<span th:unless="${currentPage < totalPages}">Last</span>
+			</div>
+		
+		</div>
+		
+    </div>
+</div>
+</div>
+</div>
+
+	<div class="alert alert-success alert-dismissible fade bottom-right" role="alert" >
+  <div style="text-align: center;">
+    <strong>Succès!</strong><br><span class="alert-text"> Utilisateur ajouté avec succès !.</span>
+  </div>
+  <button type="button" class="close" onclick="hideCustomAlert()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+  
+<script>
+function hideCustomAlert(){
+	 const alert = document.querySelector(".alert");
+	 alert.classList.remove("show");
+}</script>
+  
+  <script>
+  var token=sessionStorage.getItem('token');
+  
+	function ActiveUser(userid){
+		console.log(window.usersList)
+		fetch('/ERPPro/admin/activeUser/'+userid, {
+	        method: 'PUT',
+	        headers: {
+	            'Content-Type': 'application/json',
+	            'Authorization': `Bearer ${token}`
+	        },
+	        body: JSON.stringify(window.usersList)
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	    	
+	    	window.usersList=data
+	    	window.fullusersListSearch = data;
+	    	updatePag(1)
+	    	
+	    })
+		}
+
+	function DesactiveUser(userid){
+		fetch('/ERPPro/admin/desactiveUser/'+userid, {
+	        method: 'PUT',
+	        headers: {
+	            'Content-Type': 'application/json',
+	            'Authorization': `Bearer ${token}`
+	        },
+	        body: JSON.stringify(window.usersList)
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	    	
+	    	window.usersList=data
+	    	window.fullusersListSearch = data;
+	    	updatePag(1)
+	    	
+	    })
+		}
+  </script>
+  
+  <script>
+
+	function DisplayActiveUser(){
+		fetch('/ERPPro/admin/ActiveUsers', {
+	        method: 'GET',
+	        headers: {
+	        	 'Authorization': `Bearer ${token}`
+	        	    },
+	        
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	    	
+	    	window.usersList=data
+	    	window.fullusersListSearch = data;
+	    	search();
+	    	
+	    })
+		}
+
+	function DisplayDesactiveUser(){
+		console.log("Desactive")
+		fetch('/ERPPro/admin/DesactiveUsers', {
+	        method: 'GET',
+	        headers: {
+	        	 'Authorization': `Bearer ${token}`
+	        	    },
+	        
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	    	
+	    	window.usersList=data
+	    	window.fullusersListSearch = data;
+	    	search();
+	    	
+	    })
+		}
+		
+		
+  </script>
+  <script th:inline="javascript">
+ function generateTd(userid) {	 
+	 var active=0;
+	 var td = document.createElement('td');
+	 fetch('/ERPPro/admin/UserById/'+userid, {
+         method: 'GET',
+         headers: {
+         	 'Authorization': `Bearer ${token}`
+         	    },
+        
+     })
+     .then(response => response.json())
+     .then(data => {
+		active=data.active
+
+
+      // Create buttons
+      var ActiverButton = document.createElement('button');
+		ActiverButton.className = 'btnpreview';
+	      if(!active){
+	    	  ActiverButton.innerHTML = '<i class="fa-solid fa-user-check"></i>Activer';
+	  		ActiverButton.onclick = function() {
+	  			ActiveUser(userid); 
+	            };
+		      }
+	      else{
+	    	  ActiverButton.innerHTML = '<i class="fa-solid fa-user-lock"></i>Desactiver';
+	  		ActiverButton.onclick = function() {
+	  			DesactiveUser(userid); 
+	            };
+		      }
+	      td.appendChild(ActiverButton);
+	      var updateButton = document.createElement('button');
+	      updateButton.className = 'btnpdf';
+		    
+	      updateButton.innerHTML = '<i class="fa-solid fa-pen"></i>Modifier';
+	      updateButton.onclick = function() {
+	    	  UserDetails(userid); 
+		            };
+      td.appendChild(updateButton);
+
+     })
+      return td;
+     
+  
+  }
+
+  function updateUserTable(users) {
+	
+      var tableBody = document.getElementById('usertable').getElementsByTagName('tbody')[0];
+
+      tableBody.style.opacity = 0;
+      tableBody.innerHTML = ''; 
+
+      for (var i = 0; i < users.length; i++) {
+          var user = users[i];
+          var newRow = tableBody.insertRow(tableBody.rows.length);
+          
+          var profileHtml = `
+			        	  <div class="profile-container">
+			        	    <div class="image-container">
+			        	      <img src="${user.user.image}" alt="Profile Image" class="profile-imageus">
+			        	    </div>
+			        	    <div class="text-container">
+			        	      <span>${user.name}</span>
+			        	    </div>
+			        	  </div>
+			        	`;
+				
+        
+          var nameCell = newRow.insertCell(0);
+          nameCell.innerHTML = profileHtml;
+
+          var dateCell = newRow.insertCell(1);
+          var dateObject = new Date(user.user.datecreation);
+          var formattedDate = dateObject.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+          dateCell.innerHTML = formattedDate;
+
+          var emailCell = newRow.insertCell(2);
+          emailCell.innerHTML = user.user.email;
+          
+          var RoleCell = newRow.insertCell(3);
+          RoleCell.innerHTML = user.user.role;
+
+          var statusText = user.user.active ? 'activé' : 'désactivé';
+          var statusClass = user.user.active ? 'badge badge-success' : 'badge badge-danger';
+          var StatusCell = newRow.insertCell(4);
+          var statusSpan = document.createElement('span');
+          statusSpan.textContent = statusText;
+          statusSpan.className = statusClass;
+          StatusCell.appendChild(statusSpan);
+
+          newRow.appendChild(generateTd(user.user.idU));
+          
+      }
+      tableBody.addEventListener('transitionend', function() {
+    	    tableBody.style.transition = '';
+    	}, { once: true });
+      setTimeout(function() {
+    	    tableBody.style.cssText = 'opacity: 1; transition: opacity 1s ease-in-out;';
+    	}, 100);
+  }
+  </script>
+  
+  <script>
+    function createPaginationElement(pageNumber, isCurrentPage) {
+        if (isCurrentPage) {
+            var spanElement = document.createElement('span');
+            spanElement.innerText = pageNumber;
+            return spanElement;
+        } else {
+            var linkElement = document.createElement('a');
+            linkElement.href = '';
+            linkElement.innerText = pageNumber;
+            linkElement.setAttribute('onclick', 'movePageination(event,' + pageNumber + ');');
+
+            // Add non-breaking spaces
+            
+
+            return linkElement;
+        }
+    }
+	function updatePagination(totalPages,currentpage,list){
+		 var divRows = document.getElementById('divrows');
+		 var divNumber = document.getElementById('divnumbers');
+		 var divNext = document.getElementById('divnext');
+		 var divLast = document.getElementById('divlast');
+		 if(divRows != null){
+		 divRows.innerText = "Total Rows : "+list.length
+		 divNumber.innerHTML ="";
+		 for (var i = 1; i <= totalPages; i++) {
+			 
+	            var isCurrentPage = (i === currentpage);
+	            var paginationElement = createPaginationElement(i, isCurrentPage);
+	            
+	            // Append the element to the container
+	            divNumber.appendChild(paginationElement);
+	            if(i != totalPages){
+	            	 var space1 = document.createTextNode('\u00a0'+'\u00a0'+'\u00a0'+'\u00a0'+'\u00a0'); // &nbsp;    
+	 	            divNumber.appendChild(space1);
+		            }
+	           
+	            
+	      
+	            
+	        }
+
+	     if(currentpage < totalPages){
+	    	 var linkElementNext = document.createElement('a');
+	    	 linkElementNext.href = '';
+	    	 linkElementNext.innerText = "Next";
+	    	 linkElementNext.setAttribute('onclick', 'movePageination(event,' + (currentpage+1) + ');');
+	    	 divNext.innerHTML ="";
+	            // Append the element to the container
+	          divNext.appendChild(linkElementNext);
+	          
+
+	    	 var linkElementLast = document.createElement('a');
+	    	 linkElementLast.href = '';
+	    	 linkElementLast.innerText = "Last";
+	    	 linkElementLast.setAttribute('onclick', 'movePageination(event,' + totalPages + ');');
+	    	 divLast.innerHTML ="";
+	            // Append the element to the container
+	          divLast.appendChild(linkElementLast);
+		     }
+	     else{
+
+	    	
+	    	 var spanElementNext = document.createElement('span');
+	    	 spanElementNext.innerText = "Next";
+	    	 divNext.innerHTML ="";
+	          
+	         divNext.appendChild(spanElementNext);
+
+	         var spanElementLast = document.createElement('span');
+	         spanElementLast.innerText = "Last";
+	    	 divLast.innerHTML ="";
+	            // Append the element to the container
+	          divLast.appendChild(spanElementLast);
+		     
+		     }
+		 }
+		}
+
+	function updatePag(pageNumber){
+		var list = window.usersList
+		
+		
+		
+		
+		fetch('/ERPPro/admin/UserpageList/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.json())
+        .then(data => {
+        	
+        	
+        	updateUserTable(data)
+        	
+        	
+        })
+        
+
+	 fetch('/ERPPro/admin/Userpagetotal/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.text())
+        .then(data => {
+        	updatePagination(data,pageNumber,list)
+        	
+        })
+		}
+	
+	function updatePagWithoutArchive(pageNumber,list){
+		
+	
+		fetch('/ERPPro/user/UserpageList/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.json())
+        .then(data => {
+        	
+        	updateUserTable(data)
+        	
+        })
+        
+
+	 fetch('/ERPPro/admin/Userpagetotal/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.text())
+        .then(data => {
+        	updatePagination(data,pageNumber,list)
+        	
+        })
+		}
+
+	function movePageination(e,pageNumber){
+		e.preventDefault();
+		updatePag(pageNumber)    
+		}
+    </script>
+<script>
+function ClearFilters(list){
+	updatePag(1)
+	
+}
+function handleCheckboxClick(checkboxNumber) {
+	
+  // Check if option 1 is clicked
+  if (checkboxNumber === 1) {
+	  console.log("ch1")
+    if (document.getElementById('inlineCheckbox2').checked) {
+      document.getElementById('inlineCheckbox2').checked = false;
+    }
+    if(document.getElementById('inlineCheckbox1').checked){
+    	DisplayActiveUser();
+    	
+    	
+
+        }
+    else{
+    	 window.usersList = window.fullusersList;
+    	 window.fullusersListSearch=window.fullusersList;
+    	 search();
+    	 
+    	
+        }
+  }
+
+  // Check if option 2 is clicked
+  if (checkboxNumber === 2) {
+    // Uncheck option 1 if it is checked
+      console.log("ch2")
+    if (document.getElementById('inlineCheckbox1').checked) {
+      document.getElementById('inlineCheckbox1').checked = false;
+    }
+
+    if(document.getElementById('inlineCheckbox2').checked){
+    	DisplayDesactiveUser()
+    	
+        }
+    else{
+    	window.usersList = window.fullusersList;
+    	window.fullusersListSearch=window.fullusersList;
+    	search()
+   	 	
+   		
+        }
+  }
+  
+}
+</script>
+    <script>
+	function search(){
+		
+		
+		var search = document.getElementById('inputsearch').value;
+		 fetch('/ERPPro/admin/searchUsers?search=' + search, {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	                'Authorization': `Bearer ${token}`
+	            },
+	            body: JSON.stringify(window.fullusersListSearch)
+	        })
+	    
+         .then(response => response.json())
+         .then(data => {
+        	
+          
+         	
+        	 window.usersList=data
+        	 console.log(window.usersList)
+         	updatePag(1)
+         })
+		}
+    </script>
+    
+<script type="text/javascript">
+async function checkEmail(email){
+		console.log("email call")
+		msgtitle=""
+		msg=""
+		var alert = document.querySelector(".alert");
+		
+		 
+	
+		
+		 
+		 if(email !=""){
+			 try {
+			   const response = await fetch('/ERPPro/home/EmailCheck?email=' + email, {
+	                method: 'GET',
+	            });
+			   const isEmailUnique = await response.json();
+			        console.log(isEmailUnique)
+		            if (isEmailUnique) {
+		                // Email is unique, proceed with your logic
+		               
+		               
+		                msgtitle="Attention!";
+		                msg="Email existe déja";
+		                alert.querySelector('strong').textContent=msgtitle;
+		                alert.querySelector('.alert-text').textContent=msg;
+		                alert.classList.remove("alert-success");
+		                alert.classList.add("alert-danger");
+		                alert.classList.add("show");
+
+		                // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+		                setTimeout(function () {
+		                    alert.classList.remove("show");
+		                }, 5000);
+		                
+		                return false;
+		            } else {
+		            	
+		                // Email is not unique, handle accordingly
+		            	return true;
+		            }
+		       
+			 }
+			 catch (error) {
+		            console.error('Error checking email:', error);
+		            return false;
+		        }
+		 }
+
+		 else{
+		 console.log("mochkol")
+		 console.log(email)
+		   return false;
+		 }
+		
+		}
+
+
+	function CheckPassword(pass,passc){
+	console.log(pass)
+	console.log(passc)
+		if(pass != "" && passc != ""){
+			if(pass != passc){
+
+				 
+	                msgtitle="Attention!";
+	                msg="Les champs du mot de passe et de confirmation ne correspondent pas";
+	                alert.querySelector('strong').textContent=msgtitle;
+	                alert.querySelector('.alert-text').textContent=msg;
+	                alert.classList.remove("alert-success");
+	                alert.classList.add("alert-danger");
+	                alert.classList.add("show");
+	              
+
+	                // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+	                setTimeout(function () {
+	                    alert.classList.remove("show");
+	                }, 5000);
+	                return false;
+				}
+			else{
+				return true;}
+		}
+		else{
+			return true;}
+		}
+		
+</script>
+<script>
+var image ="anonymous.png";
+function downloadImage(name){
+	
+
+	fetch('/ERPPro/home/downloadImage?name='+name, {
+        method: 'GET',
+       
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log(data); 
+        document.getElementById('output').src =data
+        document.getElementById('outputu').src =data
+    })
+    .catch(error => {
+        console.error('Error downloading file:', error);
+    });
+}
+
+function uploadFile() {
+    // Get the selected file
+    var fileInput = document.getElementById('file');
+    var file = fileInput.files[0];
+
+    // Create a FormData object to append the file
+    var formData = new FormData();
+    formData.append('imageFile', file);
+
+    // Perform an asynchronous request (e.g., using Fetch API or XMLHttpRequest)
+    fetch('/ERPPro/home/uploadImage', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log(data);
+        image=data
+        downloadImage(data)
+    })
+    .catch(error => {
+        console.error('Error uploading file:', error);
+    });
+}
+
+
+
+
+</script>
+
+  <script>
+  var emailupdate =""
+  function UserDetails(id){
+	  console.log(id)
+	  fetch('/ERPPro/user/userById/'+id, {
+	         method: 'GET',
+	         headers: {
+	         	 'Authorization': `Bearer ${token}`
+	         	    },
+	     })
+	     .then(response => response.json())
+	     .then(data => {
+		
+	    	 emailupdate= data.email;
+	    	 document.getElementById('newuseremailu').value = data.email;
+	    	 document.getElementById('userprenomu').value = data.firstname;
+	    	 document.getElementById('usernomu').value = data.lastname;
+	    	 document.getElementById('iduseru').value = data.idU;
+	    	 
+	    	 document.getElementById('roleselecut').value = data.role;
+	    	 document.getElementById('nomprenom').innerText = " "+data.firstname+" "+data.lastname;
+	    	
+	    	 image=data.image
+	    	 downloadImage(data.image)
+	    	 document.getElementById('openmodalupdate').click();
+	         
+	     })
+	  }
+  function updateUser(event){
+	  event.preventDefault(); 
+	  
+          console.log(emailupdate)
+		if(emailupdate != document.getElementById('newuseremailu').value){
+			
+	  checkEmail(document.getElementById('newuseremailu').value).then(isEmailValid => {
+			if(CheckPassword(document.getElementById('passinputu').value,document.getElementById('passcinputu').value) && isEmailValid){
+				
+			
+			document.getElementById("newuserimgu").value = image;
+
+			const alert = document.querySelector(".alert");
+	        var formData = new FormData(document.getElementById('user-formu'));
+	        var modal = document.getElementById('ModalUpdate');
+
+	        // Perform an asynchronous request (e.g., using Fetch API or XMLHttpRequest)
+	        fetch('/ERPPro/admin/updateUser', {
+	            method: 'PUT',
+	            headers: {
+	            	 'Authorization': `Bearer ${token}`
+	            	    },
+	            body: formData
+	        })
+	        .then(response => response.json())
+	        .then(data => {	
+	           
+	        	window.usersList=data;
+	        	window.fullusersListSearch = data;
+	        	
+	        	updatePag(1)
+	        	$('#ModalUpdate').modal('hide');
+	        	$('.modal-backdrop').remove();
+	        	  alert.querySelector('strong').textContent="Succès!";
+	              alert.querySelector('.alert-text').textContent="Utilisateur modifié avec succès !.";
+	              alert.classList.add("alert-success");
+	              alert.classList.remove("alert-danger");
+	        		alert.classList.add("show");
+
+	            // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+	            setTimeout(function () {
+	                alert.classList.remove("show");
+	            }, 5000);
+	        
+		})
+	        .catch(error => {
+	            // Handle errors if needed
+	            console.error('Error adding user:', error);
+	        });
+			
+		
+			
+			}
+			  });
+		}
+		else{
+			console.log("here-2")
+			if(CheckPassword(document.getElementById('passinputu').value,document.getElementById('passcinputu').value)) {
+				console.log("here-1")
+				
+				document.getElementById("newuserimgu").value = image;
+
+				const alert = document.querySelector(".alert");
+		        var formData = new FormData(document.getElementById('user-formu'));
+		        var modal = document.getElementById('ModalUpdate');
+		        console.log("here")
+		        // Perform an asynchronous request (e.g., using Fetch API or XMLHttpRequest)
+		        fetch('/ERPPro/admin/updateUser', {
+		            method: 'PUT',
+		            headers: {
+		            	 'Authorization': `Bearer ${token}`
+		            	    },
+		            body: formData
+		        })
+		        .then(response => response.json())
+		        .then(data => {	
+		           console.log("here1")
+		        	window.usersList=data;
+		        	window.fullusersListSearch = data;
+		        	
+		        	updatePag(1)
+		        	$('#ModalUpdate').modal('hide');
+		        	$('.modal-backdrop').remove();
+		        	  alert.querySelector('strong').textContent="Succès!";
+		              alert.querySelector('.alert-text').textContent="Utilisateur modifié avec succès !.";
+		              alert.classList.add("alert-success");
+		              alert.classList.remove("alert-danger");
+		        		alert.classList.add("show");
+
+		            // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+		            setTimeout(function () {
+		                alert.classList.remove("show");
+		            }, 5000);
+		        
+			})
+		        .catch(error => {
+		            // Handle errors if needed
+		            console.error('Error adding user:', error);
+		        });
+				
+			
+				
+				}
+
+			}
+	  }
+	function addUser(event) {
+		event.preventDefault(); 
+		 
+	
+		 checkEmail(document.getElementById('newuseremail').value).then(isEmailValid => {
+		if(CheckPassword(document.getElementById('passinput').value,document.getElementById('passcinput').value) && isEmailValid){
+			
+		
+		document.getElementById("newuserimg").value = image;
+
+		const alert = document.querySelector(".alert");
+        var formData = new FormData(document.getElementById('user-form'));
+        var modal = document.getElementById('exampleModalScrollable');
+
+        // Perform an asynchronous request (e.g., using Fetch API or XMLHttpRequest)
+        fetch('/ERPPro/admin/addUser', {
+            method: 'POST',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {	
+           
+        	window.usersList=data;
+        	window.fullusersListSearch = data;
+        	
+        	updatePag(1)
+        	$('#exampleModalScrollable').modal('hide');
+        	  alert.querySelector('strong').textContent="Succès!";
+              alert.querySelector('.alert-text').textContent="Utilisateur ajouté avec succès !.";
+              alert.classList.add("alert-success");
+              alert.classList.remove("alert-danger");
+        		alert.classList.add("show");
+
+            // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+            setTimeout(function () {
+                alert.classList.remove("show");
+            }, 5000);
+        
+	})
+        .catch(error => {
+            // Handle errors if needed
+            console.error('Error adding user:', error);
+        });
+		
+	
+		
+		}
+		  });
+	}
+  </script>
+    
+  
+    
+    <script th:inline="javascript">
+jQuery(document).ready(function ($) {
+	/*<![CDATA[*/
+	// var factureList = /*[[${users}]]*/ null;
+	 var usersList = /*[[${Allusers}]]*/ null;
+	 window.usersList = usersList;
+	 window.fullusersList = usersList;
+	 window.fullusersListSearch = usersList;
+	 
+	    /*]]>*/
+
+	    
+	  
+	
+
+	 
+	
+})
+</script>
+
+
+<script th:inline="javascript">
+document.addEventListener('DOMContentLoaded', function() {
+	
+	
+	console.log("anonymous.png")
+
+	
+	});
+</script>
+
+<script>
+const pwShowHider = document.querySelectorAll(".showHidePW"),
+pwFields = document.querySelectorAll(".password");
+
+
+pwShowHider.forEach(eyeIcon =>{
+	eyeIcon.addEventListener("click",()=>{
+		
+		pwFields.forEach(pwField =>{
+			if(pwField.type == "password"){
+				pwField.type = "text";
+				
+				pwShowHider.forEach(icon =>{
+					icon.classList.replace("uil-eye-slash", "uil-eye");
+				})
+			}
+			else{
+				pwField.type = "password";
+				
+				pwShowHider.forEach(icon =>{
+					icon.classList.replace("uil-eye", "uil-eye-slash");
+				})
+			}
+		})
+	})
+})
+</script>
+
+
+<script>
+  $(document).ready(function() {
+
+	  if(sessionStorage.getItem("email") ==null){
+	  		window.location.href = '/ERPPro/home/login'
+	  		}
+	  	else{
+	  		fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+	  	        method: 'GET',
+	  	     
+	  	       
+	  	    })
+	  	    .then(response => response.text())
+	  	    .then(data => {
+	  	       
+	  	        if(data !="Admin"){
+	  	    
+
+	  	        	window.location.href = '/ERPPro/home/login'
+	  	           
+	  	            }
+	  	     
+	  	    })
+	  		}
+    $('#exampleModalScrollable').on('hide.bs.modal', function(e) {
+      $('.modal-backdrop').remove(); // Remove the modal backdrop
+    });
+
+    $('#exampleModalScrollable').on('show.bs.modal', function (e) {
+    	  // Your function here
+    	  image ="anonymous.png";
+ 		downloadImage(image)
+    	  console.log('Modal is being shown');
+    	  // You can execute any other JavaScript code you want here
+    	});
+
+
+  });
+</script>
+	
+
+ 
+    
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+	
+	
+	
+	
+
+
+</body>
+</html>

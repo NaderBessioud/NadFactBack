@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+<meta charset="UTF-8">
+<title>Dashbord</title>
+<link rel="stylesheet" href="/ERPPro/css/Dashbord/dashbord.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+<div layout:fragment="content">
+
+ <div class="radio-group" >
+                
+                
+                
+                <label style="margin-right: 10px;">
+                    <input type="radio" name="type" value="Comptable" class="radio-type" checked>
+                    <span>Comptable</span>
+                </label>
+                <label style="margin-right: 10px;">
+                    <input type="radio" name="type" value="Potentiel" class="radio-type">
+                    <span>Potentiel</span>
+                </label>
+                <label style="margin-right: 10px;">
+                    <input type="radio" name="type" value="Real" class="radio-type">
+                    <span>Reel</span>
+                </label>
+            </div>
+<div style="float: right">
+ <div class="radio-group" id="typeper">
+                <label style="margin-right: 10px;">
+                    <input type="radio" name="treatment" value="mensuel" checked>
+                    <span>Mensuel</span>
+                </label>
+                <label style="margin-right: 10px;">
+                    <input type="radio" name="treatment" value="annuel">
+                    <span>Annuel</span>
+                </label>
+            </div>
+
+<div class="page_date_button d-flex align-items-center" id="monthPickerIcon">
+ <input type="month" id="bdaymonth" name="bdaymonth" style="opacity: 0;
+            width: 1px;
+            height: 1px;
+            position: absolute;
+            z-index: -1;" onchange="updateDate()">
+<i class="fa-solid fa-calendar-days" style="margin-right: 5px" ></i>
+<span id="datetext">August 1, 2020 - August 31, 2020</span>
+</div>
+
+<div id="yearpickdiv" class="page_date_button" style="display: none">
+<div class="page_date_button d-flex align-items-center" id="YearPickerIcon">
+
+<select class="year-selector" id="yearSelector" onchange="updateYear()"></select>
+
+
+</div>
+<input type="number" id="yearInput" min="1900" step="1"  style="width: 70px;height: 20px;margin-left: 60px;display: none" onchange="updateYear()"/>
+</div>
+
+<div class="page_date_button d-flex align-items-center" id="Changerate">
+
+<span id="changetauxtext">1 Euro= <span id="changet"></span> dinars</span>
+</div>
+
+<div id="selectClient">
+ <select id="clientId"   class="btn btn-secondary dropdown-toggle" onchange="ClientStat()" >
+    <option value="0" disabled selected>Choisie Client</option>
+    <option value="all">Tous</option>
+    <option th:each="client : ${Clients}" th:value="${client.idU}" th:text="${client.libelle}" th:data-type="${client.type}"></option>
+</select>
+</div>
+</div>
+           
+
+
+            <div class="col-sm-6 col-lg-3" style="margin-top: 40px">
+                <div class="card text-white bg-flat-color-1" style="background-color: #20a8d8">
+                    <div class="card-body pb-0">
+                    
+                        <p class="text-light">Nombre total des factures</p>
+                        <h4 class="mb-0">
+                            <span  id="tvaspan" th:text="${stat.nombrefacturestotal}"></span>
+                        </h4>
+                        
+
+                        <div class="chart-wrapper px-0" style="height:70px;" height="70">
+                            <canvas id="widgetChart1"></canvas>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <!--/.col-->
+
+            <div class="col-sm-6 col-lg-3" style="margin-top: 40px">
+                <div class="card text-white bg-flat-color-2" style="background-color: #63c2de">
+                    <div class="card-body pb-0">
+                     
+                        <p class="text-light">Nombre des factures</p>
+                        <h4 class="mb-0">
+                            <span  id="timbrespan" th:text="${stat.nombrefactures}"></span>
+                        </h4>
+                        
+
+                        <div class="chart-wrapper px-0" style="height:70px;" height="70">
+                            <canvas id="widgetChart2"></canvas>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!--/.col-->
+
+            <div class="col-sm-6 col-lg-3" style="margin-top: 40px">
+                <div class="card text-white bg-flat-color-3" style="background-color: #ffc107">
+                    <div class="card-body pb-0">
+                      
+                         <p class="text-light">Nombre des avoirs</p>
+                        <h4 class="mb-0">
+                            <span class="count" th:text="${stat.nombreavoirs}" id="nbfact"></span>
+                        </h4>
+                       
+
+                    </div>
+
+                    <div class="chart-wrapper px-0" style="height:70px;" height="70">
+                        <canvas id="widgetChart3"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!--/.col-->
+
+
+       
+                 
+                         <div style="width: 700px">
+        <canvas id="myChart2" ></canvas>
+        </div>
+        <div class="row" style="margin-left: 20px">
+        <div>
+        
+        <div id="reglmtable">
+                          <div class="card" style="width: 750px">
+                            <h5 class="card-header" >Reglement statistiques</h5>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table" id="tablestat">
+                                        <thead class="bg-light">
+                                            <tr class="border-0">
+                                                <th class="border-0"></th>
+                                               
+                                                <th class="border-0">TND</th>
+                                                <th class="border-0">EURO</th>
+                                                <th class="border-0">EURO CTV</th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody id="bodyreglementtable">
+                                             
+                                            <tr>
+                                                
+                                                <td>
+                                               Reglements 
+                                                </td>
+                                                
+                                                <td th:text="${#numbers.formatDecimal(stat.totalfacturefacturetnd, 1, 'DEFAULT', 2, 'DEFAULT')}"></td>
+                                                <td th:text="${stat.totaltvafacturetnd}"></td>
+                                                <td th:text="${stat.totaltimbrefacturetnd}"></td>
+                                               
+                                               
+                                            </tr>
+                                            
+                                             <tr>
+                                               
+                                                <td>
+                                               Frais Bancaire 
+                                                </td>
+                                                <td th:text="${stat.totalfactureavoirtnd}"></td>
+                                                <td th:text="${stat.totaltvaavoirtnd}"></td>
+                                                <td th:text="${stat.totaltimbreavoirtnd}"></td>
+                                               
+                                               
+                                            </tr>
+                                              <tr>
+                                               
+                                                <td>
+                                               Total 
+                                                </td>
+                                               <td th:text="${stat.totaltnd}"></td>
+                                                <td th:text="${stat.totaltvatnd}"></td>
+                                                <td th:text="${stat.totaltimbretnd}"></td>
+                                               
+                                               
+                                            </tr>
+                                            
+                                            
+                                          
+                                            
+                                            
+                                      
+                                       
+                                          
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+               
+                    </div>
+                    
+        
+        <div id="facturestattable">
+        <div>
+                        <div class="card" style="width: 750px">
+                            <h5 class="card-header" id="tableheader">Factures statistiques</h5>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table" id="tablestat">
+                                        <thead class="bg-light">
+                                            <tr class="border-0">
+                                                <th class="border-0">Devise</th>
+                                                <th class="border-0">Type</th>
+                                                <th class="border-0">Total facturé</th>
+                                                <th class="border-0">TotalTVA</th>
+                                                <th class="border-0">Total timbre</th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody id="bodystatmensuel">
+                                             
+                                            <tr>
+                                                <td rowspan="3">TND</td>
+                                                <td>
+                                               Factures 
+                                                </td>
+                                                
+                                                <td th:text="${#numbers.formatDecimal(stat.totalfacturefacturetnd, 1, 'DEFAULT', 2, 'DEFAULT')}"></td>
+                                                <td th:text="${stat.totaltvafacturetnd}"></td>
+                                                <td th:text="${stat.totaltimbrefacturetnd}"></td>
+                                               
+                                               
+                                            </tr>
+                                            
+                                             <tr>
+                                               
+                                                <td>
+                                               Avoir 
+                                                </td>
+                                                <td th:text="${stat.totalfactureavoirtnd}"></td>
+                                                <td th:text="${stat.totaltvaavoirtnd}"></td>
+                                                <td th:text="${stat.totaltimbreavoirtnd}"></td>
+                                               
+                                               
+                                            </tr>
+                                              <tr>
+                                               
+                                                <td>
+                                               Total 
+                                                </td>
+                                               <td th:text="${stat.totaltnd}"></td>
+                                                <td th:text="${stat.totaltvatnd}"></td>
+                                                <td th:text="${stat.totaltimbretnd}"></td>
+                                               
+                                               
+                                            </tr>
+                                            
+                                              <tr>
+                                                <td rowspan="3">EURO</td>
+                                                <td>
+                                               Factures 
+                                                </td>
+                                                <td th:text="${stat.totalfacturefactureeuro}"></td>
+                                                <td th:text="${stat.totaltvafactureeuro}"></td>
+                                                <td th:text="${stat.totaltimbrefactureeuro}"></td>
+                                               
+                                               
+                                            </tr>
+                                            
+                                              <tr>
+                                                
+                                                <td>
+                                               Avoirs 
+                                                </td>
+                                              <td th:text="${stat.totalfactureavoireuro}"></td>
+                                                <td th:text="${stat.totaltvaavoireuro}"></td>
+                                                <td th:text="${stat.totaltimbreavoireuro}"></td>
+                                               
+                                               
+                                            </tr>
+                                              <tr>
+                                                <td rowspan="3">TND</td>
+                                                <td>
+                                               Total 
+                                                </td>
+                                              <td th:text="${stat.totaleuro}"></td>
+                                                <td th:text="${stat.totaltvaeuro}"></td>
+                                                <td th:text="${stat.totaltimbreeuro}"></td>
+                                               
+                                               
+                                            </tr>
+                                      
+                                       
+                                          
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                            <div>
+                        <div class="card">
+                            <h5 class="card-header" id="tableheaderctv">Factures CTV statistiques</h5>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead class="bg-light">
+                                            <tr class="border-0">
+                                                <th class="border-0">Devise</th>
+                                                <th class="border-0">Type</th>
+                                                <th class="border-0">Total facturé</th>
+                                                <th class="border-0">Total TVA</th>
+                                                <th class="border-0">Total timbre</th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody id="bodystatmensuelCTV">
+                                          <tr>
+                                                <td rowspan="3">TND</td>
+                                                <td>
+                                               Factures 
+                                                </td>
+                                                <td th:text="${stat.totalfacturefacturetnd}"></td>
+                                                <td th:text="${stat.totaltvafacturetnd}"></td>
+                                                <td th:text="${stat.totaltimbrefacturetnd}"></td>
+                                               
+                                               
+                                            </tr>
+                                            
+                                             <tr>
+                                               
+                                                <td>
+                                               Avoir 
+                                                </td>
+                                                <td th:text="${stat.totalfactureavoirtnd}"></td>
+                                                <td th:text="${stat.totaltvaavoirtnd}"></td>
+                                                <td th:text="${stat.totaltimbreavoirtnd}"></td>
+                                               
+                                               
+                                            </tr>
+                                              <tr>
+                                               
+                                                <td>
+                                               Total 
+                                                </td>
+                                               <td th:text="${stat.totaltnd}"></td>
+                                                <td th:text="${stat.totaltvatnd}"></td>
+                                                <td th:text="${stat.totaltimbretnd}"></td>
+                                               
+                                               
+                                            </tr>
+                                            
+                                         
+                                            <tr>
+                                                <td rowspan="3">EURO/CTV</td>
+                                                <td>
+                                               Factures 
+                                                </td>
+                                                <td th:text="${stat.totalfacturefactureeuroctv}"></td>
+                                                <td th:text="${stat.totaltvafactureeuroctv}"></td>
+                                                <td th:text="${stat.totaltimbrefactureeuroctv}"></td>
+                                               
+                                               
+                                            </tr>
+                                             <tr>
+                                               
+                                                <td>
+                                               Avoirs 
+                                                </td>
+                                                <td th:text="${stat.totalfactureavoireuroctv}"></td>
+                                                <td th:text="${stat.totaltvaavoireuroctv}"></td>
+                                                <td th:text="${stat.totaltimbreavoireuroctv}"></td>
+                                               
+                                               
+                                            </tr>
+                                            
+                                               <tr>
+                                               
+                                                <td>
+                                               Total 
+                                                </td>
+                                                <td th:text="${stat.totaleuroctv}"></td>
+                                                <td th:text="${stat.totaltvaeuroctv}"></td>
+                                                <td th:text="${stat.totaltimbreeuroctv}"></td>
+                                               
+                                               
+                                            </tr>
+                                      
+                                       
+                                            <tr>
+                                                <td colspan="8"><a href="#" class="btn btn-outline-light float-right">View Details</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-lg-12 col-md-6 col-sm-12 col-12" id="facturetable">
+                                <!-- ============================================================== -->
+                                <!-- top perfomimg  -->
+                                <!-- ============================================================== -->
+                                <div class="card">
+                                    <h5 class="card-header">Tableau des Factures</h5>
+                                    <div class="card-body p-0">
+                                        <div class="table-responsive">
+                                            <table class="table no-wrap p-table">
+                                                <thead class="bg-light">
+                                                    <tr class="border-0">
+                                                        <th class="border-0">Numéro</th>
+                                                        <th class="border-0">Date</th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="bodyfactlist">
+                                                    <tr th:each="facture: ${factures}">
+                                                      <td th:text = "${facture.number}"></td>
+				
+				<td th:text="${#dates.format(facture.date, 'yyyy/MM/dd')}"></td>
+                                                     
+                                                    </tr>
+                                                 
+                                                  
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- ============================================================== -->
+                                <!-- end top perfomimg  -->
+                                <!-- ============================================================== -->
+                            </div>
+                            </div>
+                            <div style="width: 700px;margin-left: 20px;margin-bottom: 20px" id="regchart" >
+        <canvas id="myChart" ></canvas>
+        </div>
+                            <div class="card mb-3" id="facturescard">
+                            
+                            <div class="no-gutters row">
+                            <div class="col-md-12 col-lg-4">
+                            <ul class="list-group list-group-flush">
+                            <li class="bg-transparent list-group-item">
+                            <div class="widget-content p-0">
+                            <div class="widget-content-outer">
+                            <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                            <div class="widget-heading">Total Facturé</div>
+                            <div class="widget-subheading">En dinars Tunisien</div>
+                            </div>
+                            <div class="widget-content-right">
+                            <div class="widget-numbers text-success" id="totalfact" th:text="${stat.totalfact}"></div>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            </li>
+                            
+                            </ul>
+</div> 
+						
+						 <div class="col-md-12 col-lg-4" id="totalTVAstat">
+                            <ul class="list-group list-group-flush">
+                            <li class="bg-transparent list-group-item">
+                            <div class="widget-content p-0">
+                            <div class="widget-content-outer">
+                            <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                            <div class="widget-heading">Total TVA</div>
+                            <div class="widget-subheading">En dinars Tunisien</div>
+                            </div>
+                            <div class="widget-content-right">
+                            <div class="widget-numbers text-primary" id="totaltva" th:text="${stat.totaltva}"></div>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            </li>
+                        
+                            </ul>
+</div> 
+						
+						 <div class="col-md-12 col-lg-4" id="totaltimbrestat">
+                            <ul class="list-group list-group-flush">
+                            <li class="bg-transparent list-group-item">
+                            <div class="widget-content p-0">
+                            <div class="widget-content-outer">
+                            <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                            <div class="widget-heading">Total Timbre</div>
+                            <div class="widget-subheading">En dinars Tunisien</div>
+                            </div>
+                            <div class="widget-content-right">
+                            <div class="widget-numbers text-danger" id="totaltim" th:text="${stat.totaltim}"></div>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            </li>
+                            
+                            </ul>
+</div> 
+
+
+	 				
+
+</div>
+
+</div> 
+
+
+                  <div class="card mb-3" id="cardReglems">
+                            
+                            <div class="no-gutters row">
+                            <div class="col-md-12 col-lg-4">
+                            <ul class="list-group list-group-flush">
+                            <li class="bg-transparent list-group-item">
+                            <div class="widget-content p-0">
+                            <div class="widget-content-outer">
+                            <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                            <div class="widget-heading">Total Reglements</div>
+                            <div class="widget-subheading">En dinars Tunisien</div>
+                            </div>
+                            <div class="widget-content-right">
+                            <div class="widget-numbers text-success" id="totalregls" th:text="${stat.totalfact}"></div>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            </li>
+                            
+                            </ul>
+</div> 
+						
+						 <div class="col-md-12 col-lg-4" >
+                            <ul class="list-group list-group-flush">
+                            <li class="bg-transparent list-group-item">
+                            <div class="widget-content p-0">
+                            <div class="widget-content-outer">
+                            <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                            <div class="widget-heading">Total Frais Bancaire</div>
+                            <div class="widget-subheading">En dinars Tunisien</div>
+                            </div>
+                            <div class="widget-content-right">
+                            <div class="widget-numbers text-primary" id="totalfb" th:text="${stat.totaltva}"></div>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            </li>
+                        
+                            </ul>
+</div> 
+
+
+		 <div class="col-md-12 col-lg-4" >
+                            <ul class="list-group list-group-flush">
+                            <li class="bg-transparent list-group-item">
+                            <div class="widget-content p-0">
+                            <div class="widget-content-outer">
+                            <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                            <div class="widget-heading">Total</div>
+                            <div class="widget-subheading">En dinars Tunisien</div>
+                            </div>
+                            <div class="widget-content-right">
+                            <div class="widget-numbers text-primary" id="totalregfb" th:text="${stat.totaltva}"></div>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            </li>
+                        
+                            </ul>
+</div> 
+				
+
+
+	 				
+
+</div>
+
+</div>             
+                    
+        
+   
+
+
+        
+        
+
+        
+        <script>
+        var token=sessionStorage.getItem('token');
+	
+
+	function updateTableFlexSortant(data){
+		const tbody = document.getElementById('bodystatmensuel');
+		tbody.innerHTML='';
+		
+			var tr = document.createElement('tr');
+			
+				 var tdCurrency = document.createElement('td');
+		            tdCurrency.setAttribute('rowspan',3);
+		            tdCurrency.textContent = "TND";
+		            tdCurrency.style.verticalAlign = "middle";
+		            tdCurrency.style.textAlign = "center";
+		            tr.appendChild(tdCurrency);
+
+		            var tdType = document.createElement('td');
+		            tdType.textContent = "Factures";
+		            tr.appendChild(tdType);
+
+		            var tdSumFact = document.createElement('td');
+		            
+		            tdSumFact.textContent = data.totalfacturefacturetnd.toFixed(3);
+		            tr.appendChild(tdSumFact);
+
+		            var tdSumTVA = document.createElement('td');
+		            
+		            tdSumTVA.textContent = data.totaltvafacturetnd.toFixed(3);
+		            tr.appendChild(tdSumTVA);
+
+		            var tdSumTimbre = document.createElement('td');
+		           
+		            tdSumTimbre.textContent = data.totaltimbrefacturetnd.toFixed(3);
+		            tr.appendChild(tdSumTimbre);
+		            tbody.append(tr);
+				
+			
+				
+		            var tr = document.createElement('tr');
+		            var tdType = document.createElement('td');
+		            tdType.textContent = "Avoirs";
+		            tr.appendChild(tdType);
+
+		            var tdSumFact = document.createElement('td');
+		            
+		            tdSumFact.textContent = data.totalfactureavoirtnd.toFixed(3);
+		            tr.appendChild(tdSumFact);
+
+		            var tdSumTVA = document.createElement('td');
+		            
+		            tdSumTVA.textContent = data.totaltvaavoirtnd.toFixed(3);
+		            tr.appendChild(tdSumTVA);
+
+		            var tdSumTimbre = document.createElement('td');
+		           
+		            tdSumTimbre.textContent = data.totaltimbreavoirtnd.toFixed(3);
+		            tr.appendChild(tdSumTimbre);
+		            tbody.append(tr);
+					
+					
+					
+		            var tr = document.createElement('tr');
+			
+				
+
+	            var tdType = document.createElement('td');
+	            tdType.textContent = "Total";
+	            tr.appendChild(tdType);
+
+	            var tdSumFact = document.createElement('td');
+	            
+	            tdSumFact.textContent = data.totaltnd.toFixed(3);
+	            tr.appendChild(tdSumFact);
+
+	            var tdSumTVA = document.createElement('td');
+	            
+	            tdSumTVA.textContent = data.totaltvatnd.toFixed(3);
+	            tr.appendChild(tdSumTVA);
+
+	            var tdSumTimbre = document.createElement('td');
+	           
+	            tdSumTimbre.textContent = data.totaltimbretnd.toFixed(3);
+	            tr.appendChild(tdSumTimbre);
+	            tbody.append(tr);
+				
+				
+				
+	            var tr = document.createElement('tr');
+				 var tdCurrency = document.createElement('td');
+		            tdCurrency.setAttribute('rowspan',3);
+		            tdCurrency.textContent = "EURO";
+		            tdCurrency.style.verticalAlign = "middle";
+		            tdCurrency.style.textAlign = "center";
+		            tr.appendChild(tdCurrency);
+
+		            var tdType = document.createElement('td');
+		            tdType.textContent = "Factures";
+		            tr.appendChild(tdType);
+
+		            var tdSumFact = document.createElement('td');
+		            
+		            tdSumFact.textContent = data.totalfacturefactureeuro.toFixed(3);
+		            tr.appendChild(tdSumFact);
+
+		            var tdSumTVA = document.createElement('td');
+		            
+		            tdSumTVA.textContent = data.totaltvafactureeuro.toFixed(3);
+		            tr.appendChild(tdSumTVA);
+
+		            var tdSumTimbre = document.createElement('td');
+		           
+		            tdSumTimbre.textContent = data.totaltimbrefactureeuro.toFixed(3);
+		            tr.appendChild(tdSumTimbre);
+		            tbody.append(tr);
+					
+					
+					
+		            var tr = document.createElement('tr');
+		
+				
+
+	            var tdType = document.createElement('td');
+	            tdType.textContent = "Avoirs";
+	            tr.appendChild(tdType);
+
+	            var tdSumFact = document.createElement('td');
+	            
+	            tdSumFact.textContent = data.totalfactureavoireuro.toFixed(3);
+	            tr.appendChild(tdSumFact);
+
+	            var tdSumTVA = document.createElement('td');
+	            
+	            tdSumTVA.textContent = data.totaltvaavoireuro.toFixed(3);
+	            tr.appendChild(tdSumTVA);
+
+	            var tdSumTimbre = document.createElement('td');
+	           
+	            tdSumTimbre.textContent = data.totaltimbreavoireuro.toFixed(3);
+	            tr.appendChild(tdSumTimbre);
+			
+	
+	            tbody.append(tr);
+				
+				
+				
+	            var tr = document.createElement('tr');
+
+            var tdType = document.createElement('td');
+            tdType.textContent = "Total";
+            tr.appendChild(tdType);
+
+            var tdSumFact = document.createElement('td');
+            
+            tdSumFact.textContent = data.totaleuro.toFixed(3);
+            tr.appendChild(tdSumFact);
+
+            var tdSumTVA = document.createElement('td');
+            
+            tdSumTVA.textContent = data.totaltvaeuro.toFixed(3);
+            tr.appendChild(tdSumTVA);
+
+            var tdSumTimbre = document.createElement('td');
+           
+            tdSumTimbre.textContent = data.totaltimbreeuro.toFixed(3);
+            tr.appendChild(tdSumTimbre);
+		
+			tbody.append(tr);
+
+
+			
+			
+		}
+
+	function updateTableFlexSortantCTV(data){
+		updateTableFlexSortant(data)
+		const tbody = document.getElementById('bodystatmensuelCTV');
+		tbody.innerHTML='';
+		
+			var tr = document.createElement('tr');
+			
+				 var tdCurrency = document.createElement('td');
+		            tdCurrency.setAttribute('rowspan',3);
+		            tdCurrency.textContent = "TND";
+		            tdCurrency.style.verticalAlign = "middle";
+		            tdCurrency.style.textAlign = "center";
+		            tr.appendChild(tdCurrency);
+
+		            var tdType = document.createElement('td');
+		            tdType.textContent = "Factures";
+		            tr.appendChild(tdType);
+
+		            var tdSumFact = document.createElement('td');
+		            
+		            tdSumFact.textContent = data.totalfacturefacturetnd.toFixed(3);
+		            tr.appendChild(tdSumFact);
+
+		            var tdSumTVA = document.createElement('td');
+		            
+		            tdSumTVA.textContent = data.totaltvafacturetnd.toFixed(3);
+		            tr.appendChild(tdSumTVA);
+
+		            var tdSumTimbre = document.createElement('td');
+		           
+		            tdSumTimbre.textContent = data.totaltimbrefacturetnd.toFixed(3);
+		            tr.appendChild(tdSumTimbre);
+		            tbody.append(tr);
+					
+					
+					
+		            var tr = document.createElement('tr');
+				
+
+		            var tdType = document.createElement('td');
+		            tdType.textContent = "Avoirs";
+		            tr.appendChild(tdType);
+
+		            var tdSumFact = document.createElement('td');
+		            
+		            tdSumFact.textContent = data.totalfactureavoirtnd.toFixed(3);
+		            tr.appendChild(tdSumFact);
+
+		            var tdSumTVA = document.createElement('td');
+		            
+		            tdSumTVA.textContent = data.totaltvaavoirtnd.toFixed(3);
+		            tr.appendChild(tdSumTVA);
+
+		            var tdSumTimbre = document.createElement('td');
+		           
+		            tdSumTimbre.textContent = data.totaltimbreavoirtnd.toFixed(3);
+		            tr.appendChild(tdSumTimbre);
+		            tbody.append(tr);
+					
+					
+					
+		            var tr = document.createElement('tr');
+				
+
+	            var tdType = document.createElement('td');
+	            tdType.textContent = "Total";
+	            tr.appendChild(tdType);
+
+	            var tdSumFact = document.createElement('td');
+	            
+	            tdSumFact.textContent = data.totaltnd.toFixed(3);
+	            tr.appendChild(tdSumFact);
+
+	            var tdSumTVA = document.createElement('td');
+	            
+	            tdSumTVA.textContent = data.totaltvatnd.toFixed(3);
+	            tr.appendChild(tdSumTVA);
+
+	            var tdSumTimbre = document.createElement('td');
+	           
+	            tdSumTimbre.textContent = data.totaltimbretnd.toFixed(3);
+	            tr.appendChild(tdSumTimbre);
+	            tbody.append(tr);
+				
+				
+				
+	            var tr = document.createElement('tr');
+				 var tdCurrency = document.createElement('td');
+		            tdCurrency.setAttribute('rowspan',3);
+		            tdCurrency.textContent = "EURO/CTV";
+		            tdCurrency.style.verticalAlign = "middle";
+		            tdCurrency.style.textAlign = "center";
+		            tr.appendChild(tdCurrency);
+
+		            var tdType = document.createElement('td');
+		            tdType.textContent = "Factures";
+		            tr.appendChild(tdType);
+
+		            var tdSumFact = document.createElement('td');
+		            
+		            tdSumFact.textContent = data.totalfacturefactureeuroctv.toFixed(3);
+		            tr.appendChild(tdSumFact);
+
+		            var tdSumTVA = document.createElement('td');
+		            
+		            tdSumTVA.textContent = data.totaltvafactureeuroctv.toFixed(3);
+		            tr.appendChild(tdSumTVA);
+
+		            var tdSumTimbre = document.createElement('td');
+		           
+		            tdSumTimbre.textContent = data.totaltimbrefactureeuroctv.toFixed(3);
+		            tr.appendChild(tdSumTimbre);
+		            tbody.append(tr);
+					
+					
+					
+		            var tr = document.createElement('tr');
+				
+
+	            var tdType = document.createElement('td');
+	            tdType.textContent = "Avoirs";
+	            tr.appendChild(tdType);
+
+	            var tdSumFact = document.createElement('td');
+	            
+	            tdSumFact.textContent = data.totalfactureavoireuroctv.toFixed(3);
+	            tr.appendChild(tdSumFact);
+
+	            var tdSumTVA = document.createElement('td');
+	            
+	            tdSumTVA.textContent = data.totaltvaavoireuroctv.toFixed(3);
+	            tr.appendChild(tdSumTVA);
+
+	            var tdSumTimbre = document.createElement('td');
+	           
+	            tdSumTimbre.textContent = data.totaltimbreavoireuroctv.toFixed(3);
+	            tr.appendChild(tdSumTimbre);
+	            tbody.append(tr);
+				
+				
+				
+	            var tr = document.createElement('tr');
+			
+
+            var tdType = document.createElement('td');
+            tdType.textContent = "Total";
+            tr.appendChild(tdType);
+
+            var tdSumFact = document.createElement('td');
+            
+            tdSumFact.textContent = data.totaleuroctv.toFixed(3);
+            tr.appendChild(tdSumFact);
+
+            var tdSumTVA = document.createElement('td');
+            
+            tdSumTVA.textContent = data.totaltvaeuroctv.toFixed(3);
+            tr.appendChild(tdSumTVA);
+
+            var tdSumTimbre = document.createElement('td');
+           
+            tdSumTimbre.textContent = data.totaltimbreeuroctv.toFixed(3);
+            tr.appendChild(tdSumTimbre);
+		
+			tbody.append(tr);
+
+
+			
+			
+		}
+
+	function updateTableReglementCTV(data){
+		
+		const tbody = document.getElementById('bodyreglementtable');
+		tbody.innerHTML='';
+		var count=0;
+		
+			
+			var tr = document.createElement('tr');
+			
+				 var tdtype = document.createElement('td');
+		            
+				 tdtype.textContent = "Reglement"
+				tr.appendChild(tdtype);
+
+				 var tdregtnd = document.createElement('td');
+				
+				 tdregtnd.textContent = data.totaltnd.toFixed(3)
+				tr.appendChild(tdregtnd);
+
+				 var tdregeuro = document.createElement('td');
+		            
+				 tdregeuro.textContent = data.totaleuro.toFixed(3)
+				tr.appendChild(tdregeuro);
+
+				 var tdregeuroctv = document.createElement('td');
+		            
+				 tdregeuroctv.textContent = data.totaleuroctv.toFixed(3)
+				tr.appendChild(tdregeuroctv);
+
+				 tbody.append(tr);
+
+				 tr = document.createElement('tr');
+				 var tdtype = document.createElement('td');
+		            
+				 tdtype.textContent = "Frais Bancaire"
+				tr.appendChild(tdtype);
+
+				 var tdregtnd = document.createElement('td');
+		            
+				 tdregtnd.textContent = data.totalfb.toFixed(3)
+				tr.appendChild(tdregtnd);
+
+				 var tdregeuro = document.createElement('td');
+		            
+				 tdregeuro.textContent = data.totalfbeuro.toFixed(3)
+				tr.appendChild(tdregeuro);
+
+				 var tdregeuroctv = document.createElement('td');
+		            
+				 tdregeuroctv.textContent = data.totalfbeuroctv.toFixed(3)
+				tr.appendChild(tdregeuroctv);
+
+				 tbody.append(tr);
+
+				 tr = document.createElement('tr');
+				 var tdtype = document.createElement('td');
+		            
+				 tdtype.textContent = "Total"
+				tr.appendChild(tdtype);
+
+				 var tdregtnd = document.createElement('td');
+		            
+				 tdregtnd.textContent = data.totaltnd.toFixed(3)-data.totalfb.toFixed(3)
+				tr.appendChild(tdregtnd);
+
+				 var tdregeuro = document.createElement('td');
+		            
+				 tdregeuro.textContent = data.totaleuro.toFixed(3)-data.totalfbeuro.toFixed(3)
+				tr.appendChild(tdregeuro);
+
+				 var tdregeuroctv = document.createElement('td');
+		            
+				 tdregeuroctv.textContent = data.totaleuroctv.toFixed(3)-data.totalfbeuroctv.toFixed(3)
+				tr.appendChild(tdregeuroctv);
+
+				 tbody.append(tr);
+				 
+
+		            
+
+
+			
+			
+		}
+
+	function updateFactureListTable(rowsData){
+		
+		const tbody = document.getElementById('bodyfactlist');
+		tbody.innerHTML='';
+		
+		rowsData.forEach(data => {
+			
+			var tr = document.createElement('tr');
+			
+				 const tdCurrency = document.createElement('td');
+		           
+		            tdCurrency.textContent = data.number;
+		            tdCurrency.style.textAlign = "center";
+		            tr.appendChild(tdCurrency);
+
+		            const tdType = document.createElement('td');
+		            tdType.textContent = data.date;
+		            tr.appendChild(tdType);
+		            tbody.appendChild(tr)
+		})
+
+		 tbody.addEventListener('transitionend', function() {
+			 tbody.style.transition = '';
+	    	}, { once: true });
+	      setTimeout(function() {
+	    	  tbody.style.cssText = 'opacity: 1; transition: opacity 1s ease-in-out;';
+	    	}, 100);
+		}
+
+	function FluxSortant(year,month){
+		 const formData = new FormData();
+		
+	       // Add fields to the form data
+	       formData.append('year',year);
+	       formData.append('month',month);
+	       
+	          
+	      	fetch('/ERPPro/user/MensuelRealsortie', {
+	            method: 'POST',
+	            headers: {
+	            	 'Authorization': `Bearer ${token}`
+	            	    },
+	            body: formData,
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+		      
+	        	updateTableFlexSortantCTV(data)
+	        	updateFactureListTable(data.factures)
+	        	
+	        	document.getElementById('regchart').style.display="none"
+	        	document.getElementById('totaltva').style.display="block"
+			        document.getElementById('timbrespan').style.display="block"
+	        	document.getElementById('tvaspan').textContent=data.nombrefacturestotal
+	        	document.getElementById('timbrespan').textContent=data.nombrefactures
+	        	document.getElementById('nbfact').textContent=data.nombreavoirs
+	        	  
+	        	document.getElementById('totalfact').textContent=data.totalfact.toFixed(3)
+	        	document.getElementById('totaltva').textContent=data.totaltva.toFixed(3)
+	        	document.getElementById('totaltim').textContent=data.totaltim
+	        	
+	        	
+	        	
+	        	
+	        })
+
+		
+		}
+
+	function FluxSortantPotentielMonth(year,month){
+		 const formData = new FormData();
+
+	       // Add fields to the form data
+	       formData.append('year',year);
+	       formData.append('month',month);
+	       
+	          
+	      	fetch('/ERPPro/user/MensuelPotentielsortie', {
+	            method: 'POST',
+	            headers: {
+	            	 'Authorization': `Bearer ${token}`
+	            	    },
+	            body: formData,
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	        	
+	        	updateTableFlexSortantCTV(data)
+	        	document.getElementById('regchart').style.display="none"
+	        	document.getElementById('totaltva').style.display="block"
+			        document.getElementById('timbrespan').style.display="block"
+
+	        	document.getElementById('totalfact').textContent=data.totalfact.toFixed(3)
+	        	document.getElementById('totaltva').textContent=data.totaltva.toFixed(3)
+	        	document.getElementById('totaltim').textContent=data.totaltim.toFixed(3)
+	        	
+	        	
+	        	
+	        	
+	        })
+
+		
+		}
+
+	function FluxSortantPotentielYear(year){
+		 const formData = new FormData();
+
+	       // Add fields to the form data
+	       formData.append('year',year);
+	      
+	       
+	          
+	      	fetch('/ERPPro/user/YearPotentielsortie', {
+	            method: 'POST',
+	            headers: {
+	            	 'Authorization': `Bearer ${token}`
+	            	    },
+	            body: formData,
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	        	
+	        	updateTableFlexSortantCTV(data)
+	        	document.getElementById('regchart').style.display="none"
+	        	document.getElementById('totaltva').style.display="block"
+			        document.getElementById('timbrespan').style.display="block"
+
+	        	document.getElementById('totalfact').textContent=data.totalfact.toFixed(3)
+	        	document.getElementById('totaltva').textContent=data.totaltva.toFixed(3)
+	        	document.getElementById('totaltim').textContent=data.totaltim.toFixed(3)
+	        	
+	        	
+	        	
+	        	
+	        })
+
+		
+		}
+
+	function FluxSortantPotentielMonthByClient(year,month){
+		 const formData = new FormData();
+		var id= document.getElementById('clientId').value
+	       // Add fields to the form data
+	       formData.append('year',year);
+	       formData.append('month',month);
+	       
+	          
+	      	fetch('/ERPPro/user/MensuelPotentielsortieByClient/'+id, {
+	            method: 'POST',
+	            headers: {
+	            	 'Authorization': `Bearer ${token}`
+	            	    },
+	            body: formData,
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	        	
+	        	updateTableFlexSortantCTV(data)
+	        	document.getElementById('regchart').style.display="none"
+	        	document.getElementById('totaltva').style.display="block"
+			        document.getElementById('timbrespan').style.display="block"
+
+	        	document.getElementById('totalfact').textContent=data.totalfact.toFixed(3)
+	        	document.getElementById('totaltva').textContent=data.totaltva.toFixed(3)
+	        	document.getElementById('totaltim').textContent=data.totaltim.toFixed(3)
+	        	
+	        	
+	        	
+	        	
+	        })
+
+		
+		}
+
+	function FluxSortantPotentielYearByClient(year){
+		console.log("hay year")
+		console.log(year)
+		 const formData = new FormData();
+		 var id= document.getElementById('clientId').value
+	       // Add fields to the form data
+	       formData.append('year',year);
+	      
+	       
+	          
+	      	fetch('/ERPPro/user/YearPotentielsortieByClient/'+id, {
+	            method: 'POST',
+	            headers: {
+	            	 'Authorization': `Bearer ${token}`
+	            	    },
+	            body: formData,
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	        	
+	        	updateTableFlexSortantCTV(data)
+	        	document.getElementById('regchart').style.display="none"
+	        	document.getElementById('totaltva').style.display="block"
+			        document.getElementById('timbrespan').style.display="block"
+
+	        	document.getElementById('totalfact').textContent=data.totalfact.toFixed(3)
+	        	document.getElementById('totaltva').textContent=data.totaltva.toFixed(3)
+	        	document.getElementById('totaltim').textContent=data.totaltim.toFixed(3)
+	        	
+	        	
+	        	
+	        	
+	        })
+
+		
+		}
+
+
+
+
+
+
+
+
+	function FluxSortantRealMonth(year,month){
+		 const formData = new FormData();
+
+	       // Add fields to the form data
+	       formData.append('year',year);
+	       formData.append('month',month);
+	       
+	          
+	      	fetch('/ERPPro/user/MensuelRegsortie', {
+	            method: 'POST',
+	            headers: {
+	            	 'Authorization': `Bearer ${token}`
+	            	    },
+	            body: formData,
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	        	
+	        	updateTableReglementCTV(data)
+	        	
+	        	ChartUpdate()
+		 document.getElementById('regchart').style.display="block"
+				document.getElementById('totaltva').style.display="block"
+			        document.getElementById('timbrespan').style.display="block"
+	        	document.getElementById('totalregls').textContent=data.totalfact.toFixed(3)
+	        	document.getElementById('totalfb').textContent=data.totalfball.toFixed(3)
+	        	document.getElementById('totalregfb').textContent=data.regmontant.toFixed(3)
+	        	
+	        	document.getElementById('totaltva').style.display="none"
+	        	document.getElementById('totaltim').style.display="none"
+	        	
+	        	
+	        	
+	        	
+	        })
+
+		
+		}
+
+	function FluxSortantRealYear(year){
+		 const formData = new FormData();
+
+	       // Add fields to the form data
+	       formData.append('year',year);
+	      
+	       
+	          
+	      	fetch('/ERPPro/user/YearRegsortie', {
+	            method: 'POST',
+	            headers: {
+	            	 'Authorization': `Bearer ${token}`
+	            	    },
+	            body: formData,
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	        	
+	        	updateTableReglementCTV(data)
+	        	ChartUpdate()
+		 document.getElementById('regchart').style.display="block"
+	        	
+
+	        		document.getElementById('totalregls').textContent=data.totalfact.toFixed(3)
+		        	document.getElementById('totalfb').textContent=data.totalfball.toFixed(3)
+		        	document.getElementById('totalregfb').textContent=data.regmontant.toFixed(3)
+	        	document.getElementById('totaltva').style.display="none"
+		        document.getElementById('totaltim').style.display="none"
+	        	
+	        	
+	        	
+	        	
+	        })
+
+		
+		}
+
+	function FluxSortantRealMonthByClient(year,month){
+		 const formData = new FormData();
+		 
+	      
+	      formData.append('year',year);
+	       formData.append('month',month);
+	       var id= document.getElementById('clientId').value
+	          
+	      	fetch('/ERPPro/user/MensuelRealsortieByClient/'+id, {
+	            method: 'POST',
+	            headers: {
+	            	 'Authorization': `Bearer ${token}`
+	            	    },
+	            body: formData,
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	        	
+	        	updateTableReglementCTV(data)
+	        	
+	        		        	
+	        	ChartUpdate()
+		 document.getElementById('regchart').style.display="block"
+
+	        		        		document.getElementById('totalregls').textContent=data.totalfact.toFixed(3)
+	        			        	document.getElementById('totalfb').textContent=data.totalfball.toFixed(3)
+	        			        	document.getElementById('totalregfb').textContent=data.regmontant.toFixed(3)
+	        	document.getElementById('totaltva').style.display="none"
+			        document.getElementById('totaltim').style.display="none"
+	        	
+	        	
+	        	
+	        	
+	        })
+
+		
+		}
+
+	function FluxSortantRealYearByClient(year){
+		 const formData = new FormData();
+
+	       // Add fields to the form data
+	       formData.append('year',year);
+	       
+	       var id= document.getElementById('clientId').value
+	          
+	      	fetch('/ERPPro/user/YearRealsortieByClient/'+id, {
+	            method: 'POST',
+	            headers: {
+	            	 'Authorization': `Bearer ${token}`
+	            	    },
+	            body: formData,
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	        	
+	        	updateTableReglementCTV(data)
+	        	ChartUpdate()
+		 document.getElementById('regchart').style.display="block"
+	        	
+	        	
+
+	        		document.getElementById('totalregls').textContent=data.totalfact.toFixed(3)
+		        	document.getElementById('totalfb').textContent=data.totalfball.toFixed(3)
+		        	document.getElementById('totalregfb').textContent=data.regmontant.toFixed(3)
+	        	document.getElementById('totaltva').style.display="none"
+			        document.getElementById('totaltim').style.display="none"
+	        	
+	        	
+	        	
+	        	
+	        })
+
+		
+		}
+        
+        const monthNamesFrench = [
+        	  "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", 
+        	  "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+        	];
+      
+        </script>
+        <script>
+        const yearMonthPicker = document.getElementById('yearMonthPicker');
+        const toggleIcon = document.querySelector('.toggle-icon');
+        const currentYear = new Date().getFullYear();
+        const yearSelector = document.getElementById('yearSelector');
+        const monthsContainer = document.getElementById('monthsContainer');
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        // Function to populate the year selector
+        function populateYearSelector(startYear, endYear) {
+          for (let year = startYear; year <= endYear; year++) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearSelector.appendChild(option);
+          }
+        }
+
+        // Function to update the year
+   
+
+        // Function to populate the months container
+   
+
+        // Initialize the year selector and months container
+        populateYearSelector(currentYear - 5, currentYear + 5); // Populate with a range of years
+         // Populate with all months
+        yearSelector.value = currentYear; // Set the current year as selected
+        updateYear(); // Update the year display
+
+        // Function to toggle visibility of year-month-picker
+        function toggleYearMonthPicker() {
+          if (yearMonthPicker.style.display === 'none') {
+            yearMonthPicker.style.display = 'flex'; // Show the picker
+          
+          } else {
+            yearMonthPicker.style.display = 'none'; // Hide the picker
+           
+          }
+        }
+
+        // Function to handle month click
+        function handleMonthClick(monthName, monthNumber) {
+        	yearMonthPicker.style.display = 'none';
+          const selectedYear = yearSelector.value;
+         
+          const formData = new FormData();
+
+       // Add fields to the form data
+       formData.append('year',selectedYear);
+       formData.append('month',monthNumber);
+       
+          
+      	fetch('/ERPPro/user/TvaSum', {
+            method: 'POST',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+            body: formData,
+        })
+        .then(response => response.text())
+        .then(data => {
+        	console.log(data)
+        	
+        	document.getElementById('tvaspan').textContent=data
+        	
+        	
+        })
+
+               
+      	fetch('/ERPPro/user/TimbreSum', {
+            method: 'POST',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+            body: formData,
+        })
+        .then(response => response.text())
+        .then(data => {
+        	
+        	
+        	document.getElementById('timbrespan').textContent=data
+        	
+        	
+        })
+        }
+
+        function updateDate(){
+        	
+        	
+        	var month=monthNamesFrench[document.getElementById('bdaymonth').value.substring(5, 7) - 1]
+        	var year=document.getElementById('bdaymonth').value.substring(0, 4)
+        	document.getElementById('datetext').textContent="1 "+month+" "+year+"-28 "+month+" "+year
+
+        	var selectedRadio = document.querySelector('input[name="type"]:checked');
+
+
+        	 var selectedValue = selectedRadio.value;
+        	 handleRadioChangetype(selectedValue)
+
+        	  
+        	
+        }
+         
+      	
+
+        </script>
+<script>
+jQuery(document).ready(function ($) {
+	const currentDate = new Date();
+
+	// Get the current month (0-11) and add 1 (1-12)
+	const currentMonth = currentDate.getMonth() + 1;
+
+	// Convert the month to a two-digit string
+	const formattedMonth = currentMonth < 10 ? '0' + currentMonth : currentMonth.toString();
+	const currentYear = new Date().getFullYear();
+	var month=monthNamesFrench[currentMonth]
+	document.getElementById('bdaymonth').value=currentYear+"-"+formattedMonth
+
+	document.getElementById('datetext').textContent="1 "+month+" "+currentYear+"-28 "+month+" "+currentYear
+
+    
+  	fetch('/ERPPro/user/ChangeRate', {
+        method: 'GET',
+        headers: {
+        	 'Authorization': `Bearer ${token}`
+        	    },
+        
+    })
+    .then(response => response.json())
+    .then(data => {
+    	document.getElementById('changet').textContent=data
+    	
+    	
+    	
+    	
+    	
+    })
+
+
+
+	// Set the max attribute of the input field to the current year
+	document.getElementById('yearInput').setAttribute('max', currentYear);
+	
+    
+	
+})
+    </script>
+    
+    <script>
+    document.getElementById('monthPickerIcon').addEventListener('click', function() {
+        console.log("hhhh")
+        document.getElementById('bdaymonth').showPicker();
+    });
+    document.getElementById('YearPickerIcon').addEventListener('click', function() {
+        
+    	const yearinput=document.getElementById('yearInput')
+    	if(yearinput.style.display == 'block'){
+    		yearinput.style.display = 'none';
+        	}
+    	else{
+    		yearinput.style.display == 'block'
+        	}
+    })
+</script>
+
+<script>
+    // Get all radio buttons
+      const radioButtons1 = document.querySelectorAll('input[name="type"]');
+      
+
+    // Add event listener to each radio button
+    radioButtons1.forEach((radio) => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                const selectedValue = this.value;
+                // Call your function with the selected value
+               
+                handleRadioChangetype(selectedValue);
+            }
+        });
+    });
+
+    function handleRadioChangetype(value) {
+    	const yearmonthdiv = document.getElementById('typeper');
+    	const yeardiv = document.getElementById('yearpickdiv');
+    	const monthdiv = document.getElementById('monthPickerIcon');
+    
+    	const clientdiv = document.getElementById('selectClient');
+    	
+    	const selectedValue = document.querySelector('input[name="treatment"]:checked').value;
+    	
+        
+        if(value=="Comptable"){
+        	
+        	yearmonthdiv.style.display = 'none';
+        	yeardiv.style.display = 'none';
+        	clientdiv.style.display = 'none';
+        	
+        		var month=document.getElementById('bdaymonth').value.substring(5, 7);
+                var year=document.getElementById('bdaymonth').value.substring(0, 4);
+        		FluxSortant(year,month)
+        		document.getElementById('facturescard').style.display="block"
+        			document.getElementById('cardReglems').style.display="none"
+        		
+        		document.getElementById('Changerate').style.display="none"
+        		document.getElementById('reglmtable').style.display="none"
+        		document.getElementById('facturetable').style.display="block"
+        		document.getElementById('facturestattable').style.display="block"
+
+        		document.getElementById('totaltimbrestat').style.display="block"
+                document.getElementById('totaltimbrestat').style.display="block"
+            	
+                	
+        	
+             
+            }
+        else if(value=="Real"){
+        	document.getElementById('facturescard').style.display="none"
+    			document.getElementById('cardReglems').style.display="block"
+        	clientdiv.style.display = 'block';
+        	document.getElementById('Changerate').style.display="block"
+        	document.getElementById('reglmtable').style.display="block"
+        		document.getElementById('facturetable').style.display="none"
+        		document.getElementById('facturestattable').style.display="none"
+
+        		document.getElementById('totaltimbrestat').style.display="none"
+                document.getElementById('totaltimbrestat').style.display="none"
+        	yearmonthdiv.style.display = 'block';
+        	if(selectedValue=="mensuel"){
+        		yeardiv.style.display = 'none';
+            	
+            	monthdiv.style.display = 'block';
+        		var month=document.getElementById('bdaymonth').value.substring(5, 7);
+                var year=document.getElementById('bdaymonth').value.substring(0, 4)
+                FluxSortantRealMonth(year,month)
+            }
+        	else{
+        		yeardiv.style.display = 'block';
+            	
+            	monthdiv.style.display = 'none';
+        		var year=document.getElementById('yearSelector').value
+        		FluxSortantRealYear(year)
+            	}
+        }
+
+        else{
+        	document.getElementById('facturescard').style.display="block"
+    			document.getElementById('cardReglems').style.display="none"
+        	clientdiv.style.display = 'block';
+        	document.getElementById('facturetable').style.display="none"
+        		document.getElementById('tableheader').textContent="Proformas statistiques"
+        			document.getElementById('tableheaderctv').textContent="Proformas CTV statistiques"
+        	document.getElementById('Changerate').style.display="none"
+        	document.getElementById('reglmtable').style.display="none"
+        		
+        		document.getElementById('facturestattable').style.display="block"
+        			document.getElementById('totaltimbrestat').style.display="block"
+                        document.getElementById('totaltimbrestat').style.display="block"
+        	yearmonthdiv.style.display = 'block';
+        	if(selectedValue=="mensuel"){
+        		yeardiv.style.display = 'none';
+            	
+            	monthdiv.style.display = 'block';
+        		var month=document.getElementById('bdaymonth').value.substring(5, 7);
+                var year=document.getElementById('bdaymonth').value.substring(0, 4)
+                FluxSortantPotentielMonth(year,month)
+            }
+        	else{
+        		monthdiv.style.display = 'none';
+        		yeardiv.style.display = 'block';
+            	
+        		var year=document.getElementById('yearSelector').textContent
+        		console.log(year)
+        		FluxSortantPotentielYear(year)
+            	}
+        }
+        }
+    
+
+    // Add event listener to each radio button
+    const radioButtons = document.querySelectorAll('input[name="treatment"]');
+    radioButtons.forEach((radio) => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                const selectedValue = this.value;
+                // Call your function with the selected value
+                handleRadioChange(selectedValue);
+            }
+        });
+    });
+
+    // Function to handle radio button change
+    function handleRadioChange(value) {
+    	const yearmonthdiv = document.getElementById('typeper');
+    	const yeardiv = document.getElementById('yearpickdiv');
+    	const monthdiv = document.getElementById('monthPickerIcon');
+    	const clientdiv = document.getElementById('selectClient');
+        
+        const selectedValuetype = document.querySelector('input[name="type"]:checked').value;	
+        if(value=="mensuel"){
+        	
+        	yeardiv.style.display = 'none';
+        	monthdiv.style.display = 'block';
+             if(selectedValuetype=="Potentiel"){
+                 var month=document.getElementById('bdaymonth').value.substring(5, 7);
+                 var year=document.getElementById('bdaymonth').value.substring(0, 4)
+                 clientdiv.style.display = 'block';
+                 FluxSortantPotentielMonth(year,month)
+                 
+                 }
+             else  if(selectedValuetype=="Real"){
+                 var month=document.getElementById('bdaymonth').value.substring(5, 7);
+                 var year=document.getElementById('bdaymonth').value.substring(0, 4)
+                 clientdiv.style.display = 'block';
+                 FluxSortantRealMonth(year,month)
+                 
+                 }
+             else{
+            	 yearmonthdiv.style.display = 'none';
+            	 clientdiv.style.display = 'none';
+            	 var month=document.getElementById('bdaymonth').value.substring(5, 7);
+                 var year=document.getElementById('bdaymonth').value.substring(0, 4)
+                 FluxSortant(year,month)
+                 }
+             
+             
+            }
+        else{
+            
+        	clientdiv.style.display = 'block';
+        	yeardiv.style.display = 'block';
+        	monthdiv.style.display = 'none';
+             if(selectedValuetype=="Potentiel"){
+            	 var year=document.getElementById('yearSelector').value
+            	
+            	 FluxSortantPotentielYear(year)
+                 
+                 }
+             else  if(selectedValuetype=="Real"){
+            	 var year=document.getElementById('yearSelector').value
+            	 console.log(year)
+            	 FluxSortantRealYear(year)
+                 
+                 }
+             }
+        // Add your logic here based on the selected value
+    }
+    
+
+  function updateYear(){
+	 
+	  var year=document.getElementById('yearSelector').value
+	  handleRadioChange(year);
+  	document.getElementById('yearInput').textContent="Année: "+year
+	  }
+
+  function ClientStat(){
+	  
+	  const selectedValue = document.querySelector('input[name="treatment"]:checked').value;
+	  const selectedValuetype = document.querySelector('input[name="type"]:checked').value;
+	  
+	  const RegTable = document.getElementById('reglmtable');
+	  const selectElement = document.getElementById('clientId');
+      const selectedValuec = selectElement.value;
+
+      const monthInput = document.getElementById('monthPickerIcon');
+	  const yearInputdiv = document.getElementById('monthPickerIcon');
+      
+     if(selectedValuec == "all"){
+         if(selectedValue=="mensuel"){
+         	yearInputdiv.style.display = 'none';
+              monthInput.style.display = 'block';
+              if(selectedValuetype=="Potentiel"){
+                  var month=document.getElementById('bdaymonth').value.substring(5, 7);
+                  var year=document.getElementById('bdaymonth').value.substring(0, 4)
+                  FluxSortantPotentielMonth(year,month)
+                  
+                  }
+              else  if(selectedValuetype=="Comptable"){
+                  var month=document.getElementById('bdaymonth').value.substring(5, 7) ;
+                  var year=document.getElementById('bdaymonth').value.substring(0, 4)
+                  FluxSortant(year,month)
+                  
+                  }
+              else{
+            	  
+              	
+             	 var month=document.getElementById('bdaymonth').value.substring(5, 7);
+                  var year=document.getElementById('bdaymonth').value.substring(0, 4)
+                  console.log(month)
+                  console.log(year)
+                  FluxSortantRealMonth(year,month)
+                  
+                  }
+              
+              
+             }
+         else{
+         	yearInputdiv.style.display = 'block';
+              monthInput.style.display = 'none';
+              if(selectedValuetype=="Potentiel"){
+             	 var year=document.getElementById('yearSelector').value
+             	 FluxSortantPotentielYear(year)
+                  
+                  }
+              else  if(selectedValuetype=="Real"){
+             	 var year=document.getElementById('yearSelector').value
+             	 FluxSortantRealYear(year,month)
+                  
+                  }
+              }
+         }
+     else{
+	  if(selectedValue=="mensuel"){
+      	
+           if(selectedValuetype=="Potentiel"){
+               var month=document.getElementById('bdaymonth').value.substring(5, 7);
+               var year=document.getElementById('bdaymonth').value.substring(0, 4)
+               FluxSortantPotentielMonthByClient(year,month)
+               
+               }
+           else  if(selectedValuetype=="Real"){
+               
+               var month=document.getElementById('bdaymonth').value.substring(5, 7);
+               var year=document.getElementById('bdaymonth').value.substring(0, 4)
+               FluxSortantRealMonthByClient(year,month)
+               
+               
+               }
+          
+           
+           
+          }
+      else{
+      	yearInputdiv.style.display = 'block';
+           monthInput.style.display = 'none';
+           if(selectedValuetype=="Potentiel"){
+          	 var year=document.getElementById('yearSelector').value
+          	FluxSortantPotentielYearByClient(year)
+               
+               }
+           else  if(selectedValuetype=="Real"){
+          	 var year=document.getElementById('yearSelector').value
+          	FluxSortantRealYearByClient(year)
+               
+               }
+           }
+     }
+
+	  }
+
+  
+
+
+  $(document).ready(function() {
+		if(sessionStorage.getItem("email") ==null){
+			window.location.href = '/ERPPro/home/login'
+			}
+		else{
+			fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+		        method: 'GET',
+		     
+		       
+		    })
+		    .then(response => response.text())
+		    .then(data => {
+		       
+		        if(data =="Client"){
+		    
+
+		        	window.location.href = '/ERPPro/home/login'
+		           
+		            }
+		     
+		    })
+			}
+	  handleRadioChangetype("Comptable")
+	});
+</script>
+
+
+<script>
+function ChartUpdate(){
+	fetch('/ERPPro/user/getReglementPoints', {
+	    method: 'GET',
+	    headers: {
+	    	 'Authorization': `Bearer ${token}`
+	    	    },
+
+	})
+	            .then(response => response.json())
+	            .then(data1 => {
+	            	const ctx = document.getElementById('myChart').getContext('2d');
+	            	const chart = new Chart(ctx, {
+	            	    type: 'bar',
+	            	    data: {
+	            	        labels: data1.map(point => point.label),
+	            	        datasets: [
+	            	            {
+	            	                type: 'bar',
+	            	                label: 'Reglements',
+	            	                data: data1.map(point => point.value),
+	            	                backgroundColor: 'rgba(0, 119, 204, 0.3)'
+	            	            },
+	            	            {
+	            	                type: 'line',
+	            	                label: 'CA',
+	            	                data: data1.map(point => point.value),
+	            	                borderColor: 'rgba(255, 99, 132, 1)',
+	            	                borderWidth: 2,
+	            	                fill: false
+	            	            }
+	            	        ]
+	            	    },
+	            	    options: {
+	            	        scales: {
+	            	            xAxes: [{
+	            	                type: 'category',
+	            	                labels: data1.map(point => point.label)
+	            	            }],
+	            	            yAxes: [{
+	            	                type: 'linear'
+	            	            }]
+	            	        }
+	            	    }
+	            	});
+
+	            });
+}
+    </script>
+
+
+
+
+        
+</body>
+</html>

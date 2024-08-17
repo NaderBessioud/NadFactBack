@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+<meta charset="UTF-8">
+<title>Factures</title>
+<link rel="stylesheet" href="/ERPPro/css/factures.css">
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+	
+	
+	<div class="row" style="display: flex;margin-top: 20px">
+	<h3>Factures</h3>
+		
+	</div>
+	<div class="card">
+    <div class="card-header">
+       <i class="menu-icon uil uil-invoice"></i> Liste des factures
+    </div>
+    <div class="rounded-rectangle">
+    
+
+    <div class="inputs">
+	   <label style="color: #2d3539">Recherche:</label>  
+	   <input id="inputsearch" type="text" onkeyup="search()" style="margin-top: 7px">
+   </div>
+    </div>
+    
+    
+    
+    
+
+    
+    
+    
+   
+    
+    
+    <div class="card-body">
+    
+     
+       <table class="table table-striped table-bordered" id="facturetable">
+		<thead class="table-dark">
+			<tr>
+				<th>Number</th>
+				<th>Date emission</th>
+				
+				<th>Etat</th>
+				<th>Type</th>
+				<th>Total</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody id="invoiceTableBody">
+		 <th:block th:each="facture: ${factures}">
+			<tr>
+				<td th:text = "${facture.number}"></td>
+				
+				<td th:text="${#dates.format(facture.dateemission, 'yyyy/MM/dd')}"></td>
+				
+				<td>
+				<span  th:if="${facture.status.toString() == 'Proforma_envoyee_validee'}" class="badge badge-danger">Proforma</span>
+				<span  th:if="${facture.status.toString() == 'Facture_envoye'}" class="badge badge-success">Facture</span>
+				
+    			
+				</td>
+				<td th:text = "${facture.type}"></td>
+				
+				
+							<td style="color:#65b05e">
+    			<span   th:if="${facture.type.toString() == 'Export'}" th:utext="${#numbers.formatDecimal(facture.totalttc, 1, 'DEFAULT', 2, 'DEFAULT')} + '&nbsp;&#x20ac;'"></span>
+    			<span   th:if="${facture.type.toString() == 'National'}" th:utext="${#numbers.formatDecimal(facture.totalttc, 1, 'DEFAULT', 2, 'DEFAULT')} + '&nbsp;TND'"></span>
+				</td>
+				<td class="button-wrapper">
+				
+				
+
+					 
+					 
+					
+					
+
+										 
+				
+					<button th:onclick="'pdf(' + ${facture.idF} + ')'" class="btnpdf"><i class="fa-solid fa-file-pdf"></i>PDF</button>
+					
+					
+					
+					<button th:if="${facture.status.toString() == 'Proforma_envoyee'}" th:onclick="'ValiderFacture(' + ${facture.idF} + ')'" class="btnpreview">
+					   <i class="fa-solid fa-check"></i>Valider
+					</button>
+					
+					
+					<button th:if="${facture.status.toString() == 'Proforma_envoyee'}" th:onclick="'RefuseFacture(' + ${facture.idF} + ')'" class="btnsupp">
+					   <i class="fa-solid fa-x"></i>Refuser
+					</button>
+					
+				 <button th:if="${ facture.status.toString() == 'Facture_envoye'}"  th:onclick="'toggleAvoirs(' + ${facture.idF} + ')'" class="btn-info btn-sm" style="border-radius: 10px;"><i class="fa-solid fa-list"></i> Avoirs</button>
+					
+			</td>
+				
+			</tr>
+			<th:block th:if="${facture.avoirs != null}" th:each="avoir : ${facture.avoirs}">
+			<th:block th:if="${avoir.status.toString()=='Avoir_envoye'}">
+			<tr  th:attr="data-group='avoirs-' + ${facture.idF}" style="display:none">
+						<td th:text = "${avoir.number}"></td>
+				
+				<td th:text="${#dates.format(avoir.dateemission, 'yyyy/MM/dd')}"></td>
+				
+				<td>
+    				<span 
+      class="badge badge-warning">Avoir</span>
+				</td>
+				<td th:text = "${facture.type}"></td>
+				
+				
+							<td style="color:#65b05e">
+    			<span   th:if="${facture.type.toString() == 'Export'}" th:utext="${#numbers.formatDecimal(avoir.montant, 1, 'DEFAULT', 2, 'DEFAULT')} + '&nbsp;&#x20ac;'"></span>
+    			<span   th:if="${facture.type.toString() == 'National'}" th:utext="${#numbers.formatDecimal(avoir.montant, 1, 'DEFAULT', 2, 'DEFAULT')} + '&nbsp;TND'"></span>
+				</td>
+				<td class="button-wrapper">				 
+				
+					<button th:onclick="'pdfAvoir(' + ${avoir.idC} + ')'" class="btnpdf"><i class="fa-solid fa-file-pdf"></i>PDF</button>
+
+				</td>
+			
+						
+			</tr>
+			 </th:block>
+			 </th:block>
+  </th:block>
+			
+		</tbody>
+	
+	</table>
+	
+	<div th:if = "${totalPages > 1}">
+		<div class="row col-sm-12">
+			<div class="col-sm-2" id="divrows" >
+				Total Rows : [[${totalItems}]]
+			</div>
+			<div class="col-auto" id="divnumbers">
+				<span th:each="i:${#numbers.sequence(1,totalPages)}">
+					<a th:if="${currentPage != i}" href="" th:onclick="'movePageination(event, ' + ${i} + ')'">[[${i}]]</a>
+					<span th:unless="${currentPage != i}">[[${i}]]</span> 
+					&nbsp;
+				 	&nbsp;
+				</span>
+			</div>
+			<div class="col-sm-1" id="divnext">
+				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${currentPage+1} + ')'">Next</a>
+				<span th:unless="${currentPage < totalPages}">Next</span>
+			</div>
+			<div class="col-sm-1"  id="divlast">
+				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${totalPages} + ')'">Last</a>
+				<span th:unless="${currentPage < totalPages}">Last</span>
+			</div>
+		
+		</div>
+		
+    </div>
+</div>
+</div>
+</div>
+
+
+<div class="alert alert-success alert-dismissible fade bottom-right" role="alert" >
+  <div style="text-align: center;">
+    <strong>Succès!</strong><br><span class="alert-text"> Proforma validé !.</span>
+  </div>
+  <button type="button" class="close" onclick="hideCustomAlert()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+  
+    
+<script>
+var token=sessionStorage.getItem('token');
+function hideCustomAlert(){
+	 const alert = document.querySelector(".alert");
+	 alert.classList.remove("show");
+}
+
+function toggleAvoirs(invoiceId) {
+	
+    const avoirRows = document.querySelectorAll(`#invoiceTableBody [data-group='avoirs-${invoiceId}']`);
+   
+    avoirRows.forEach(row => {
+    	 console.log(row.style.display)
+        row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+    	
+    });
+    document.getElementById("facturetable").offsetHeight;
+}
+</script>
+  
+  <script th:inline="javascript">
+ function generateTd(factureId) {
+	 
+	 var type="";
+	 var number =0;
+	 var signed=0;
+	 var archived=0;
+	 var traited=0;
+	 var status="";
+	
+	 var td = document.createElement('td');
+	 td.className = 'button-wrapper'; 
+	 fetch('/ERPPro/client/getFactureById/'+factureId, {
+         method: 'GET',
+         headers: {
+         	 'Authorization': `Bearer ${token}`
+         	    },
+     })
+     .then(response => response.json())
+     .then(data => {
+
+    	 
+    	 
+         type=data.type;
+         number=data.number;
+         signed=data.signed;
+         archived=data.archived
+         traited=data.traited
+         status=data.status
+
+   
+    
+		
+	  
+	
+      
+      
+      
+
+      // Create buttons
+   
+      
+
+      var pdfButton = document.createElement('button');
+      pdfButton.innerHTML = '<i class="fa-solid fa-file-pdf"></i>PDF';
+      pdfButton.className = 'btnpdf';
+     
+      pdfButton.onclick = function() {
+          pdf(factureId); 
+      };
+      
+     
+          
+      td.appendChild(pdfButton);
+     
+     
+
+      
+  		var signButton = document.createElement('button');
+  	      
+  	      signButton.innerHTML = '<i class="fa-solid fa-signature"></i>Valider';
+  	      signButton.className = 'btnpreview';
+  	      signButton.onclick = function() {
+  	    	ValiderFacture(factureId); 
+  	      };
+  	      td.appendChild(signButton);
+  
+ 
+     })
+
+     
+      
+
+      return td;
+  
+  }
+
+
+ function generateTdAvoir(avoir,facture) {
+	 
+	 var type=facture.type;
+	 var number =avoir.number;
+	
+	
+	 var status=avoir.status;
+	
+	 var td = document.createElement('td');
+	 td.className = 'button-wrapper'; 
+	 var avoirid=avoir.idC
+	 
+	
+   
+
+	    
+	
+    
+		
+	  
+	
+      
+      
+      
+
+      // Create buttons
+     
+      
+
+      var pdfButton = document.createElement('button');
+      pdfButton.innerHTML = '<i class="fa-solid fa-file-pdf"></i>PDF';
+      pdfButton.className = 'btnpdf';
+     
+      pdfButton.onclick = function() {
+          pdfAvoir(avoirid); 
+      };
+      
+     
+          
+      td.appendChild(pdfButton);
+      return td;
+  
+  }
+ 
+
+  function updateFactureTable(factures) {
+	  
+      var tableBody = document.getElementById('invoiceTableBody');
+
+      tableBody.style.opacity = 0;
+      tableBody.innerHTML = ''; // Clear existing rows
+
+      for (var i = 0; i < factures.length; i++) {
+          var facture = factures[i];
+          if(facture.status =="Proforma_envoyee" || facture.status =="Facture" || facture.status =="Facture_envoye" || facture.status =="Facture_valide" ){
+              
+          var newRow = tableBody.insertRow(tableBody.rows.length);
+
+          // Add cells and populate with facture details
+          // Example:
+          var numberCell = newRow.insertCell(0);
+          numberCell.innerHTML = facture.number;
+
+          var dateCell = newRow.insertCell(1);
+          var dateObject = new Date(facture.dateemission);
+          var formattedDate = dateObject.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+          dateCell.innerHTML = formattedDate;
+
+
+
+          var statusText = "Profoma";
+          var statusClass="";
+          if(facture.status =="Facture" || facture.status =="Facture_envoye" || facture.status =="Facture_valide"){
+        	  statusClass ='badge badge-success';
+        	  statusText = "Facture";
+              }
+          else if(facture.status =="Avoir"){
+        	  statusClass ='badge badge-warning';
+        	  statusText = "Avoir";
+              }
+              else{
+            	  statusClass ='badge badge-danger';
+                  }
+           
+          var StatusCell = newRow.insertCell(2);
+          var statusSpan = document.createElement('span');
+          statusSpan.textContent = statusText;
+          statusSpan.className = statusClass;
+          StatusCell.appendChild(statusSpan);
+
+          var typeCell = newRow.insertCell(3);
+          typeCell.innerHTML = facture.type;
+
+          var totalCell = newRow.insertCell(4);
+       
+          
+          if(facture.type.toString() == "National"){
+        	  totalCell.innerHTML = facture.totalttc.toFixed(3)+"&nbsp;TND";
+        	
+              }
+          else {
+        	  totalCell.innerHTML = facture.totalttc.toFixed(3)+'&nbsp;&#x20ac;';
+        	  
+              }
+          
+          totalCell.style.color = '#65b05e';
+         
+          
+          newRow.appendChild(generateTd(facture.idF));
+			if(facture.avoirs != null){
+          for (var j = 0; j < facture.avoirs.length; j++) {
+              var avoir = facture.avoirs[j];
+              var newRow1 = tableBody.insertRow(tableBody.rows.length);
+
+              // Add cells and populate with facture details
+              // Example:
+              var numberCell = newRow1.insertCell(0);
+              numberCell.innerHTML = avoir.number;
+
+              var dateCell = newRow1.insertCell(1);
+              var dateObject = new Date(avoir.dateemission);
+              var formattedDate = dateObject.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+              dateCell.innerHTML = formattedDate;
+
+              
+
+              var statusText = "Avoir";
+              var statusClass="";
+              statusClass ='badge badge-warning';
+             
+               
+              var StatusCell = newRow1.insertCell(2);
+              var statusSpan = document.createElement('span');
+              statusSpan.textContent = statusText;
+              statusSpan.className = statusClass;
+              StatusCell.appendChild(statusSpan);
+
+              var typeCell = newRow1.insertCell(3);
+              typeCell.innerHTML = facture.type;
+
+              var totalCell = newRow1.insertCell(4);
+           
+              
+              if(facture.type.toString() == "National"){
+            	  totalCell.innerHTML = facture.totalttc.toFixed(3)+"&nbsp;TND";
+            	
+                  }
+              else {
+            	  totalCell.innerHTML = facture.totalttc.toFixed(3)+'&nbsp;&#x20ac;';
+            	  
+                  }
+              
+              totalCell.style.color = '#65b05e';
+              newRow1.appendChild(generateTdAvoir(avoir,facture));
+          }
+
+			}
+          
+      }
+
+          
+      }
+      tableBody.addEventListener('transitionend', function() {
+    	    tableBody.style.transition = '';
+    	}, { once: true });
+      setTimeout(function() {
+    	    tableBody.style.cssText = 'opacity: 1; transition: opacity 1s ease-in-out;';
+    	}, 100);
+  	
+  }
+  </script>
+  
+  <script>
+    function createPaginationElement(pageNumber, isCurrentPage) {
+        if (isCurrentPage) {
+            var spanElement = document.createElement('span');
+            spanElement.innerText = pageNumber;
+            return spanElement;
+        } else {
+            var linkElement = document.createElement('a');
+            linkElement.href = '';
+            linkElement.innerText = pageNumber;
+            linkElement.setAttribute('onclick', 'movePageination(event,' + pageNumber + ');');
+
+            // Add non-breaking spaces
+            
+
+            return linkElement;
+        }
+    }
+	function updatePagination(totalPages,currentpage,list){
+		
+		 var divRows = document.getElementById('divrows');
+		 var divNumber = document.getElementById('divnumbers');
+		 var divNext = document.getElementById('divnext');
+		 var divLast = document.getElementById('divlast');
+		 if(divRows != null){
+		 divRows.innerText = "Total Rows : "+list.length
+		 divNumber.innerHTML ="";
+		 for (var i = 1; i <= totalPages; i++) {
+			 
+	            var isCurrentPage = (i === currentpage);
+	            var paginationElement = createPaginationElement(i, isCurrentPage);
+	            
+	            // Append the element to the container
+	            divNumber.appendChild(paginationElement);
+	            if(i != totalPages){
+	            	 var space1 = document.createTextNode('\u00a0'+'\u00a0'+'\u00a0'+'\u00a0'+'\u00a0'); // &nbsp;    
+	 	            divNumber.appendChild(space1);
+		            }
+	           
+	            
+	      
+	            
+	        }
+
+	     if(currentpage < totalPages){
+	    	 var linkElementNext = document.createElement('a');
+	    	 linkElementNext.href = '';
+	    	 linkElementNext.innerText = "Next";
+	    	 linkElementNext.setAttribute('onclick', 'movePageination(event,' + (currentpage+1) + ');');
+	    	 divNext.innerHTML ="";
+	            // Append the element to the container
+	          divNext.appendChild(linkElementNext);
+	          
+
+	    	 var linkElementLast = document.createElement('a');
+	    	 linkElementLast.href = '';
+	    	 linkElementLast.innerText = "Last";
+	    	 linkElementLast.setAttribute('onclick', 'movePageination(event,' + totalPages + ');');
+	    	 divLast.innerHTML ="";
+	            // Append the element to the container
+	          divLast.appendChild(linkElementLast);
+		     }
+	     else{
+
+	    	
+	    	 var spanElementNext = document.createElement('span');
+	    	 spanElementNext.innerText = "Next";
+	    	 divNext.innerHTML ="";
+	          
+	         divNext.appendChild(spanElementNext);
+
+	         var spanElementLast = document.createElement('span');
+	         spanElementLast.innerText = "Last";
+	    	 divLast.innerHTML ="";
+	            // Append the element to the container
+	          divLast.appendChild(spanElementLast);
+		     
+		     }
+		 }
+		}
+
+	function updatePag(pageNumber){
+		var list = window.factureslistSign 
+			
+		
+		
+		
+		fetch('/ERPPro/client/pageList/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.json())
+        .then(data => {
+        	
+        	
+        	updateFactureTable(data)
+        	
+        	
+        })
+        
+
+	 fetch('/ERPPro/client/pagetotal/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.text())
+        .then(data => {
+        	
+        	updatePagination(data,pageNumber,list)
+        	
+        })
+		}
+	
+	function updatePagWithoutArchive(pageNumber,list){
+		
+	
+		fetch('/ERPPro/client/pageList/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.json())
+        .then(data => {
+        	
+        	updateFactureTable(data)
+        	
+        })
+        
+
+	 fetch('/ERPPro/client/pagetotal/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.text())
+        .then(data => {
+        	updatePagination(data,pageNumber,list)
+        	
+        })
+		}
+
+	function movePageination(e,pageNumber){
+		e.preventDefault();
+		updatePag(pageNumber)
+		 
+	        
+		}
+    </script>
+
+
+<script>
+    function preview(id) {
+
+
+        fetch('/ERPPro/client/previewFacture/'+id, {
+            method: 'GET',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+          
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const pdfUrl = URL.createObjectURL(blob);
+
+            // Open a new window or tab and load the PDF content
+            window.open(pdfUrl, '_blank');
+        });
+        
+     
+        
+    }
+
+
+    function pdf(id) {
+
+
+        fetch('/ERPPro/client/previewFacture/'+id, {
+            method: 'GET',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+          
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const pdfUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            a.href = pdfUrl;
+            a.download = 'facture' + id + '.pdf';
+
+            document.body.appendChild(a);
+
+            a.click();
+
+            document.body.removeChild(a);
+
+        });
+        
+     
+        
+    }
+
+    function pdfAvoir(id) {
+
+
+        fetch('/ERPPro/client/previewAvoir/'+id, {
+            method: 'GET',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+          
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const pdfUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            a.href = pdfUrl;
+            a.download = 'facture' + id + '.pdf';
+
+            document.body.appendChild(a);
+
+            a.click();
+
+            document.body.removeChild(a);
+
+        });
+        
+     
+        
+    }
+
+   
+
+
+
+
+    
+ 
+    
+
+
+    
+</script>
+
+<script>
+function ClearFilters(list){
+	updatePag(1)
+	//updatePagWithoutArchive(1,list);
+}
+
+</script>
+<script>
+
+
+
+
+
+
+function ValiderProforma(id){
+	fetch('/ERPPro/client/ValidateProformaByClient/'+id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(window.factureslistSign)
+    })
+    .then(response => response.json())
+    .then(data => {
+        
+    	
+    	window.factureslistSign=data
+      	window.factureslistSearch=data
+      	window.factureslistWithoutArchive=data
+      	
+      	updatePag(1)
+      	
+    	
+    })
+	
+}
+
+
+
+
+</script>
+ 
+
+
+
+<script>
+
+
+
+
+
+
+function ValiderFacture(id){
+	const alert = document.querySelector(".alert");
+	fetch('/ERPPro/client/ValidateProformaByClient/'+id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(window.factureslistSign)
+    })
+    .then(response => response.json())
+    .then(data => {
+        
+    	
+    	window.factureslistSign=data
+      	window.factureslistSearch=data
+      	window.factureslistWithoutArchive=data
+      	
+      	updatePag(1)
+    	alert.querySelector('.alert-text').textContent="Proforma validée !.";
+    	alert.classList.add("show");
+
+        // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+        setTimeout(function () {
+            alert.classList.remove("show");
+        }, 5000);
+    	
+    })
+}
+
+function RefuseFacture(id){
+	const alert = document.querySelector(".alert");
+	fetch('/ERPPro/client/denyProformaByClient/'+id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(window.factureslistSign)
+    })
+    .then(response => response.json())
+    .then(data => {
+        
+    	
+    	window.factureslistSign=data
+      	window.factureslistSearch=data
+      	window.factureslistWithoutArchive=data
+      	
+      	updatePag(1)
+    	alert.querySelector('.alert-text').textContent="Proforma refusée !.";
+    	alert.classList.add("show");
+
+        // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+        setTimeout(function () {
+            alert.classList.remove("show");
+        }, 5000);
+    	
+    })
+}
+
+
+
+
+
+
+
+
+</script>
+
+    <script>
+	function search(){
+		
+		
+		var search = document.getElementById('inputsearch').value;
+		 fetch('/ERPPro/client/SearchFacture?search=' + search, {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	                'Authorization': `Bearer ${token}`
+	            },
+	            body: JSON.stringify(window.factureslistSearch)
+	        })
+	    
+         .then(response => response.json())
+         .then(data => {
+        	
+          
+         	
+        	 window.factureslist=data
+         	window.factureslistSign=data
+         	if(!document.getElementById('inlineCheckbox3').checked)
+            	window.factureslistWithoutArchive=data
+         	updatePag(1)
+         })
+		}
+    </script>
+    
+  
+    
+    <script th:inline="javascript">
+jQuery(document).ready(function ($) {
+	
+	/*<![CDATA[*/
+	// var factureList = /*[[${factures}]]*/ null;
+	 var facturesList = /*[[${Allfactures}]]*/ null;
+	 
+	 
+	  var currentUserRole = /*[[${role}]]*/ 'Guest'; 
+	 
+
+	 window.factureslist = facturesList;
+	 window.factureslistWithoutArchive = facturesList;
+	 window.factureslistSign = facturesList;
+	 window.factureslistSearch = facturesList;
+	 window.factureslistBeforeSearch = facturesList;
+	 window.factureslistBeforeSearch1 = facturesList;
+	 window.role=currentUserRole;
+	    /*]]>*/
+	    const modal = document.getElementById('exampleModalCenter');
+	  
+	  
+	 
+})
+
+document.addEventListener('DOMContentLoaded', function() {
+
+	if(sessionStorage.getItem("email") ==null){
+  		window.location.href = '/ERPPro/home/login'
+  		}
+  	else{
+  		fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+  	        method: 'GET',
+  	     
+  	       
+  	    })
+  	    .then(response => response.text())
+  	    .then(data => {
+  	       
+  	        if(data !="Client"){
+  	    
+
+  	        	window.location.href = '/ERPPro/home/login'
+  	           
+  	            }
+  	     
+  	    })
+  		}
+    const factureTable = document.getElementById('facturetable');
+
+    factureTable.addEventListener('click', function(event) {
+        const target = event.target;
+        if (target.tagName === 'BUTTON') {
+            const action = target.getAttribute('data-action');
+            const id = target.getAttribute('data-id');
+
+            if (action && id) {
+                window[action](id);
+            }
+        }
+    });
+})
+
+</script>
+
+
+
+
+
+	
+
+ 
+    
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+	
+	
+	
+	
+</div>
+
+</body>
+</html>

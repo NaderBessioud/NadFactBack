@@ -1,0 +1,114 @@
+h3{
+	color: #202326;
+	margin-left:25px
+}
+
+.card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+           overflow:auto;
+            max-height: 90%; /* Set a maximum height for the card */
+            margin-left:10px;
+            margin-right:10px;
+            margin-bottom:20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            
+  
+        }
+        
+        .bottom-right {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin-bottom:20px;
+    margin-right: 15px;
+     /* Adjust margin as needed */
+    z-index: 999; /* Ensure the alert appears on top of other content */
+}
+
+.card-header {
+            background-color:rgba(25,42,86,255);
+            color:white;
+            font-weight: bold;
+        }
+
+.card-body {
+            
+            background-color: #ffffff;
+             overflow-y: auto; /* Allow the card body to scroll if needed */
+    flex-grow: 1; /* Allow the card body to take available space */
+            
+        }
+        
+        
+        .inputs{
+	margin-left: auto;
+	display:flex;
+}
+
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  appearance: none !important;
+  -moz-appearance: none !important;
+  -webkit-appearance: none !important;
+  -o-appearance: none !important;
+  -ms-appearance: none !important;
+  margin: 0; }
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -o-box-shadow: none !important;
+  -ms-box-shadow: none !important; }
+  
+  input, select {
+  display: block;
+  
+  border: 1px solid #ebebeb;
+ 
+  box-sizing: border-box;
+  font-family: 'Montserrat';
+  font-weight: 500;
+  font-size: 13px; }
+   input:focus, select:focus {
+    border: 1px solid #ff6801; }
+    
+    input{
+     padding: 11px 20px;
+     }
+        
+          label {
+          
+  font-size: 14px;
+  font-weight: bold;
+  font-family: 'Montserrat';
+  margin-bottom: 2px;
+  display: block; }
+
+  i{
+  border: none;
+  background-color: transparent;
+  box-shadow: none;}
+  
+ .rounded-rectangle1 {
+            /* Set your desired width */
+            height: 50px; /* Set your desired height */
+             /* Set your desired background color */
+            border-radius: 15px; /* Set your desired border radius */
+            background-color:#3a56a0;
+            color:white;
+            /* Center text horizontally */
+            line-height: 50px; /* Center text vertically */
+            margin-right: 10px;
+            margin-left: 10px;
+            margin-top: 10px;
+            display: flex;
+           
+            
+        }
+        
+        
+        
+        

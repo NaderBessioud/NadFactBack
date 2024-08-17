@@ -1,0 +1,824 @@
+
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+<meta charset="UTF-8">
+<title>Users</title>
+<link rel="stylesheet" href="/ERPPro/css/newfacturestyle.css">
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="main">
+        <div class="container1">
+            <div class="signup-content">
+               
+                <div class="signup-form">
+                    <form th:action="@{/user/factures}" th:object="${facture}" method="POST" class="register-form" id="facture-form">
+                        <h2>New invoice</h2>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Client :</label>
+     
+
+ <select id="clientId" th:field="*{client.idU}"  class="btn btn-secondary dropdown-toggle" onchange="TypeFacture()" >
+    <option value="0">Choisir Client</option>
+    <option th:each="client : ${Clients}" th:value="${client.idU}" th:text="${client.libelle}" th:data-type="${client.type}"></option>
+</select>
+                            </div>
+                      
+                          
+                          
+                        </div>
+
+                       <input type="text" hidden id="newfacturesigned" th:field=*{signed}>
+                       <input type="text" hidden id="newfactureref" th:field=*{ref}>
+                      
+                        <div class="form-row">
+                            <div class="form-group" id="divtva">
+                                <label for="state">TVA :</label>
+                              <input type="number" step="any" name="tva" id="tva" th:field=*{tva}>
+                            </div>
+                            <div class="form-group" id="divtimbre">
+                                <label for="city">Timbre :</label>
+                               <input type="number" step="any" name="ctvtimbre" id="ctvtimbre" th:field=*{ctvtimbre}>
+                            </div>
+                            
+                            <div class="form-group" id="divcv">
+                                <label for="state">Date CV :</label>
+                              <input type="date" name="datecv" id="datecv" th:field=*{datecv}>
+                            </div>
+                            <div class="form-group" id="divcours">
+                                <label for="city">Cours :</label>
+                               <input type="number" step="any" name="cours" id="cours" th:field=*{cours}>
+                            </div>
+                             <input type="text" id="useridu" th:field=*{user.idU} hidden>
+                        </div>
+                        
+                        <div class="form-row" id="divcours">
+                            
+                        </div>
+                        <div id="productsContainer">
+        <!-- This container will hold the dynamically added product input fields -->
+    </div>
+
+    <!-- Button to add a new product dynamically -->
+
+	 <div class="button-container">   
+ 	<button class="button-24" type="button" onclick="addProductFields()">Ajouter produit</button>
+    <button class="button-25" type="button" id="btnsup" onclick="deleteProductField()" style="display: none">supprimer produit</button>
+    </div>
+    
+    
+       
+                       
+                       
+                      
+                    
+                       <div class="form-submit">
+    <div class="button-container1">
+        <button type="button" class="submit" name="btns" onclick="checkIfExist(event)" id="btns"><i class="fa-regular fa-bookmark"></i>Enregistrer</button>
+        <button type="button" class="btnpreview1" name="reset" onclick="preview()"><i class="fa-regular fa-eye"></i>Aperçu</button>
+    </div>
+    
+</div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="alert alert-danger alert-dismissible fade bottom-right " role="alert">
+	  <div style="text-align: center;">
+	    <strong>a</strong><br><span class="alert-text">a</span>
+	  </div>
+	  <button type="button" class="close" onclick="hideCustomAlert()" aria-label="Close">
+	    <span aria-hidden="true">&times;</span>
+	  </button>
+	</div>
+	
+	<div class="modal fade" id="checkIfExist" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary text-center">
+        <h5 class="modal-title w-100 " id="exampleModalLongTitle">Dupplication du Facture</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <span>Une facture avec ces parametres a éte deja créer</span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="enregister()">Enregistrer</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+    
+ <script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+  <script>
+  var token=sessionStorage.getItem('token');
+  var factureType="";
+
+  function TypeFacture(){
+      
+  	var clientid = document.getElementById('clientId').value;
+  	
+  	
+  	var selectElement = document.getElementById("clientId");
+  	var selectedOption = selectElement.options[selectElement.selectedIndex];
+  	factureType=selectedOption.getAttribute("data-type");
+  
+	var divCours = document.getElementById('divcours');
+  	var divcv  = document.getElementById('divcv');
+  	var divtimbre = document.getElementById('divtimbre');
+  	var divtva  = document.getElementById('divtva');
+  
+  	
+    	if(factureType == "National"){
+      		
+      		divCours.style.display = 'none';
+      		divcv.style.display = 'none';
+      		divtva.style.display = 'block';
+      		divtimbre.style.display = 'block';
+          	}
+      	else {
+      		divCours.style.display = 'block';
+      		divcv.style.display = 'block';
+      		divtva.style.display = 'none';
+      		divtimbre.style.display = 'none';
+          	}
+
+   
+ 
+  }
+  	
+  
+  </script>
+   
+    <script>
+
+
+
+       
+      
+		
+        
+      
+
+        function addProductFields() {
+        	
+        	 
+            var productsContainer = document.getElementById('productsContainer');
+            var optionsList=window.produitList
+         
+            var selectElement = document.getElementById("clientId");
+          	var selectedOption = selectElement.options[selectElement.selectedIndex];
+          	factureType=selectedOption.getAttribute("data-type");
+
+            // Create a new div for the product input fields
+            var productDiv = document.createElement('div');
+            productDiv.id="productdiv"+productsContainer.children.length
+            productDiv.className = 'form-row'; // Apply the 'form-group' class
+
+            // Create a new input field for the product libelle
+            var productDivLabel = document.createElement('div');
+            productDivLabel.className = 'form-group product-fields'; // Apply the 'form-group' class
+            
+            var libelleLabel = document.createElement('label');
+            libelleLabel.innerHTML = 'Libelle produit:';
+
+
+            var libelleSelect = document.createElement('select');
+            libelleSelect.className = 'selectlabel';
+            libelleSelect.name = 'commandes[' + productsContainer.children.length + '].produit.libelle';
+            console.log(optionsList);
+            optionsList.forEach(function(optionData) {
+                var option = new Option(optionData.libelle, optionData.libelle);
+                libelleSelect.add(option);
+            });
+
+            libelleSelect.addEventListener('change', function() {
+                
+                // Get the selected option
+                var selectedOption = optionsList.find(option => option.libelle === this.value);
+                // Set PU value to PUInput
+                if(factureType == "National"){
+                	document.getElementById('PU'+productsContainer.children.length).value = selectedOption.putnd;
+                    }
+                else{
+                	document.getElementById('PU'+productsContainer.children.length).value = selectedOption.pueuro;
+                    }
+                
+            });
+           
+
+            // Append the libelle input field to the product div
+            productDivLabel.appendChild(libelleLabel);
+            productDivLabel.appendChild(libelleSelect);
+            productDiv.appendChild(productDivLabel)
+
+            // Create a new input field for the product pincode
+            var productDivQte = document.createElement('div');
+            productDivQte.className = 'form-group product-fields'; // Apply the 'form-group' class
+            var nbjourlabel = document.createElement('label');
+            nbjourlabel.innerHTML = 'Quantite du produit:';
+
+            var nbjourInput = document.createElement('input');
+            nbjourInput.type = 'number';
+            nbjourInput.step = 'any';
+            nbjourInput.name = 'commandes[' + productsContainer.children.length + '].qte'; // Adjust the name based on your model
+            nbjourInput.placeholder = ' Quantite du produit';
+
+            // Append the pincode input field to the product div
+            productDivQte.appendChild(nbjourlabel);
+            productDivQte.appendChild(nbjourInput);
+            productDiv.appendChild(productDivQte)
+
+            // Create a new input field for the product pincode
+            var productDivPU = document.createElement('div');
+            productDivPU.className = 'form-group product-fields'; // Apply the 'form-group' class
+            var PULabel = document.createElement('label');
+            PULabel.innerHTML = 'PU:';
+
+            var PUInput = document.createElement('input');
+            PUInput.type = 'number';
+            PUInput.step = 'any';
+			var id =productsContainer.children.length+1
+            PUInput.id="PU"+id
+            if(factureType == "National"){
+            	 PUInput.value = optionsList[0].putnd;
+                 PUInput.name = 'commandes[' + productsContainer.children.length + '].produit.putnd'; // Adjust the name based on your model
+            	 
+                }
+            else{
+            	 PUInput.value = optionsList[0].pueuro;
+                 PUInput.name = 'commandes[' + productsContainer.children.length + '].produit.pueuro'; // Adjust the name based on your model
+            	 
+                }
+            PUInput.field
+
+            // Append the pincode input field to the product div
+            productDivPU.appendChild(PULabel);
+            productDivPU.appendChild(PUInput);
+            productDiv.appendChild(productDivPU)
+            
+              
+             var productDivComment = document.createElement('div');
+            productDivComment.className = 'form-group product-fields'; // Apply the 'form-group' class
+            var CommentLabel = document.createElement('label');
+            CommentLabel.innerHTML = 'Commentaire:';
+
+            var CommentInput = document.createElement('input');
+            CommentInput.type = 'text';
+            CommentInput.maxLength = 30;
+            CommentInput.name = 'commandes[' + productsContainer.children.length + '].commentaire'; // Adjust the name based on your model
+            CommentInput.placeholder = ' Commentaire';
+           
+
+            // Append the pincode input field to the product div
+            productDivComment.appendChild(CommentLabel);
+            productDivComment.appendChild(CommentInput);
+            productDiv.appendChild(productDivComment)
+
+            // Append the product div to the container
+            productsContainer.appendChild(productDiv);
+        	var button = document.getElementById('btnsup');
+        	if(productsContainer.children.length == 0){
+        		button.style.display = 'none';
+            	}
+        	else{
+        		button.style.display = 'block';}
+        
+
+            
+        }
+
+        function addProductFieldsForUpdate(produits) {
+        	
+          	 console.log(produits)
+            var productsContainer = document.getElementById('productsContainer');
+            var optionsList=window.produitList
+            
+            produits.forEach(function(lc) {
+            // Create a new div for the product input fields
+            var p =lc.produit
+            var productDiv = document.createElement('div');
+            productDiv.id="productdiv"+productsContainer.children.length
+            productDiv.className = 'form-row'; // Apply the 'form-group' class
+
+            // Create a new input field for the product libelle
+            var productDivLabel = document.createElement('div');
+            productDivLabel.className = 'form-group product-fields'; // Apply the 'form-group' class
+            
+            var libelleLabel = document.createElement('label');
+            libelleLabel.innerHTML = 'Libelle produit:';
+
+
+            var libelleSelect = document.createElement('select');
+            libelleSelect.className = 'selectlabel';
+            
+            libelleSelect.name = 'commandes[' + productsContainer.children.length + '].produit.libelle';
+            console.log(optionsList);
+            optionsList.forEach(function(optionData) {
+                var option = new Option(optionData.libelle, optionData.libelle);
+                libelleSelect.add(option);
+            });
+            libelleSelect.value=p.libelle
+
+            libelleSelect.addEventListener('change', function() {
+                
+                // Get the selected option
+                var selectedOption = optionsList.find(option => option.libelle === this.value);
+                // Set PU value to PUInput
+                if(factureType == "National"){
+                	document.getElementById('PU'+productsContainer.children.length).value = selectedOption.putnd;
+                    }
+                else{
+                	document.getElementById('PU'+productsContainer.children.length).value = selectedOption.pueuro;
+                    }
+                
+            });
+           
+
+            // Append the libelle input field to the product div
+            productDivLabel.appendChild(libelleLabel);
+            productDivLabel.appendChild(libelleSelect);
+            productDiv.appendChild(productDivLabel)
+
+            // Create a new input field for the product pincode
+            var productDivQte = document.createElement('div');
+            productDivQte.className = 'form-group product-fields'; // Apply the 'form-group' class
+            var nbjourlabel = document.createElement('label');
+            nbjourlabel.innerHTML = 'Quantite du produit:';
+
+            var nbjourInput = document.createElement('input');
+            nbjourInput.type = 'number';
+            nbjourInput.step = 'any';
+            nbjourInput.name = 'commandes[' + productsContainer.children.length + '].qte'; // Adjust the name based on your model
+            nbjourInput.placeholder = ' Quantite du produit';
+            nbjourInput.value=lc.qte * -1
+
+            // Append the pincode input field to the product div
+            productDivQte.appendChild(nbjourlabel);
+            productDivQte.appendChild(nbjourInput);
+            productDiv.appendChild(productDivQte)
+
+            // Create a new input field for the product pincode
+            var productDivPU = document.createElement('div');
+            productDivPU.className = 'form-group product-fields'; // Apply the 'form-group' class
+            var PULabel = document.createElement('label');
+            PULabel.innerHTML = 'PU:';
+
+            var PUInput = document.createElement('input');
+            PUInput.type = 'number';
+            PUInput.step = 'any';
+            PUInput.name = 'commandes[' + productsContainer.children.length + '].produit.pu'; // Adjust the name based on your model
+			var id =productsContainer.children.length+1
+            PUInput.id="PU"+id
+          
+            	 PUInput.value = p.pu;
+            
+
+            // Append the pincode input field to the product div
+            productDivPU.appendChild(PULabel);
+            productDivPU.appendChild(PUInput);
+            productDiv.appendChild(productDivPU)
+            
+              
+             var productDivComment = document.createElement('div');
+            productDivComment.className = 'form-group product-fields'; // Apply the 'form-group' class
+            var CommentLabel = document.createElement('label');
+            CommentLabel.innerHTML = 'Commentaire:';
+
+            var CommentInput = document.createElement('input');
+            CommentInput.type = 'text';
+            CommentInput.maxLength = 30;
+            CommentInput.name = 'commandes[' + productsContainer.children.length + '].commentaire'; // Adjust the name based on your model
+            CommentInput.value = lc.commentaire
+           
+
+            // Append the pincode input field to the product div
+            productDivComment.appendChild(CommentLabel);
+            productDivComment.appendChild(CommentInput);
+            productDiv.appendChild(productDivComment)
+
+            // Append the product div to the container
+            productsContainer.appendChild(productDiv);
+            })
+        	var button = document.getElementById('btnsup');
+        	if(productsContainer.children.length == 0){
+        		button.style.display = 'none';
+            	}
+        	else{
+        		button.style.display = 'block';}
+        
+
+            
+        }
+
+        function deleteProductField(){
+        	 var productsContainer = document.getElementById('productsContainer');
+        	 var length=productsContainer.children.length-1
+        	 var div = document.getElementById("productdiv"+length);
+        	 console.log(length)
+        	 div.remove();
+        	var button = document.getElementById('btnsup');
+            if(productsContainer.children.length == 0){
+            		button.style.display = 'none';
+                	}
+            else{
+            		button.style.display = 'block';}
+            
+        	 }
+
+        function submit(){
+        	var productInputs = document.querySelectorAll('.product-fields input');
+            var productData = {};
+
+            productInputs.forEach(function (input) {
+                var inputName = input.name;
+                var inputValue = input.value;
+                productData[inputName] = inputValue;
+            });
+
+            // Add the product data to the form
+            var productDataInput = document.createElement('input');
+            productDataInput.type = 'hidden';
+            productDataInput.name = 'productData'; // Adjust the name based on your model
+            productDataInput.value = JSON.stringify(productData);
+            document.getElementById('productsContainer').appendChild(productDataInput);
+            document.getElementById('facture-form').submit();
+            }
+
+        function deleteProductField(){
+        	 var productsContainer = document.getElementById('productsContainer');
+        	 var length=productsContainer.children.length-1
+        	 var div = document.getElementById("productdiv"+length);
+        	 console.log(length)
+        	 div.remove();
+        	var button = document.getElementById('btnsup');
+            if(productsContainer.children.length == 0){
+            		button.style.display = 'none';
+                	}
+            else{
+            		button.style.display = 'block';}
+            
+        	 }
+
+        function submit(){
+        	var productInputs = document.querySelectorAll('.product-fields input');
+            var productData = {};
+
+            productInputs.forEach(function (input) {
+                var inputName = input.name;
+                var inputValue = input.value;
+                productData[inputName] = inputValue;
+            });
+
+            // Add the product data to the form
+            var productDataInput = document.createElement('input');
+            productDataInput.type = 'hidden';
+            productDataInput.name = 'productData'; // Adjust the name based on your model
+            productDataInput.value = JSON.stringify(productData);
+            document.getElementById('productsContainer').appendChild(productDataInput);
+            document.getElementById('facture-form').submit();
+            }
+</script>
+
+<script>
+   
+       function test(){
+           console.log("tesst");
+        fetch('/ERPPro/user/downloadfactureEuro/13', {
+            method: 'GET',
+            headers: {
+ 		    	 'Authorization': `Bearer ${token}`
+ 		    	    },
+           
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            // Create a temporary link element to trigger the download
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'facture.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+       }
+    
+    </script>
+    
+   
+
+<script>
+
+
+function sign() {
+	var formData = new FormData(document.getElementById('facture-form'));
+	 fetch('/ERPPro/user/SignNewFacture', {
+        method: 'POST',
+        headers: {
+		    	 'Authorization': `Bearer ${token}`
+		    	    },
+        body: formData
+      
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        const pdfUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        
+        a.href = pdfUrl;
+        a.download = 'facture.pdf';
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        document.body.removeChild(a);
+
+    });
+    
+ 
+	
+	
+}
+</script>
+   <script>
+   
+   function checkIfExist(event){
+	   event.preventDefault();
+	   const alert = document.querySelector(".alert");
+	   var formData = new FormData(document.getElementById('facture-form'));
+	   if(document.getElementById('clientId').value == 0){
+
+	  		 alert.querySelector('strong').textContent="Attention !";
+	           
+	           alert.querySelector('.alert-text').textContent="Veuillez choisir un client valide";
+	           console.log(alert)
+	           alert.classList.add("show");
+	          
+
+	           // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+	           setTimeout(function () {
+	               alert.classList.remove("show");
+	           }, 5000);
+	       
+	      	}
+	   else{
+		   
+		 fetch('/ERPPro/user/CheckIfExist', {
+             method: 'POST',
+             headers: {
+  		    	 'Authorization': `Bearer ${token}`
+  		    	    },  // Use 'GET' or 'POST' depending on your endpoint
+             body: formData
+         })
+         .then(response => response.json())
+         .then(data => {
+             if(data ==true){
+            	 $("#ExistModal").modal('show');
+                 }
+             else{
+            	 enregister()
+                 }
+        	 
+
+         });
+	   }
+		
+	   }
+   function enregister(){
+	   $("#ExistModal").modal('hide');
+	   var formData = new FormData(document.getElementById('facture-form'));
+	   
+	   const alert = document.querySelector(".alert");
+	   
+	   if(document.getElementById('clientId').value == 0){
+
+  		 alert.querySelector('strong').textContent="Attention !";
+           
+           alert.querySelector('.alert-text').textContent="Veuillez choisir un client valide";
+           console.log(alert)
+           alert.classList.add("show");
+          
+
+           // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+           setTimeout(function () {
+               alert.classList.remove("show");
+           }, 5000);
+       
+      	}
+ 
+  	else{
+  		if(window.type != "avoir"){
+  			document.forms["facture-form"].submit();
+  	  		}
+  		else{
+  	  		
+
+  	  	 fetch('/ERPPro/user/addAvoir', {
+             method: 'POST', 
+             headers: {
+  		    	 'Authorization': `Bearer ${token}`
+  		    	    }, // Use 'GET' or 'POST' depending on your endpoint
+             body: formData
+         })
+         .then(response => response.blob())
+         .then(blob => {
+             const pdfUrl = URL.createObjectURL(blob);
+             const a = document.createElement('a');
+             
+             a.href = pdfUrl;
+             a.download = 'avoir.pdf';
+
+             document.body.appendChild(a);
+
+             a.click();
+
+             document.body.removeChild(a);
+             window.location.href="/ERPPro/user/factures"
+
+         });
+  	  		}
+  		
+  		}
+ 		
+	   }
+    function preview() {
+    	const alert = document.querySelector(".alert");
+    	if(document.getElementById('clientId').value == 0){
+
+    		 alert.querySelector('strong').textContent="Attention !";
+             
+             alert.querySelector('.alert-text').textContent="Veuillez choisir un client valide";
+             console.log(alert)
+             alert.classList.add("show");
+             console.log(alert.classList)
+
+             // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+             setTimeout(function () {
+                 alert.classList.remove("show");
+             }, 5000);
+         
+        	}
+    
+    	else{
+        	
+
+        // Gather form data
+        var formData = new FormData(document.getElementById('facture-form'));
+        formData.append('status', 'Proforma');
+      
+        if(factureType == "International"){
+        fetch('/ERPPro/user/downloadfactureEuro', {
+            method: 'POST',
+            headers: {
+ 		    	 'Authorization': `Bearer ${token}`
+ 		    	    },  // Use 'GET' or 'POST' depending on your endpoint
+            body: formData
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const pdfUrl = URL.createObjectURL(blob);
+
+            // Open a new window or tab and load the PDF content
+            window.open(pdfUrl, '_blank');
+        });
+        }
+        else{
+        	 fetch('/ERPPro/user/downloadfacture', {
+                 method: 'POST',
+                 headers: {
+	  		    	 'Authorization': `Bearer ${token}`
+	  		    	    },  // Use 'GET' or 'POST' depending on your endpoint
+                 body: formData
+             })
+             .then(response => response.blob())
+             .then(blob => {
+                 const pdfUrl = URL.createObjectURL(blob);
+
+                 // Open a new window or tab and load the PDF content
+                 window.open(pdfUrl, '_blank');
+             });
+            }
+    	}
+        
+    }
+</script>
+<script>
+        
+        document.addEventListener('DOMContentLoaded', function () {
+        	document.getElementById('newfacturesigned').value='False';
+        	
+        });
+
+    
+    </script>
+    
+    <script>
+function hideCustomAlert(){
+	 const alert = document.querySelector(".alert");
+	 alert.classList.remove("show");
+}
+</script>
+      <script th:inline="javascript">
+jQuery(document).ready(function ($) {
+
+
+	if(sessionStorage.getItem("email") ==null){
+  		window.location.href = '/ERPPro/home/login'
+  		}
+  	else{
+  		fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+  	        method: 'GET',
+  	     
+  	       
+  	    })
+  	    .then(response => response.text())
+  	    .then(data => {
+  	       
+  	        if(data =="Client"){
+  	    
+
+  	        	window.location.href = '/ERPPro/home/login'
+  	           
+  	            }
+  	     
+  	    })
+  		}
+	/*<![CDATA[*/
+	// var factureList = /*[[${idu}]]*/ null;
+	 var idu = /*[[${idu}]]*/ null;
+	 var lastCours = /*[[${lcours}]]*/ null;
+	 var produitList = /*[[${produits}]]*/ null;
+	 var factureupdate = /*[[${factureupdate}]]*/ null;
+	 var tva = /*[[${tva}]]*/ null;
+	 var ctvtimbre = /*[[${ctvtimbre}]]*/ null;
+	 var fref = /*[[${fref}]]*/ null;
+	 
+	 window.produitList=produitList;
+	 
+
+
+	    /*]]>*/
+
+	    document.getElementById("useridu").value=sessionStorage.getItem("id")
+	  
+var currentDate = new Date();
+
+
+//Format the date to YYYY-MM-DD format
+var formattedDate = currentDate.toISOString().slice(0, 10);
+
+//Set the value of the date input element
+document.getElementById("datecv").value = formattedDate;
+document.getElementById("datecv").setAttribute("min", currentDate.toISOString().split('T')[0]);
+document.getElementById("cours").value = lastCours;
+if(lastCours != 0){
+	document.getElementById("cours").readOnly = true;
+}
+document.getElementById("tva").value = tva;
+document.getElementById("ctvtimbre").value = ctvtimbre;
+if(factureupdate != null){
+	document.getElementById("tva").value = factureupdate.tva;
+	document.getElementById("ctvtimbre").value = factureupdate.ctvtimbre;
+	
+
+	document.getElementById("datecv").value = factureupdate.dateemission;
+	document.getElementById("cours").value = factureupdate.cours;
+
+	addProductFieldsForUpdate(factureupdate.commandes)
+	TypeFacture()
+	window.type="avoir"
+}
+if(fref != null){
+	document.getElementById("newfactureref").value = fref;
+}
+else{
+	document.getElementById("newfactureref").value = 0;
+}
+
+	   
+	
+})
+</script>
+
+
+    <!-- JS -->
+    
+   
+    
+</div>
+</body>

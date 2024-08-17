@@ -1,0 +1,422 @@
+.main-container{
+	background-image: url('/ERPPro/images/facturebg.jpg');
+      background-color: rgba(25, 42, 86, .05);
+}
+
+.container{
+	
+/* Allow the card body to scroll if needed */
+    flex-grow: 1; /* Allow the card body to take available space */
+    height: 90vh
+     
+}
+
+
+.inputdatecontainer{
+	 display: flex;
+  justify-content: center; 
+  align-items: center; 
+}
+.custom-modal-dialog {
+  width: 500px; /* Adjust the percentage as needed */
+}
+.card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+           overflow:auto;
+            max-height: 90%; /* Set a maximum height for the card */
+            margin-left:10px;
+            margin-right:10px;
+            margin-bottom:20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            
+  
+        }
+        
+        .bottom-right {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin-bottom:20px;
+    margin-right: 15px;
+     /* Adjust margin as needed */
+    z-index: 999; /* Ensure the alert appears on top of other content */
+}
+
+.card-header {
+            background-color:rgba(25,42,86,255);
+            color:white;
+            font-weight: bold;
+        }
+
+.card-body {
+            
+            background-color: #ffffff;
+             overflow-y: auto; /* Allow the card body to scroll if needed */
+    flex-grow: 1; /* Allow the card body to take available space */
+            
+        }
+        
+thead,th{
+	background-color: #273c75;
+	text-align: center;
+}
+td{
+	text-align: center;
+}
+
+
+
+.btnpreview,.btnpdf,.btnsign,.btnsupp,.btnarchive{
+	border-radius: 10px;
+	color:white;
+	 border: none;
+	 margin-left: 8px;
+}
+
+.btnpdf{
+	background-color: #132a69;
+	margin-left: 8px;
+}
+
+.btnpreview
+{
+	background-color: #408bcb
+	
+} 
+
+.btnsign
+{
+	background-color: #00a8ff;
+	margin-left: 8px;
+}    
+
+.btnsupp{
+	background-color: #d32f2f;
+	margin-left: 8px;
+}   
+
+.btnarchive
+{
+	background-color: #5bc0dc;
+	margin-left: 8px;
+}      
+
+
+h3{
+	color: #202326;
+	margin-left:25px
+}
+
+
+ .rounded-rectangle {
+            /* Set your desired width */
+            height: 50px; /* Set your desired height */
+           
+              
+            border-radius: 15px; /* Set your desired border radius */
+             /* Set your desired text color */
+            /* Center text horizontally */
+            line-height: 50px; /* Center text vertically */
+            margin-right: 10px;
+            margin-left: 10px;
+            margin-top: 10px;
+            display: flex;
+            
+        }
+        
+        
+ .rounded-rectangle1 {
+            /* Set your desired width */
+            height: 50px; /* Set your desired height */
+             /* Set your desired background color */
+            border-radius: 15px; /* Set your desired border radius */
+            background-color:#3a56a0;
+            color:white;
+            /* Center text horizontally */
+            line-height: 50px; /* Center text vertically */
+            margin-right: 10px;
+            margin-left: 10px;
+            margin-top: 10px;
+            display: flex;
+           
+            
+        }
+        
+
+ 
+.selectfilter{
+	
+	width: 120px;
+	height:25px;
+	margin-left: 8px;
+	margin-top: 12px;
+	
+}
+
+.btnsigned,.btnnotsigned{
+	text-align: center;
+	color:white;
+}
+
+.btnsigned{
+	background-color: #2c7a30
+}
+
+.btnnotsigned{
+	background-color: #e75e46
+}
+
+
+.btn-group{
+	border-radius: 1px;
+	border:none;
+	
+	font-size:95%;
+	outline:none !important;
+	height:30px;
+	box-shadow:0px 2px 2px rgba(0,0,0,0.7);
+	margin-left:30px
+}
+
+.btn1{
+	width: 100px;
+	padding: 0px
+}
+
+#inputsearch{
+	height: 30px;
+	width:100px;
+	margin-right: 20px
+}
+
+.inputs{
+	margin-left: auto;
+	display:flex;
+}
+
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  appearance: none !important;
+  -moz-appearance: none !important;
+  -webkit-appearance: none !important;
+  -o-appearance: none !important;
+  -ms-appearance: none !important;
+  margin: 0; }
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -o-box-shadow: none !important;
+  -ms-box-shadow: none !important; }
+  
+  input, select {
+  display: block;
+  
+  border: 1px solid #ebebeb;
+ 
+  box-sizing: border-box;
+  font-family: 'Montserrat';
+  font-weight: 500;
+  font-size: 13px; }
+   input:focus, select:focus {
+    border: 1px solid #ff6801; }
+    
+    input{
+     padding: 11px 20px;}
+  
+  label {
+  font-size: 14px;
+  font-weight: bold;
+  font-family: 'Montserrat';
+  margin-bottom: 2px;
+  display: block; }
+  
+  
+  
+  
+  input:not([type="checkbox"]) {
+  outline: none;
+  margin: 0;
+  border: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  width: 100%;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+
+.input-group {
+  position: relative;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #ccc;
+}
+
+.input-group input{
+	margin-left:10px;
+}
+
+.iconpass{
+	 position: absolute;
+  font-size: 18px;
+  color: #ccc;
+  right: 8px;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+.input-icon {
+  position: absolute;
+  font-size: 18px;
+  color: red;
+  left: 0;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.input--style-1 {
+  padding-right: 8px; box-sizing: border-box;
+  color: #666;
+}
+
+.input--style-1::-webkit-input-placeholder {
+  /* WebKit, Blink, Edge */
+  color: #555;
+}
+
+.input--style-1:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+  color: #555;
+  opacity: 1;
+}
+
+.input--style-1::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+  color: #555;
+  opacity: 1;
+}
+
+.input--style-1:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: #555;
+}
+
+.input--style-1:-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: #555;
+}
+
+
+
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  appearance: none !important;
+  -moz-appearance: none !important;
+  -webkit-appearance: none !important;
+  -o-appearance: none !important;
+  -ms-appearance: none !important;
+  margin: 0; }
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -o-box-shadow: none !important;
+  -ms-box-shadow: none !important; }
+  
+  input, select {
+  display: block;
+  
+
+ 
+  box-sizing: border-box;
+  font-family: 'Montserrat';
+  font-weight: 500;
+  font-size: 13px; }
+   
+    
+    input{
+     padding: 11px 20px;}
+  
+  label {
+  font-size: 14px;
+  font-weight: bold;
+  font-family: 'Montserrat';
+  margin-bottom: 2px;
+  display: block; }
+
+.custom-modal-dialog {
+  max-width: 800px; /* Adjust the width as needed */
+}
+
+
+.inputs input:focus {
+    border: 1px solid #ff6801; }
+    
+    
+  .inputs{
+	
+	display:flex;
+}
+
+.inputs label{
+	margin-top:10px
+}
+
+
+.btn {
+  line-height: 40px;
+  display: inline-block;
+  padding: 0 25px;
+  cursor: pointer;
+  font-family: "Roboto", "Arial", "Helvetica Neue", sans-serif;
+  color: #fff;
+  -webkit-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.btn--radius {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.btn--green {
+  background: #57b846;
+}
+
+.btn--green:hover {
+  background: #4dae3c;
+}
+
+.bottom-right {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin-bottom:20px;
+    margin-right: 15px;
+     /* Adjust margin as needed */
+    z-index: 999; /* Ensure the alert appears on top of other content */
+}
+
+
+
+

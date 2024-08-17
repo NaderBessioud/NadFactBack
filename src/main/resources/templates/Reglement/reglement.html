@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reglements</title>
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/ERPPro/css/Reglement/reglement.css">
+    <script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    
+
+</head>
+<body>
+<div layout:fragment="content">
+<div>
+ <div class="custom-select1" onclick="toggleDropdown()">
+        <select id="filterSelect"  >
+            <option value="Tous">Tous</option>
+             <option th:each="client : ${Clients}" th:value="${client.idU}" th:text="${client.libelle}"></option>
+            
+        </select>
+        <div class="select-selected" id="selectlib">Filter by...</div>
+        <div class="select-items" id="filterOptions">
+            <div onclick="filterItems('Tous')">Tous</div>
+            <div th:each="client : ${Clients}" 
+    		 
+     		th:text="${client.libelle}" 
+     		onclick="filterItems(this.innerText)">
+			</div>
+        </div>
+    </div>
+</div>
+<div class="container">
+ 
+    <div class="list-container" id="paymentsContainer" style="width: 40%">
+        <div class="header">
+            <h2>Reglements</h2>
+            <i onclick="openModal()" class="fas fa-plus-circle"></i>
+        </div>
+        <ul class="list" id="paymentsList">
+            <!-- Payment items will be dynamically added here -->
+            <li th:each="regl: ${reglements}" onclick="selectItem(this)" th:data-idr="${regl.idR}" th:data-montant="${regl.montantrestant}" th:data-client="${regl.regclient.libelle}" th:data-type="${regl.type}">
+              <div class="info">
+             
+               
+                <span style="margin-right: 20px"><i class="fas fa-money-bill-wave"></i><span th:text= "${#numbers.formatDecimal(regl.montantrestant, 1, 'POINT', 2, 'COMMA')}"></span>
+                <span th:if="${regl.type.toString() == 'Euro'}" > $</span>
+                        <span th:if="${regl.type.toString() == 'TND'}"> TND</span></span>
+                
+                <span style="margin-right: 20px"><i class="far fa-calendar-alt"></i><span th:text="${#dates.format(regl.datepayement, 'yyyy/MM/dd')}"></span></span>
+                <span><i class="fa-solid fa-user"></i><span th:text = "${regl.regclient.libelle}"></span></span>
+            </div>
+            <div class="actions" th:if="${#lists.isEmpty(regl.regFactures)}">
+            <button  th:if="${regl.status.toString()=='Reglement'}" th:onclick="'openUpdateModal(' + ${regl.idR} + ')'"><i class="fa-solid fa-pen"></i></button>
+                <button th:if="${regl.status.toString()=='Reglement'}"  th:onclick="'deleteRegl(' + ${regl.idR} + ')'"><i class="fas fa-trash-alt"></i></button>
+                 
+                
+            </div>
+            </li>
+        </ul>
+    </div>
+    <div class="list-container" id="invoicesContainer">
+        <div class="header">
+            <h2>Factures</h2>
+           
+        </div>
+        <ul class="list" id="invoicesList">
+            <!-- Invoice items will be dynamically added here -->
+            <li th:each="fact: ${factures}" onclick="selectInvoice(this)" th:data-idf="${fact.idF}" th:data-montant="${fact.totalrestant}" th:data-client="${fact.client.libelle}">
+              <div class="info">
+             
+               
+                <span style="margin-right: 20px"><i class="fas fa-money-bill-wave"></i><span th:text= "${#numbers.formatDecimal(fact.totalrestant, 1, 'POINT', 2, 'COMMA')}"></span>
+                      <span th:if="${fact.type.toString() == 'Export'}" > $</span>
+                              <span th:if="${fact.type.toString() == 'National'}"> TND</span></span>
+                              <span><i class="fas fa-money-bill-wave"></i><span th:text= "${#numbers.formatDecimal(fact.retenue, 1, 'POINT', 2, 'COMMA')}"></span>
+                              <span th:if="${fact.type.toString() == 'Export'}"  style="margin-right: 20px"> $</span>
+                              <span th:if="${fact.type.toString() == 'National'}" style="margin-right: 20px"> TND</span>
+                              </span>
+
+                <span><i class="fa-solid fa-user"></i><span th:text = "${fact.client.libelle}"></span></span>
+            </div>
+            
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Add Payment/Invoice Form (Hidden by default) -->
+<div id="paymentsForm" style="display: none;">
+    <h2>Add Payment</h2>
+    <!-- Your payment form elements here -->
+</div>
+
+<div id="invoicesForm" style="display: none;">
+    <h2>Add Invoice</h2>
+    <!-- Your invoice form elements here -->
+</div>
+
+<div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable custom-modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary text-center">
+        <h3 class="modal-title w-100" id="exampleModalScrollableTitle" style="color: #fff">Nouveau Reglement</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+    
+        <div class="card2 card-1" style="border:none">
+               
+                <div class="card-body" style="padding-top: 10px">
+                    
+                    <form method="POST" id="reglement-form" th:action="@{/user/addReglement}" th:object="${Reglement}">
+	                                         												
+                   
+                    
+                    	 <div style="display: flex">
+                            
+                               <div class="input-group" style="width: 200px">
+                               
+                            <input class="input--style-1" type="number" placeholder="Montant" id="regmontant" th:field="*{montant}" required>
+                            
+                        <i class="fa-solid fa-money-bill input-icon"></i>
+                            </div>
+                            
+                         
+                               <div class="input-group" style="width: 200px;margin-left:80px">
+                            <input class="input--style-1" type="date"  id="regdate"  th:field="*{datepayement}" required>
+                            <i class="uil uil-calender input-icon"></i>
+                        </div>
+                            
+                            </div>
+                            
+                             <div class="input-group" style="width: 200px;margin-left: 25%">
+                               
+                            <input class="input--style-1" type="number" placeholder="Frais Bancaire" id="regfb" th:field="*{fb}" required>
+                            <i class="fa-solid fa-money-bill-transfer input-icon"></i>
+                        
+                            </div>
+                             
+                        
+                            <div style="width: 400px">
+                                   <select class="clientselect" id="clientselect" th:field="*{regclient}" required>
+		        <option value="0" selected disabled>Choisie un client</option>
+		         <option th:each="client : ${Clients}" th:value="${client.idU}" th:text="${client.libelle}"></option>
+		        
+		        
+		        
+		    </select>
+		    </div>
+		    
+		      
+                            <div style="width: 400px">
+                                   <select class="clientselect" id="typeReg" th:field="*{type}" required>
+		        <option value="TND" selected >TND</option>
+		        <option value="Euro">EURO</option>
+		        
+		        
+		        
+		        
+		    </select>
+		    </div>
+		    
+		      
+                            
+                     
+                       
+                      
+                      <div class="p-t-20" style="float: right" >
+                            <button  class="btn btn--radius btn-primary"   id="btnsubmit" onclick="addReglement(event)">Ajouter</button>
+                            
+                        </div>
+                       
+                    </form>
+                </div>
+            </div>
+      </div>
+   
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="updatemodal" tabindex="-1" role="dialog" aria-labelledby="modaltitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable custom-modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary text-center">
+        <h3 class="modal-title w-100" id="modaltitle" style="color: #fff">Reglement</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+    
+        <div class="card2 card-1" style="border:none">
+               
+                <div class="card-body" style="padding-top: 10px">
+                    
+                    <form method="POST" id="reglementupd-form" th:action="@{/user/updateReglement}" th:object="${Reglement}">
+	                                         												
+                   
+                    
+                    	 <div style="display: flex">
+                            
+                               <div class="input-group" style="width: 200px">
+                               
+                            <input class="input--style-1" type="number" placeholder="Montant" id="regmontantupd" th:field="*{montant}" required>
+                            <i class="uil uil-envelope input-icon"></i> 
+                        
+                            </div>
+                            
+                         
+                               <div class="input-group" style="width: 200px;margin-left:80px">
+                            <input class="input--style-1" type="date"  id="regdateupd"  th:field="*{datepayement}" required>
+                            <i class="uil uil-credit-card input-icon"></i>
+                        </div>
+                            
+                            </div>
+                            
+                            <div class="input-group" style="width: 200px;margin-left: 25%">
+                               
+                            <input class="input--style-1" type="number" placeholder="Frais Bancaire" id="regfbup" th:field="*{fb}" required>
+                            <i class="fa-solid fa-money-bill-transfer input-icon"></i>
+                        
+                            </div>
+                             
+                        
+                            <div style="width: 400px">
+                                   <select class="clientselect" id="clientselectupd" th:field="*{regclient}" required>
+		        <option value="0" selected disabled>Choisie un client</option>
+		         <option th:each="client : ${Clients}" th:value="${client.idU}" th:text="${client.libelle}"></option>
+		        
+		        
+		        
+		    </select>
+		    </div>
+		    
+		      
+                            <div style="width: 400px">
+                                   <select class="clientselect" id="typeRegupd" th:field="*{type}" required>
+		        <option value="TND" selected >TND</option>
+		        <option value="Euro">EURO</option>
+		        
+		        
+		        
+		        
+		    </select>
+		    </div>
+		    
+		      
+                            
+                     
+                       
+                      
+                      <div class="p-t-20" style="float: right" >
+                            <button  class="btn btn--radius btn-primary"   id="btnsubmit" onclick="updateReglement(event)">Modifier</button>
+                            
+                        </div>
+                       
+                    </form>
+                </div>
+            </div>
+      </div>
+   
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="RetenueModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary text-center">
+        <h5 class="modal-title w-100 " id="exampleModalLongTitle">Retenue à la source</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <span id="retenuetext"></span>
+        <label for="myfile"></label>
+		<input type="file" id="myfile" name="myfile">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="affectReglementFacture()">Enregistrer</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+<div class="alert alert-danger alert-dismissible fade bottom-right" role="alert" >
+  <div style="text-align: center;">
+    <strong>Attention!</strong><br><span class="alert-text"> client différent !.</span>
+  </div>
+  <button type="button" class="close" onclick="hideCustomAlert()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+
+<script>
+var token=sessionStorage.getItem('token');
+function hideCustomAlert(){
+	 const alert = document.querySelector(".alert");
+	 alert.classList.remove("show");
+}
+    // Sample data for payments and invoices (you would replace this with your actual data)
+    const paymentsData = [
+        { id: 1, amount: 100, date: '2024-04-22', method: 'Credit Card' },
+        { id: 2, amount: 150, date: '2024-04-21', method: 'PayPal' },
+        // Add more payment objects as needed
+    ];
+
+    const invoicesData = [
+        { id: 101, amount: 200, dueDate: '2024-04-30', status: 'Pending' },
+        { id: 102, amount: 250, dueDate: '2024-05-10', status: 'Paid' },
+        // Add more invoice objects as needed
+    ];
+
+    // Function to render payments
+    function renderPayments() {
+        const paymentsList = document.getElementById('paymentsList');
+        paymentsList.innerHTML = '';
+        paymentsData.forEach(payment => {
+            const li = createItemElement(payment, 'Payment');
+            paymentsList.appendChild(li);
+        });
+    }
+
+    // Function to render invoices
+    function renderInvoices() {
+        const invoicesList = document.getElementById('invoicesList');
+        invoicesList.innerHTML = '';
+        invoicesData.forEach(invoice => {
+            const li = createItemElement(invoice, 'Invoice');
+            invoicesList.appendChild(li);
+        });
+    }
+
+    // Function to create item element
+    function createItemElement(item, type) {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <div class="info">
+                <span style="margin-right: 20px"><i class="fas fa-file-invoice-dollar"></i>${type} ID: ${item.id}</span>
+                <span><i class="fas fa-money-bill-wave"></i>Amount: $${item.amount}</span>
+                ${type === 'Payment' ? `<span><i class="far fa-calendar-alt"></i>Date: ${item.date}</span>` : `<span><i class="far fa-calendar-alt"></i>Due Date: ${item.dueDate}</span>`}
+                ${type === 'Payment' ? `<span><i class="far fa-credit-card"></i>Payment Method: ${item.method}</span>` : `<span><i class="far fa-clock"></i>Status: ${item.status}</span>`}
+            </div>
+            <div class="actions">
+                <button onclick="deleteItem(${item.id}, '${type}')"><i class="fas fa-trash-alt"></i>Delete</button>
+            </div>
+        `;
+        return li;
+    }
+
+    // Toggle add payment/invoice form
+    function toggleAddItemForm(formId) {
+        const form = document.getElementById(formId);
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Function to delete item
+    function deleteItem(itemId, itemType) {
+        if (confirm(`Are you sure you want to delete this ${itemType.toLowerCase()}?`)) {
+            const index = itemType === 'Payment' ? paymentsData.findIndex(item => item.id === itemId) : invoicesData.findIndex(item => item.id === itemId);
+            if (index !== -1) {
+                if (itemType === 'Payment') {
+                    paymentsData.splice(index, 1);
+                    renderPayments();
+                } else {
+                    invoicesData.splice(index, 1);
+                    renderInvoices();
+                }
+            }
+        }
+    }
+
+    // Function to filter items
+    function filterItems() {
+        const searchInput = document.getElementById('searchInput').value.toLowerCase();
+        const paymentsList = document.getElementById('paymentsList');
+        const invoicesList = document.getElementById('invoicesList');
+
+        filterList(paymentsList, paymentsData, searchInput, 'Payment');
+        filterList(invoicesList, invoicesData, searchInput, 'Invoice');
+    }
+
+    // Function to filter list
+    function filterList(listElement, dataList, searchTerm, type) {
+        listElement.innerHTML = '';
+        dataList.forEach(item => {
+            const searchString = type === 'Payment' ? `${item.id} ${item.amount} ${item.date} ${item.method}` : `${item.id} ${item.amount} ${item.dueDate} ${item.status}`;
+            if (searchString.toLowerCase().includes(searchTerm)) {
+                const li = createItemElement(item, type);
+                listElement.appendChild(li);
+            }
+        });
+    }
+
+    // Function to handle item selection
+    
+
+    // Render initial data
+    
+  
+
+    // Event listener for search input
+</script>
+
+<script>
+	var libc ="";
+	var idRS=0;
+	var idFS=0;
+	var montantR=0;
+	var montantF=0;
+	var regclient=0
+	var factclient=0
+	let uploadedFile = null; 
+
+	document.getElementById("myfile").addEventListener("change", function(event) {
+	    uploadedFile = event.target.files[0];
+	    console.log("File uploaded:", uploadedFile);
+	});
+	function openModalR(){
+		document.getElementById("retenuetext").textContent ="Vous avez choisie le reglement de montant "+montantR+" pour payer la facture de montant "
+		+montantF+" .\n Veuillez choisir le retenue à la source."
+		$("#RetenueModal").modal('show');
+		}
+	function selectItem(element) {
+    	var idR = element.getAttribute('data-idr');
+    	var montant = element.getAttribute('data-montant');
+    	var clientlib = element.getAttribute('data-client');
+    	var type = element.getAttribute('data-type');
+    	
+	if(element.classList.contains('selected')){
+		element.classList.remove('selected');
+		idRS=0;
+		montantR=0
+		regclient=0
+		updateInvoiceList(window.factureslist)
+		}
+	else{
+		
+        const listItems = document.querySelectorAll('#paymentsList li');
+        listItems.forEach(item => {
+            item.classList.remove('selected');
+        });
+        element.classList.add('selected');
+        idRS=idR;
+        montantR=parseFloat(montant).toFixed(3)
+        if(idFS != 0){
+        	openModalR()
+            }
+    	else{
+    		
+	if(document.getElementById("selectlib").textContent != "Tous" && document.getElementById("selectlib").textContent != "Filter by"){
+		var formData = new FormData();
+		formData.append('lib', clientlib);
+		formData.append('type', type);
+      	  fetch('/ERPPro/user/FactureByClient/'+idR, {
+             method: 'POST',
+             headers: {
+             	 'Authorization': `Bearer ${token}`
+             	    },
+             body:formData
+            
+         })
+         .then(response => response.json())
+         .then(data => {
+       	  updateInvoiceList(data)
+         });
+    	}
+        
+	}
+	}
+	
+    }
+    function removeSelect(){
+    	  const listItems = document.querySelectorAll('#invoicesList li');
+          listItems.forEach(item => {
+              item.classList.remove('selected');
+          });
+
+          const listItemsReg = document.querySelectorAll('#paymentsList li');
+          listItemsReg.forEach(item => {
+              item.classList.remove('selected');
+          });
+        }
+
+    function selectInvoice(element){
+     	var idF = element.getAttribute('data-idF');
+    	var montant = element.getAttribute('data-montant');
+    	var clientlib = element.getAttribute('data-client');
+     	
+    	if(element.classList.contains('selected')){
+    		element.classList.remove('selected');
+    		idFS=0;
+    		montantF=0
+    		factclient=0
+    		updateReglementList(window.reglementlist)
+    		}
+    	else{
+    		
+            const listItems = document.querySelectorAll('#invoicesList li');
+            listItems.forEach(item => {
+                item.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            idFS=idF;
+            montantF=parseFloat(montant).toFixed(3)
+        	if(idRS != 0){
+            	openModalR()
+                }
+        	else{
+        		if(document.getElementById("selectlib").textContent != "Tous" && document.getElementById("selectlib").textContent != "Filter by"){
+                	
+        		fetch('/ERPPro/user/GetReglementByClient/'+clientlib, {
+                    method: 'GET',
+                    headers: {
+                    	 'Authorization': `Bearer ${token}`
+                    	    },
+                })
+                .then(response => response.json())
+                .then(data => {
+              	  updateReglementList(data)
+                });
+            	}
+        	}
+            
+    	}
+    
+        }
+	function openModal(){
+		$('#exampleModalScrollable').modal('show');
+		}
+
+	function createItemReglement(item) {
+		const date = new Date(item.datepayement);
+		const year = date.getFullYear();
+		const month = ('0' + (date.getMonth() + 1)).slice(-2); // Ensure two digits for month
+		const day = ('0' + date.getDate()).slice(-2); // Ensure two digits for day
+
+		const formattedDate = `${year}/${month}/${day}`;
+		var formattedMontant = formatNumber(item.montantrestant);
+        const li = document.createElement('li');
+        if(item.type.toString() == "Euro"){
+        	formattedMontant=formattedMontant+" $"
+			
+			}
+		else{
+			formattedMontant=formattedMontant+" TND"
+			
+			}
+       if(item.regFactures  != null){
+    	   li.innerHTML = `
+           	<div class="info">
+           	
+               <span style="margin-right: 20px"><i class="fas fa-money-bill-wave"></i><span>${formattedMontant}</span></span>
+               <span style="margin-right: 20px"><i class="far fa-calendar-alt"></i><span>${formattedDate}</span></span>
+               <span><i class="fa-solid fa-user"></i><span>${item.regclient.libelle}</span></span>
+           </div>
+           <div class="actions">
+
+           <button class="update-button" th:onclick="openUpdateModal(${item.idR})"><i class="fa-solid fa-pen"></i></button>
+           <button class="delete-button" th:onclick="deleteRegl(${item.idR})"><i class="fas fa-trash-alt"></i></button>
+           </div>
+           `;
+
+           const updateButton = li.querySelector('.update-button');
+    if (updateButton) {
+        updateButton.onclick = function(event) {
+            event.stopPropagation();
+            openUpdateModal(item.idR);
+        };
+    }
+
+    const deleteButton = li.querySelector('.delete-button');
+    if (deleteButton) {
+        deleteButton.onclick = function(event) {
+            event.stopPropagation();
+            deleteRegl(item.idR);
+        };
+    }
+           }
+       else{
+    	   li.innerHTML = `
+           	<div class="info">
+           	
+               <span><i class="fas fa-money-bill-wave"></i><span>${formattedMontant}</span></span>
+               <span style="margin-right: 20px"><i class="far fa-calendar-alt"></i><span>${formattedDate}</span></span>
+               <span><i class="fa-solid fa-user"></i><span>${item.regclient.libelle}</span></span>
+           </div>
+         
+           `;
+
+           }
+        
+        li.setAttribute('data-idr', item.idR);
+        li.setAttribute('data-montant', item.montantrestant);
+        li.setAttribute('data-client', item.regclient.libelle);
+        li.setAttribute('data-type', item.type.toString());
+        li.onclick = function() {
+    // Your onclick logic here
+  
+    selectItem(this)
+};
+        return li;
+    }
+	function updateReglementList(list){
+	
+		 const paymentsList = document.getElementById('paymentsList');
+	        paymentsList.innerHTML = '';
+	        list.forEach(payment => {
+	      
+	            const li = createItemReglement(payment);
+	            paymentsList.appendChild(li);
+	        });
+		}
+
+
+	function addReglement(e){
+		e.preventDefault()
+		
+		 var formData = new FormData(document.getElementById('reglement-form'));
+		 var date = document.getElementById("regdate").value
+			
+			const dateString = String(date);
+			const parts = dateString.split('-');
+			date=parts[2]+"/"+parts[1]+"/"+parts[0]
+			const cl={
+					idU: parseInt(formData.get('regclient'), 10)}
+			
+			 const reglement1 = {
+				montant:formData.get('montant'),
+				datepayement:formData.get('datepayement'),
+				type:formData.get('type'),
+				regclient: cl
+				};
+			 const lib = libc
+	const Reglement =formData
+	const dataF = {
+				lib: lib,
+				reglement: reglement1
+			};
+
+		 fetch('/ERPPro/user/addReglement', {
+             method: 'POST', 
+             headers: {
+                 'Content-Type': 'application/json',
+                 'Authorization': `Bearer ${token}`
+             },
+             body: JSON.stringify(dataF)
+         })
+         .then(response => response.json())
+         .then(data => {
+        	 updateReglementList(data)
+        	 document.getElementById('regdate').value = '';
+        	 document.getElementById('regmontant').value = '0.0';
+
+         });
+		 $("#exampleModalScrollable").modal('hide');
+		}
+
+	function createItemInvoice(item) {
+		
+		var formattedMontant = formatNumber(item.totalrestant);
+		var formattedRetenue = formatNumber(item.retenue);
+		if(item.type.toString() == "Export"){
+			formattedMontant=formattedMontant+" $"
+			formattedRetenue=formattedRetenue+" $"
+			}
+		else{
+			formattedMontant=formattedMontant+" TND"
+			formattedRetenue=formattedRetenue+" TND"
+			}
+        const li = document.createElement('li');
+       
+        if(item.payementstatus.toString()=="Paye"){
+     	   li.innerHTML = `
+            	<div class="info">
+            	
+                <span style="margin-right: 20px"><i class="fas fa-money-bill-wave"></i><span>${formattedMontant}</span></span>
+                <span style="margin-right: 20px"><i class="fas fa-money-bill-wave"></i><span>${formattedRetenue}</span></span>
+                <span><i class="fa-solid fa-user"></i><span>${item.client.libelle}</span></span>
+                <span style="color:green">Payée</span>
+            </div>
+           
+            `;
+            }
+        else{
+         li.innerHTML = `
+         	<div class="info">
+         	
+             <span style="margin-right: 20px"><i class="fas fa-money-bill-wave"></i><span>${formattedMontant}</span></span>
+             <span style="margin-right: 20px"><i class="fas fa-money-bill-wave"></i><span>${formattedRetenue}</span></span>
+             <span><i class="fa-solid fa-user"></i><span>${item.client.libelle}</span></span>
+         </div>
+        
+         `;
+         li.setAttribute('data-idF', item.idF);
+         li.setAttribute('data-montant', item.totalrestant);
+         li.setAttribute('data-client', item.client.libelle);
+         
+         li.onclick = function() {
+     // Your onclick logic here
+     console.log('li clicked');
+     selectInvoice(this)
+ };
+        }
+      
+        return li;
+    }
+
+	function updateInvoiceList(list){
+		 const invoiceList = document.getElementById('invoicesList');
+		 invoiceList.innerHTML = '';
+	        list.forEach(invoice => {
+	      
+	            const li = createItemInvoice(invoice);
+	            invoiceList.appendChild(li);
+	        });
+		}
+
+
+	
+	function filterItems(opt){
+		console.log(opt)
+		 
+	    document.getElementById("selectlib").textContent = opt;
+	    if(opt != "Tous" && opt !="Filter by..."){
+
+	    	libc=opt
+	    	  fetch('/ERPPro/user/GetReglementByClient/'+opt, {
+	              method: 'GET',
+	              headers: {
+	            	 	 'Authorization': `Bearer ${token}`
+	            	 	    },
+	          })
+	          .then(response => response.json())
+	          .then(data => {
+	        	  updateReglementList(data)
+	          });
+
+	   	  fetch('/ERPPro/user/FactureByClient/'+opt, {
+              method: 'GET',
+              headers: {
+            	 	 'Authorization': `Bearer ${token}`
+            	 	    },
+          })
+          .then(response => response.json())
+          .then(data => {
+        	  updateInvoiceList(data)
+          });
+		    }
+	    else{
+	    	  fetch('/ERPPro/user/DisplayReglement', {
+	              method: 'GET',
+	              headers: {
+	            	 	 'Authorization': `Bearer ${token}`
+	            	 	    },
+	          })
+	          .then(response => response.json())
+	          .then(data => {
+	        	  updateReglementList(data)
+	          });
+
+	   	  fetch('/ERPPro/user/Allfactures', {
+              method: 'GET',
+              headers: {
+            	 	 'Authorization': `Bearer ${token}`
+            	 	    },
+             
+          })
+          .then(response => response.json())
+          .then(data => {
+        	  updateInvoiceList(data)
+          });
+		    }
+	    
+	    
+	
+	}
+    function toggleDropdown() {
+        document.getElementById("filterOptions").classList.toggle("show");
+    }
+
+    function affectReglementFacture(){
+   	  
+   	   	  	
+    	 	
+    		const reglements =window.reglementlist
+    		const factures = window.factureslist
+    		
+    	if (uploadedFile != null) {
+    		
+    		 var fileInput = document.getElementById('myfile');
+    		    var file = fileInput.files[0];
+
+    		    // Create a FormData object to append the file
+    		    var formData = new FormData();
+    		    
+    		    formData.append('imageFile', file);
+
+    		    // Perform an asynchronous request (e.g., using Fetch API or XMLHttpRequest)
+    		    fetch('/ERPPro/uploadFile', {
+    		        method: 'POST',
+    		        headers: {
+    		        	 'Authorization': `Bearer ${token}`
+    		        	    },
+    		        body: formData
+    		    })
+    		    .then(response => response.text())
+    		    .then(data => {
+    		    	const dataF = {
+    	    				reglements: reglements,
+    	    				factures: factures,
+    	    				retenue:data
+    					};
+					
+    		    	 fetch('/ERPPro/user/AffectReglementFactureWithRetenue/'+idRS+"/"+idFS, {
+    	    		        method: 'POST',
+    	    		        headers: {
+    	    	                 'Content-Type': 'application/json',
+    	    	                 'Authorization': `Bearer ${token}`
+    	    	             },
+    	    	             body: JSON.stringify(dataF)
+    	    		    })
+    	    		   .then(response => response.json())
+        				 .then(data1 => {
+    	    				  
+    	    				  updateReglementList(data1.reglements);
+    	    	 			updateInvoiceList(data1.factures);
+    	    	 			filterItems(document.getElementById("selectlib").textContent);
+        	    			  
+        	    		  })
+    		    })
+    		    .catch(error => {
+    		        console.error('Error uploading file:', error);
+    		    });
+        	}
+    	else{
+    		const dataF1 = {
+    				reglements: reglements,
+    				factures: factures,
+    				
+				};
+    		 fetch('/ERPPro/user/AffectReglementFacture/'+idRS+"/"+idFS, {
+ 		        method: 'POST',
+ 		       headers: {
+ 	                 'Content-Type': 'application/json',
+ 	                'Authorization': `Bearer ${token}`
+ 	             },
+ 	             body: JSON.stringify(dataF1)
+ 		      
+ 		    })
+ 		    .then(response => response.json())
+         .then(data1 => {
+             console.log(data1)
+ 				 
+ 				 updateReglementList(data1.reglements);
+ 				updateInvoiceList(data1.factures);
+ 				 filterItems(document.getElementById("selectlib").textContent);
+	    			  })
+	    		  
+        	}
+    		idRS=0;
+    		idFS=0
+    	uploadedFile=null;
+    	$("#RetenueModal").modal('hide');
+    	 const invoiceItems = document.querySelectorAll('#invoicesList li');
+    	  invoiceItems.forEach(item => {
+    	    item.classList.remove('selected');
+    	  });
+
+    	  const regItems = document.querySelectorAll('#paymentsList li');
+    	  regItems.forEach(item => {
+    	    item.classList.remove('selected');
+    	  });
+   	  	}
+    var idreg=0;
+
+  	function openUpdateModal(id){
+  	  	
+  	  	idreg=id
+  	 
+  		fetch('/ERPPro/user/RegById/'+id, {
+	        method: 'GET',
+	        headers: {
+	            'Content-Type': 'application/json',
+	            'Authorization': `Bearer ${token}`
+	        },
+	        
+	    })
+	    .then(response => response.json())
+	    .then(data => { 
+		   
+	    	const date = new Date(data.datepayement);
+	    	const formattedDate = date.toISOString().split('T')[0];
+	    	document.getElementById('regmontantupd').value=data.montant;
+	    
+	    	document.getElementById('regdateupd').value=formattedDate;
+	    	document.getElementById('typeRegupd').value=data.regclient.idU;
+	    	document.getElementById('typeRegupd').value=data.type;
+	    	document.getElementById('regfbup').value=data.fb;
+	    	 $('#updatemodal').modal('show');
+	    	
+	    	 
+	    	
+	    	
+	    });
+  	  	}
+
+  	
+	function updateReglement(e){
+		e.preventDefault()
+	
+		 var formData = new FormData(document.getElementById('reglementupd-form'));
+		 var date = document.getElementById("regdateupd").value
+			
+			const dateString = String(date);
+			const parts = dateString.split('-');
+			date=parts[2]+"/"+parts[1]+"/"+parts[0]
+			const cl={
+					idU: parseInt(formData.get('regclient'), 10)}
+			
+					 const reglement1 = {
+					 idR:idreg,
+				montant:formData.get('montant'),
+				datepayement:formData.get('datepayement'),
+				type:formData.get('type'),
+				fb:formData.get('fb'),
+				regclient: cl
+				};
+			 const lib = libc
+	const Reglement =formData
+	const dataF = {
+				lib: lib,
+				reglement: reglement1
+			};
+
+		 fetch('/ERPPro/user/updateReglement', {
+             method: 'POST', 
+             headers: {
+                 'Content-Type': 'application/json',
+                 'Authorization': `Bearer ${token}`
+             },
+             body: JSON.stringify(dataF)
+         })
+         .then(response => response.json())
+         .then(data => {
+        	 updateReglementList(data)
+        	 
+
+         });
+		 $("#updatemodal").modal('hide');
+		}
+
+  	 function deleteRegl(id){
+  		 const formData = new URLSearchParams();
+  	    formData.append("lib", libc);
+  		 fetch('/ERPPro/user/deleteRegl/'+id, {
+             method: 'POST', 
+             headers: {
+                 'Content-Type': 'application/x-www-form-urlencoded',
+                 'Authorization': `Bearer ${token}`
+             },
+             body: formData
+         })
+         .then(response => response.json())
+         .then(data => {
+        	 updateReglementList(data)
+        	 
+
+         });
+  	  	 }
+  
+
+</script>
+
+    <script th:inline="javascript">
+jQuery(document).ready(function ($) {
+
+
+	if(sessionStorage.getItem("email") ==null){
+  		window.location.href = '/ERPPro/home/login'
+  		}
+  	else{
+  		fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+  	        method: 'GET',
+  	     
+  	       
+  	    })
+  	    .then(response => response.text())
+  	    .then(data => {
+  	       
+  	        if(data =="Client"){
+  	    
+
+  	        	window.location.href = '/ERPPro/home/login'
+  	           
+  	            }
+  	     
+  	    })
+  		}
+	
+	/*<![CDATA[*/
+	
+	 var facturesList = /*[[${factures}]]*/ null;
+	 var reglementsList = /*[[${reglements}]]*/ null;
+	 
+	  
+	 
+
+	 window.factureslist = facturesList;
+	 window.reglementlist = reglementsList;
+
+	    /*]]>*/
+
+	 $('#RetenueModal').on('hidden.bs.modal', function (e) {
+	        // Votre fonction ici
+	        console.log("Le modal a été fermé.");
+	        // Appeler votre fonction spécifique
+	        idFS=0
+	        idRS=0
+
+	        const invoiceItems = document.querySelectorAll('#invoicesList li');
+	    	  invoiceItems.forEach(item => {
+	    	    item.classList.remove('selected');
+	    	  });
+
+	    	  const regItems = document.querySelectorAll('#paymentsList li');
+	    	  regItems.forEach(item => {
+	    	    item.classList.remove('selected');
+	    	  });
+	    });
+	  
+	 
+})
+
+function formatNumber(number) {
+  return number.toLocaleString('fr-FR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+</script>
+
+
+</body>
+</html>

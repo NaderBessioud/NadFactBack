@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+<meta charset="ISO-8859-1">
+<title>BonLivraison</title>
+<link rel="stylesheet" href="/ERPPro/css/bl.css">
+</head>
+<body>
+<div layout:fragment="content">
+<div class="ag-format-container">
+  <div class="ag-courses_box">
+  
+    <div class="ag-courses_item" th:each = "bc: ${bcs}">
+     
+      <a href="#" class="ag-courses-item_link">
+        <div class="ag-courses-item_bg" th:classappend="${bc.bcliv.ddepense.cat}">
+       </div>
+             
+       
+
+        <div class="ag-courses-item_title" th:text ="${bc.addresse}">
+      
+        </div>
+
+ <div class="ag-courses-item_date-box">
+          Start:
+          <span class="ag-courses-item_date" th:text ="${#dates.format(bc.date, 'yyyy/MM/dd')}">
+           
+          </span>
+        </div>
+        <div class="ag-courses-item_date-box">
+          Montant:
+          <span class="ag-courses-item_date" th:text ="${bc.bcliv.montant}">
+            
+          </span>
+        </div>
+      </a>
+    </div>
+
+ 
+
+ 
+
+  
+
+  
+
+
+
+
+
+
+  </div>
+</div>
+<script type="text/javascript">
+var token=sessionStorage.getItem('token');
+function updateBCList(bcs){
+	var itemsdiv = document.querySelector('.ag-courses_box');
+	itemsdiv.style.opacity = 0;
+	itemsdiv.innerHTML = ''; 
+	for (var i = 0; i < bcs.length; i++) {
+        var bc = bcs[i];
+     // Create the main container
+        const agCoursesItem = document.createElement('div');
+        agCoursesItem.classList.add('ag-courses_item');
+
+        // Create the link element
+        const agCoursesItemLink = document.createElement('a');
+        agCoursesItemLink.classList.add('ag-courses-item_link');
+        agCoursesItemLink.href = '#';
+
+        // Create the background div
+        const agCoursesItemBg = document.createElement('div');
+        agCoursesItemBg.classList.add('ag-courses-item_bg');
+        agCoursesItemBg.classList.add(bc.ddepense.cat);
+        
+        agCoursesItemLink.appendChild(agCoursesItemBg);
+
+
+
+        const deliverButtonSpan = document.createElement('span');
+        deliverButtonSpan.setAttribute('aria-hidden', 'true');
+        deliverButtonSpan.style.float = 'right';
+        deliverButtonSpan.style.color = 'white';
+        deliverButtonSpan.style.zIndex = '2';
+        deliverButtonSpan.style.position = 'relative';
+
+        // Create the close button icon
+        const deliverButtonIcon = document.createElement('i');
+        deliverButtonIcon.classList.add('fa-light','fa-truck');
+        deliverButtonIcon.style.marginTop = '10px';
+        deliverButtonIcon.addEventListener('click', function() {
+        	delivreBC(bc.idBC);
+        	  // Add your close button functionality here
+        	});
+        deliverButtonSpan.appendChild(deliverButtonIcon);
+
+        
+        // Create the close button span
+        const closeButtonSpan = document.createElement('span');
+        closeButtonSpan.setAttribute('aria-hidden', 'true');
+        closeButtonSpan.style.float = 'right';
+        closeButtonSpan.style.color = 'white';
+        closeButtonSpan.style.zIndex = '2';
+        closeButtonSpan.style.position = 'relative';
+
+        // Create the close button icon
+        const closeButtonIcon = document.createElement('i');
+        closeButtonIcon.classList.add('fa', 'fa-close');
+        closeButtonIcon.style.marginTop = '10px';
+        closeButtonIcon.addEventListener('click', function() {
+        	  cancelBC(bc.idBC);
+        	  // Add your close button functionality here
+        	});
+        closeButtonSpan.appendChild(closeButtonIcon);
+        
+
+        // Append the close button span to the link
+        agCoursesItemLink.appendChild(closeButtonSpan);
+
+        // Create the title div
+        const agCoursesItemTitle = document.createElement('div');
+        agCoursesItemTitle.classList.add('ag-courses-item_title');
+        agCoursesItemTitle.textContent = bc.description;
+        agCoursesItemLink.appendChild(agCoursesItemTitle);
+
+        // Create the start date box div
+        const startDateBox = document.createElement('div');
+        startDateBox.classList.add('ag-courses-item_date-box');
+        var dateObject = new Date(bc.date);
+        var formattedDate = dateObject.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        dateCell.innerHTML = formattedDate;
+        startDateBox.innerHTML = 'Start: <span class="ag-courses-item_date">${formattedDate}</span>';
+        agCoursesItemLink.appendChild(startDateBox);
+
+        // Create the amount date box div
+        const amountDateBox = document.createElement('div');
+        amountDateBox.classList.add('ag-courses-item_date-box');
+        amountDateBox.innerHTML = 'Montant: <span class="ag-courses-item_date">${bc.montant}d</span>';
+        agCoursesItemLink.appendChild(amountDateBox);
+
+        // Append the link to the main container
+        agCoursesItem.appendChild(agCoursesItemLink);
+
+        // Append the main container to the body (or another container)
+        itemsdiv.appendChild(agCoursesItem);
+                
+	}
+
+	itemsdiv.addEventListener('transitionend', function() {
+    	  rowDiv.style.transition = '';
+    	}, { once: true });
+      setTimeout(function() {
+    	  itemsdiv.style.cssText = 'opacity: 1; transition: opacity 1s ease-in-out;';
+    	}, 100);
+}
+
+function cancelBC(id){
+	fetch('/ERPPro/user/CancelBC/'+id, {
+        method: 'POST',
+        headers: {
+        	 'Authorization': `Bearer ${token}`
+        	    },
+       
+    })
+    .then(response => response.json())
+    .then(data => {
+    	updateBCList(data)
+    })
+}
+
+function delivreBC(id){
+	fetch('/ERPPro/user/delevreBC/'+id, {
+        method: 'POST',
+        headers: {
+        	 'Authorization': `Bearer ${token}`
+        	    },
+       
+    })
+    .then(response => response.json())
+    .then(data => {
+    	updateBCList(data)
+    })
+}
+</script>
+
+
+  <script type="text/javascript">
+
+
+  jQuery(document).ready(function ($) {
+
+  	if(sessionStorage.getItem("email") ==null){
+  		window.location.href = '/ERPPro/home/login'
+  		}
+  	else{
+  		fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+  	        method: 'GET',
+  	     
+  	       
+  	    })
+  	    .then(response => response.text())
+  	    .then(data => {
+  	       
+  	        if(data =="Client"){
+  	    
+
+  	        	window.location.href = '/ERPPro/home/login'
+  	           
+  	            }
+  	     
+  	    })
+  		}
+  })
+  </script>
+
+</body>
+</html>

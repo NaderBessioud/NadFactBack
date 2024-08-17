@@ -1,0 +1,414 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200;600&display=swap');
+ 
+ .main-container{
+
+ background-color: #f2f2f2;
+}
+.pagination .page-item a {
+  background-color: #f2f2f2;
+}
+ body {
+	
+	 background-color: #f2f2f2;
+}
+ body section {
+	 width: 90%;
+	 max-width: 1200px;
+	 margin: 0 auto;
+}
+ body section .row {
+	 align-items: center;
+	
+}
+.exonereselect{
+	width: 300px;
+	height: 30px;
+	border: none;
+	 outline: none;
+	
+	 border-bottom: solid #d9d9d9;
+	    margin-top:17px;
+}
+
+.headerdiv{
+	display: flex;
+	justify-content: space-between;
+	margin-top:20px;
+	margin-left:40px;
+	margin-right: 20px
+}
+.btn {
+  line-height: 40px;
+  display: inline-block;
+  padding: 0 25px;
+  cursor: pointer;
+  font-family: "Roboto", "Arial", "Helvetica Neue", sans-serif;
+  color: #fff;
+  -webkit-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+  font-size: 14px;
+  font-weight: 700;
+}
+ .card {
+	 position: relative;
+	 height: 400px;
+	 width: 100%;
+	 margin: 10px 0;
+	 transition: ease all 2.3s;
+	 perspective: 1200px;
+	  background-color: #f2f2f2;
+}
+.card:hover {
+background-color: #f2f2f2;
+}
+
+ .card:hover .cover {
+	 transform: rotateX(0deg) rotateY(-180deg);
+	  
+}
+ .card:hover .cover:before {
+	 transform: translateZ(30px);
+
+}
+ .card:hover .cover:after {
+	 background-color: black;
+}
+ .card:hover .cover h1 {
+	 transform: translateZ(100px);
+}
+ .card:hover .cover .price {
+	 transform: translateZ(60px);
+}
+ .card:hover .cover a {
+	 transform: translateZ(-60px) rotatey(-180deg);
+}
+ .card .cover {
+	 position: absolute;
+	 height: 100%;
+	 width: 100%;
+	 transform-style: preserve-3d;
+	 transition: ease all 2.3s;
+	 background-size: cover;
+	 background-position: center center;
+	 background-repeat: no-repeat;
+}
+ .card .cover:before {
+	 content: '';
+	 position: absolute;
+	 border: 5px solid rgba(255, 255, 255, .5);
+	 box-shadow: 0 0 12px rgba(0, 0, 0, .3);
+	 top: 20px;
+	 left: 20px;
+	 right: 20px;
+	 bottom: 20px;
+	 z-index: 2;
+	 transition: ease all 2.3s;
+	 transform-style: preserve-3d;
+	 transform: translateZ(0px);
+}
+ .card .cover:after {
+	 content: '';
+	 position: absolute;
+	 top: 0px;
+	 left: 0px;
+	 right: 0px;
+	 bottom: 0px;
+	 z-index: 2;
+	 transition: ease all 1.3s;
+	 background: rgba(0, 0, 0, .4);
+}
+ .card .cover.item-a {
+	 background-image: url('https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb?auto=format&fit=crop&w=600&q=80');
+}
+ .card .cover.item-b {
+	 background-image: url('https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=600&q=80');
+}
+ .card .cover.item-c {
+	 background-image: url('https://images.unsplash.com/photo-1525945518069-b924046d1385?auto=format&fit=crop&w=600&q=80');
+}
+ .card .cover h1 {
+	 font-weight: 600;
+	 position: absolute;
+	 bottom: 55px;
+	 left: 50px;
+	 color: white;
+	 transform-style: preserve-3d;
+	 transition: ease all 2.3s;
+	 z-index: 3;
+	 font-size: 3em;
+	 transform: translateZ(0px);
+}
+ .card .cover .price {
+	 font-weight: 200;
+	 position: absolute;
+	 top: 55px;
+	 right: 50px;
+	 color: white;
+	 transform-style: preserve-3d;
+	 transition: ease all 2.3s;
+	 z-index: 4;
+	 font-size: 2em;
+	 transform: translateZ(0px);
+}
+ .card .card-back {
+	 position: absolute;
+	 height: 100%;
+	 width: 100%;
+	 background: #0b0f08;
+	 transform-style: preserve-3d;
+	 transition: ease all 2.3s;
+	 transform: translateZ(-1px);
+	 display: flex;
+	 align-items: center;
+	 justify-content: center;
+}
+ .card .card-back a {
+	 transform-style: preserve-3d;
+	 transition: ease transform 2.3s, ease background 0.5s;
+	 transform: translateZ(-1px) rotatey(-180deg);
+	 background: transparent;
+	 border: 1px solid white;
+	 font-weight: 200;
+	 font-size: 1.3em;
+	 color: white;
+	 padding: 14px 32px;
+	 outline: none;
+	 text-decoration: none;
+}
+ .card .card-back a:hover {
+	 background-color: white;
+	 color: #0b0f08;
+}
+
+
+
+.profile-pic {
+	 color: transparent;
+	 transition: all 0.3s ease;display: flex; justify-content: center;align-items: center;position: relative;transition: all 0.3s ease;
+	 
+	
+	 
+	 
+	 
+}
+
+ .imgpro {
+	 position: absolute;
+	 object-fit: cover;
+	 width: 165px;
+	 height: 165px;
+	 box-shadow: 0 0 10px 0 rgba(255, 255, 255, .35);
+	 border-radius: 100px;
+	 z-index: 0;
+}
+ .profile-pic label {
+	 cursor: pointer;
+	 height: 165px;
+	 width: 165px;
+}
+ .profile-pic:hover .-label {
+	 display: flex;
+	 justify-content: center;
+	 align-items: center;
+	 background-color: rgba(0, 0, 0, .8);
+	 z-index: 10000;
+	 color: #fafafa;
+	 transition: background-color 0.2s ease-in-out;
+	 border-radius: 100px;
+	 
+}
+ .spanpro {
+	 display: inline-flex;
+	 padding: 0.2em;
+	 height: 2em;
+}
+
+
+/* Apply styles to all input elements except checkboxes */
+input:not([type="checkbox"]) {
+  outline: none;
+  margin: 0;
+  border: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  width: 100%;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+
+.input-group {
+  position: relative;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #ccc;
+}
+
+.input-group input{
+	margin-left:10px;
+}
+
+.iconpass{
+	 position: absolute;
+  font-size: 18px;
+  color: #ccc;
+  right: 8px;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+.input-icon {
+  position: absolute;
+  font-size: 18px;
+  color: red;
+  left: 0;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.input--style-1 {
+  padding-right: 8px; box-sizing: border-box;
+  color: #666;
+}
+
+.input--style-1::-webkit-input-placeholder {
+  /* WebKit, Blink, Edge */
+  color: #555;
+}
+
+.input--style-1:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+  color: #555;
+  opacity: 1;
+}
+
+.input--style-1::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+  color: #555;
+  opacity: 1;
+}
+
+.input--style-1:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: #555;
+}
+
+.input--style-1:-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: #555;
+}
+
+
+
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  appearance: none !important;
+  -moz-appearance: none !important;
+  -webkit-appearance: none !important;
+  -o-appearance: none !important;
+  -ms-appearance: none !important;
+  margin: 0; }
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -o-box-shadow: none !important;
+  -ms-box-shadow: none !important; }
+  
+  input, select {
+  display: block;
+  
+
+ 
+  box-sizing: border-box;
+  font-family: 'Montserrat';
+  font-weight: 500;
+  font-size: 13px; }
+   
+    
+    input{
+     padding: 11px 20px;}
+  
+  label {
+  font-size: 14px;
+  font-weight: bold;
+  font-family: 'Montserrat';
+  margin-bottom: 2px;
+  display: block; }
+
+.custom-modal-dialog {
+  max-width: 800px; /* Adjust the width as needed */
+}
+
+
+.inputs input:focus {
+    border: 1px solid #ff6801; }
+    
+    
+  .inputs{
+	
+	display:flex;
+}
+
+.inputs label{
+	margin-top:10px
+}
+
+
+.btn {
+  line-height: 40px;
+  display: inline-block;
+  padding: 0 25px;
+  cursor: pointer;
+  font-family: "Roboto", "Arial", "Helvetica Neue", sans-serif;
+  color: #fff;
+  -webkit-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.btn--radius {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.btn--green {
+  background: #57b846;
+}
+
+.btn--green:hover {
+  background: #4dae3c;
+}
+
+.bottom-right {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin-bottom:20px;
+    margin-right: 15px;
+     /* Adjust margin as needed */
+    z-index: 999; /* Ensure the alert appears on top of other content */
+}
+
+#inputsearch{
+	height: 30px;
+	width:100px;
+	margin-right: 20px
+}

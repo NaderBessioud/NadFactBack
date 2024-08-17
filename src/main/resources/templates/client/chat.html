@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+<meta charset="ISO-8859-1">
+<title>Chat</title>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+<link rel="stylesheet" href="/ERPPro/css/Client/chat.css">
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container-fluid h-50">
+  <div class="row justify-content-center h-100">
+    <div class="col-md-4 col-xl-3 chat"><div class="card mb-sm-3 mb-md-0 contacts_card">
+      <div class="card-header">
+        <div class="input-group">
+          <input type="text" placeholder="Search..." name="" class="form-control search">
+          <div class="input-group-prepend">
+            <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
+          </div>
+        </div>
+      </div>
+      <div class="card-body contacts_body">
+        <ul class="contacts" id="contactlist">
+          <li th:each="user :${userOnLine}" th:class="'active1' + ${user.idU}" th:onclick="'ChangeUser(' + ${user.idU} + ')'">
+            <div class="d-flex bd-highlight">
+              <div class="img_cont" >
+                <img th:src="${user.image}" class="rounded-circle user_img" >
+                <span class="online_icon"  th:classappend="${user.online} ? '':'offline'" th:id="${user.idU}"></span>
+              </div>
+              <div class="user_info" >
+                <span th:style="'font-weight: ' + (${user.seen} ? 'normal' : 'bold') + ';'" th:text = "${user.name}" style="font-size: 21px" th:id="'username'+${user.idU}"></span>                
+             <div style="max-width: 80px; overflow: hidden;">
+    <span
+        th:style="'font-size: 15px; color: rgba(255,255,255,0.6); font-weight: ' + (${user.seen} ? 'normal' : 'bold') + '; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;'" th:id="'lastmsg'+${user.idU}">
+        [[${user.content}]]
+    </span>
+</div>
+			                 
+                 
+              </div>
+              
+                
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="card-footer"></div>
+    </div></div>
+    <div class="col-md-8 col-xl-6 chat">
+      <div class="card">
+        <div class="card-header msg_head">
+          <div class="d-flex bd-highlight">
+            <div class="img_cont">
+           
+            <img  th:src="${receiverimage}" class="rounded-circle user_img" th:unless="${#lists.isEmpty(userOnLine)}" id="userimg1">
+              <img src="https://therichpost.com/wp-content/uploads/2020/06/avatar2.png" class="rounded-circle user_img" th:if="${#lists.isEmpty(userOnLine)}">
+              <span th:unless="${#lists.isEmpty(userOnLine)}" class="online_icon"  th:classappend="${online} ? '':'offline'" id="onlineuser"></span>
+
+            </div>
+            <div class="user_info">
+              <span th:text = "${username}" id="username"></span>
+              <p th:text = "${nb +' Messages'}" id="nbmessage"></p>
+            </div>
+            <div class="video_cam">
+              <span><i class="fas fa-video"></i></span>
+              <span><i class="fas fa-phone"></i></span>
+            </div>
+          </div>
+          <span id="action_menu_btn"><i class="fas fa-ellipsis-v"></i></span>
+          <div class="action_menu">
+            <ul>
+              <li><i class="fas fa-user-circle"></i> View profile</li>
+              <li><i class="fas fa-users"></i> Add to close friends</li>
+              <li><i class="fas fa-plus"></i> Add to group</li>
+              <li><i class="fas fa-ban"></i> Block</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-body msg_card_body" id="divmsg">
+          <div th:each="mes : ${messages}" class="d-flex mb-4 message" th:classappend="${mes.sender.idU != ids} ? 'justify-content-start' : 'justify-content-end'" data-id="[[${mes.id}]]">
+       
+            <div class="img_cont_msg" th:if="${mes.sender.idU !=ids}">
+              <img th:src="${receiverimage}" class="rounded-circle user_img_msg">
+            </div>
+            
+            
+            <div class="msg_cotainer" th:classappend="${mes.sender.idU != ids} ? 'msg_cotainer':'msg_cotainer_send'" th:text = "${mes.content}">
+             
+              <span class="msg_time" th:text = "${mes.hour +','}"><span th:unless="${mes.dateForTaday != 'null'}" th:text = "${mes.day}"></span>
+              <span th:if="${mes.dateForTaday == 'null'}" th:text = "${mes.date}"></span></span>
+            </div>
+            <div class="img_cont_msg" th:unless="${mes.sender.idU != ids}">
+              <img th:src="${senderimage}" class="rounded-circle user_img_msg">
+            </div>
+          </div>
+
+
+
+        </div>
+        <div class="card-footer">
+          <div class="input-group">
+            <div class="input-group-append">
+              <span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
+            </div>
+            <textarea name="content" class="form-control type_msg" placeholder="Type your message..."  id="msgcontent"></textarea>
+            <div class="input-group-append">
+              <span class="input-group-text send_btn" th:onclick="sendMessage()" ><i class="fas fa-location-arrow"></i></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+var lastid="0"
+var senderimage;
+var token=sessionStorage.getItem('token');
+async function sendMessage(){
+	var content=document.getElementById("msgcontent").value
+	
+	
+	let formData = new FormData();
+	const idr=window.idr
+	formData.append('idr', idr);
+	
+	formData.append('ids', sessionStorage.getItem("id"));
+	const url = new URL('http://127.0.0.1:5000/api/cencor');
+    const params = { text: content };
+    url.search = new URLSearchParams(params).toString();
+
+    const response = await fetch(url);
+    const censoredText = await response.text();
+    formData.append('content', censoredText);
+	 fetch('/ERPPro/chat/addMessage', {
+         method: 'POST',
+         headers: {
+		    	 'Authorization': `Bearer ${token}`
+		    	    },
+         body: formData
+        
+     })
+     .then(response => response.json())
+     .then(data => {})
+     document.getElementById("msgcontent").value=""
+	
+}
+
+
+function updatemessages(){
+	var messages =window.messages
+	var id= window.ids;
+	
+	var divmsg=document.getElementById("divmsg");
+	
+	divmsg.innerHTML='';
+
+	messages.forEach(mes => {
+		const container = document.createElement('div');
+		container.classList.add('message');
+		container.setAttribute('data-id', mes.idM);
+		if(mes.sender.idU !=id){
+			 container.classList.add('d-flex', 'mb-4','justify-content-start');
+			 const imagecontainer = document.createElement('div');
+			 imagecontainer.classList.add('img_cont_msg');
+			 const imgLeft = document.createElement('img');
+		        imgLeft.src = window.receiverimage;
+		        imgLeft.classList.add('rounded-circle', 'user_img_msg');
+		        imagecontainer.appendChild(imgLeft);
+		        container.appendChild(imagecontainer);
+			}
+		else{
+			container.classList.add('d-flex', 'mb-4','justify-content-end');
+			}
+
+		const msgcontainer = document.createElement('div');
+		if(mes.sender.idU !=id){
+			msgcontainer.classList.add('msg_cotainer');
+			}
+		else{
+			msgcontainer.classList.add('msg_cotainer_send');
+			}
+		msgcontainer.textContent=mes.content
+
+		const msgTime = document.createElement('span');
+		msgTime.classList.add('msg_time');
+	    msgTime.textContent = mes.hour + ',';
+
+	    const msgTime1 = document.createElement('span');
+		if(mes.day != null){
+			msgTime1.textContent = mes.day;
+			}
+		else{
+			msgTime1.textContent = mes.date;
+			}
+		msgTime.appendChild(msgTime1);
+		msgcontainer.appendChild(msgTime);
+		container.appendChild(msgcontainer);
+
+		if(mes.sender.idU ==id){
+			 container.classList.add('d-flex', 'mb-4','justify-content-start');
+			 const imagecontainer1 = document.createElement('div');
+			 imagecontainer1.classList.add('img_cont_msg');
+			 const imgLeft1 = document.createElement('img');
+			 imgLeft1.src = window.senderimage;
+			 imgLeft1.classList.add('rounded-circle', 'user_img_msg');
+		        imagecontainer1.appendChild(imgLeft1);
+		        container.appendChild(imagecontainer1);
+			}
+		
+	    
+		divmsg.appendChild(container);
+    });
+	
+}
+function ChangeUser(id){
+	
+	 fetch('/ERPPro/chat/usernameById/'+id, {
+         method: 'GET',
+         headers: {
+		    	 'Authorization': `Bearer ${token}`
+		    	    },
+        
+     })
+     .then(response => response.text())
+     .then(data => {
+    	 document.getElementById('username').innerText=data
+
+    	 })
+    	 
+    	fetch('/ERPPro/home/downloadImageByid/'+id, {
+         method: 'GET',
+         headers: {
+		    	 'Authorization': `Bearer ${token}`
+		    	    },
+        
+     })
+     .then(response => response.text())
+     .then(data => {
+   
+         
+    	 window.receiverimage=data
+     	 const imgElement = document.getElementById('userimg1');
+    	 
+    	 
+    	 imgElement.src = data
+    	 
+
+
+    	 })
+    	 
+    	 fetch('/ERPPro/chat/IsUserOnLine/'+id, {
+         method: 'GET',
+         headers: {
+		    	 'Authorization': `Bearer ${token}`
+		    	    },
+        
+     })
+     .then(response => response.text())
+     .then(data => {
+    	 console.log(data)
+    	 if(data == "true"){
+        	console.log("here")
+    		 document.getElementById("onlineuser").classList.remove("offline");
+        	 }
+    	 else{
+    		 document.getElementById("onlineuser").classList.add("offline");
+        	 }
+
+    	 })
+	
+
+	const element1 = document.getElementsByClassName('active1' + lastid)[0];
+	if (element1) {
+	    // Change the background color to transparent
+	    element1.style.backgroundColor = 'transparent';
+	}
+	lastid=id
+	window.idr=id
+	const element2 = document.getElementsByClassName('active1' + id)[0];
+	if (element2) {
+	    // Change the background color to transparent
+	    element2.style.backgroundColor = 'rgba(0,0,0,0.3)';
+	}
+
+	let formData = new FormData();
+	
+	formData.append('idr', id);
+	formData.append('ids', sessionStorage.getItem("id"));
+	
+	
+	 fetch('/ERPPro/chat/Messages', {
+         method: 'POST',
+         headers: {
+		    	 'Authorization': `Bearer ${token}`
+		    	    },
+         body: formData
+        
+     })
+     .then(response => response.json())
+     .then(data => {
+         window.messages=data
+         updatemessages()
+         document.getElementById('nbmessage').innerText=data.length
+             })
+
+         	
+}
+
+function updateuser(users){
+	  var ullist = document.getElementById("contactlist");
+
+	  ullist.style.opacity = 0;
+	  ullist.innerHTML = ''; // Clear existing rows
+	 for (var i = 0; i < users.length; i++){
+		 user=users[i];
+		  const li = document.createElement('li');
+	      li.className = `active1${user.idU}`;
+	      li.setAttribute('onclick', `changeUser(${user.idU})`);
+	      li.innerHTML = `
+	          <div class="d-flex bd-highlight">
+	            <div class="img_cont">
+	              <img src="{user.image}" class="rounded-circle user_img">
+	              <span class="online_icon ${user.online ? '' : 'offline'}" id="${user.idU}"></span>
+	            </div>
+	            <div class="user_info">
+	              <span th:style="'font-weight: ' + (${user.seen} ? 'normal' : 'bold') + ';'">${user.name}</span>
+	                <span th:each="user : ${userOnLine}"
+	  			      th:style="'font-size: 10px; color: rgba(255,255,255,0.6); font-weight: ' + (${user.seen} ? 'normal' : 'bold') + ';'">
+	  			  ${user.content}
+	  			</span>	              
+		  			
+	            </div>
+	          </div>
+	        `;
+	 }
+	 ullist.append(li);
+	 ullist.addEventListener('transitionend', function() {
+ 	    tableBody.style.transition = '';
+ 	}, { once: true });
+   setTimeout(function() {
+ 	    tableBody.style.cssText = 'opacity: 1; transition: opacity 1s ease-in-out;';
+ 	}, 100);
+}
+
+const stompClient = new StompJs.Client({
+    brokerURL: 'ws://192.168.1.18:8080/gs-guide-websocket'
+});
+
+
+
+ 
+
+
+
+
+function markMessagesAsRead(messageIds) {
+    fetch('/ERPPro/chat/readmsgsbyid', {
+        method: 'POST',
+        headers: {
+        	'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(messageIds)
+   
+    })  
+    .then(response => response.json())
+    	.then(data => {
+        	console.log("hay retour")
+        	console.log(data)
+        	if(data == true){
+        		console.log("hay hana dkhalna")
+        		document.getElementById('username'+window.idr).style.fontWeight = 'normal';
+            	}
+    		
+       
+    });
+}
+
+function getVisibleMsg(){
+	
+	 const messages = document.querySelectorAll('.message');
+     const visibleMessageIds = [];
+     messages.forEach(message => {
+         const rect = message.getBoundingClientRect();
+         const idmes=message.getAttribute('data-id');
+         if (rect.top >= 0 && rect.bottom <= window.innerHeight && idmes != window.ids) {
+        	 
+             visibleMessageIds.push(parseInt(message.getAttribute('data-id')));
+         }
+     });
+     return visibleMessageIds;
+ }
+
+function checkVisibleMessages() {
+    const visibleMessageIds = getVisibleMsg();
+    if (visibleMessageIds.length > 0) {
+        
+        markMessagesAsRead(visibleMessageIds);
+    }
+}
+
+
+
+
+
+
+window.addEventListener('scroll', checkVisibleMessages);
+window.addEventListener('load', checkVisibleMessages);
+window.addEventListener('resize', checkVisibleMessages);
+
+</script>
+
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const socket = new SockJS('/ERPPro/gs-guide-websocket');  // Connect to your WebSocket endpoint
+            const stompClient = StompJs.Stomp.over(socket);
+
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                
+                stompClient.subscribe('/topic/messages', (msg) => {
+                    console.log(JSON.parse(msg.body))
+                    if((window.ids==(JSON.parse(msg.body)).sender.idU && window.idr==(JSON.parse(msg.body)).reciever.idU)  ||
+                    		(window.ids==(JSON.parse(msg.body)).reciever.idU) && window.idr==(JSON.parse(msg.body)).sender.idU) {
+            			  let newMessage = { content:(JSON.parse(msg.body)).content,date:(JSON.parse(msg.body)).date,
+            			  hour:(JSON.parse(msg.body)).hour,sender:(JSON.parse(msg.body)).sender,reciever:(JSON.parse(msg.body)).reciever,
+            			  day:"Autjourd'hui" };
+            			  window.messages.push(newMessage)
+            			  updatemessages()
+            			  if((window.ids==(JSON.parse(msg.body)).sender.idU)){
+            				  document.getElementById('lastmsg'+(JSON.parse(msg.body)).reciever.idU).textContent = (JSON.parse(msg.body)).content;
+                			  }
+
+            			  if((window.ids==(JSON.parse(msg.body)).reciever.idU)){
+            				  document.getElementById('lastmsg'+(JSON.parse(msg.body)).sender.idU).textContent = (JSON.parse(msg.body)).content;
+            				  document.getElementById('username').style.fontWeight = 'bold';
+                			  }
+            			  
+            			  
+            			  
+            			  }
+                });
+
+                stompClient.subscribe('/topic/online', (user) => {
+                	const iduo = user.body;
+                	
+                	const el = document.getElementById(iduo);
+                	if(el){
+                	el.classList.remove("offline");
+                	
+                	if(iduo == window.idr){
+                    	
+                    	 document.getElementById("onlineuser").classList.remove("offline")
+                    	}
+                	
+                	
+                	
+                    
+                	}
+                });
+
+                stompClient.subscribe('/topic/offline', (user) => {
+                	const iduo = user.body;
+                	const el = document.getElementById(iduo);
+                	if(el){
+                    el.classList.add("offline");
+                    if(iduo == window.idr){
+                    	 document.getElementById("onlineuser").classList.add("offline")
+                    	}
+                   
+                	}
+                });
+            });
+        });
+    </script>
+<script th:inline="javascript">
+jQuery(document).ready(function ($) {
+    /*<![CDATA[*/
+      var userline = /*[[${userOnLine}]]*/ null;
+      var ids = /*[[${ids}]]*/ null;
+      var receiverimage = /*[[${receiverimage}]]*/ null;
+     console.log(userline)
+      window.receiverimage=receiverimage
+      var senderimage = /*[[${senderimage}]]*/ null;
+      var idr=0;
+      lastid=userline[0].idU
+      window.senderimage=senderimage
+    if (userline != null && userline.length > 0) {
+        idr = userline[0].idU;
+        
+        // Now you can use `firstUser` as needed
+    }
+      document.getElementsByClassName('active1' + idr)[0].style.backgroundColor = "rgba(0, 0, 0, 0.3)";
+    window.idr=idr;
+    window.ids=ids
+    if(idr != 0){
+    	 const formData = new FormData();
+ 		
+	       // Add fields to the form data
+	       formData.append('idr',idr);
+	       formData.append('ids', sessionStorage.getItem("id"));
+	       
+	          
+	      	fetch('/ERPPro/chat/Messages', {
+	            method: 'POST',
+	            headers: {
+	  		    	 'Authorization': `Bearer ${token}`
+	  		    	    },
+	            body: formData,
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	        	 window.messages=data
+	             updatemessages()
+	      			        	
+	        })
+        }   
+
+	 /*]]>*/
+
+
+ 
+
+
+    	 
+})
+</script>
+
+</body>
+</html>

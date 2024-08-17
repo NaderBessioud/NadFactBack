@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+<meta charset="UTF-8">
+<title>Fournisseur</title>
+<link rel="stylesheet" href="/ERPPro/css/fournisseur.css">
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+	
+	
+	<div class="row" style="display: flex;margin-top: 20px;margin-left: 4px">
+	<h3>Fournisseur</h3>
+	<div class="col-Lg-3" style="margin-left: auto;">
+			<button  class="btn btn-primary btn-sm mb-3" onclick="newFournisseur()" style="margin-right: 25px">Ajouter Fournisseur</button>
+		</div>
+		
+	</div>
+	<div class="card">
+    <div class="card-header">
+       <i class="menu-icon uil uil-user"></i> Liste des fournisseurs
+    </div>
+    <div class="rounded-rectangle">
+  
+    
+
+
+
+    <div class="inputs">
+	   <label style="color:white">Recherche:</label>  
+	   <input id="inputsearch" type="text" onkeyup="search()" style="margin-top: 7px;padding:0;margin-bottom: 7px;margin-left: 5px">
+   </div>
+    </div>
+    
+    
+    
+    
+  
+    
+    
+    
+   
+    
+    
+    <div class="card-body">
+    
+    
+    	<div class="row" id="facturetable">
+				<div class="col-md-12">
+					<div class="table-wrap">
+					<div class="table-responsive">
+						<table class="table" style="z-index: 1">
+						  <thead style="z-index: 2; position: relative; " class="table-dark">
+						    <tr>
+						    
+						    <th>Libelle</th>
+						      <th>Adresse</th>
+						      <th>Tel</th>
+						      <th>RIB</th>
+						      <th>Status</th>
+						      <th>&nbsp;</th>
+						    </tr>
+						  </thead>
+<tbody id="fourniseeurtablebody" style="position: relative; z-index: 1; opacity: 1; transition: opacity 1s ease-in-out; z-index: 1;">						    <tr  role="alert" th:each="four : ${fournisseurs}">
+						    	
+						      <td class="d-flex align-items-center">
+						      	<div class="img" th:style="'background-image: url(' + ${four.image} + ');'"></div>
+						      	<div class="pl-3 email">
+						      		<span th:text = "${four.libelle}" style="font-weight: bold"></span>
+						      		
+						      	</div>
+						      </td>
+						      <td th:text = "${four.addresse}"></td>
+						      <td th:text = "${four.tel}"></td>
+						      <td th:text = "${four.RIB}"></td>
+						      <td class="status" th:unless="${four.archived}"><span class="active">Active</span></td>
+						      <td class="status" th:if="${four.archived}"><span class="unactive">Archivé</span></td>
+						      <td>
+						      
+						     
+				          	
+						      	<button th:unless="${four.archived}" type="button" class="close"  aria-label="desarchiver" style="margin-left: 15px" th:onclick="'DesactiverFour(' + ${four.idF} + ')'">
+				            	<span aria-hidden="true"><i class="fa fa-close"></i></span>
+				          	</button>
+				          	
+				          	<button th:if="${four.archived}" type="button" class="open"  aria-label="Activer" style="margin-left: 15px" th:onclick="'activerFour(' + ${four.idF} + ')'">
+				            	<span aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+				            	
+				          	</button>
+				          	
+				          	 <button  type="button" class="update"  aria-label="Modifier"  th:onclick="'fourDetails(' + ${four.idF} + ')'">
+				            	<span aria-hidden="true"><i class="fa-solid fa-pen"></i></span>
+				          	</button>
+				        	</td>
+						    </tr>
+						   
+						    
+						    
+						    
+						  </tbody>
+						</table>
+						
+						</div>
+					</div>
+				</div>
+			</div>
+	
+	<div th:if = "${totalPages > 1}">
+		<div class="row col-sm-12">
+			<div class="col-sm-2" id="divrows" >
+				Total Rows : [[${totalItems}]]
+			</div>
+			<div class="col-auto" id="divnumbers">
+				<span th:each="i:${#numbers.sequence(1,totalPages)}">
+					<a th:if="${currentPage != i}" href="" th:onclick="'movePageination(event, ' + ${i} + ')'">[[${i}]]</a>
+					<span th:unless="${currentPage != i}">[[${i}]]</span> 
+					&nbsp;
+				 	&nbsp;
+				</span>
+			</div>
+			<div class="col-sm-1" id="divnext">
+				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${currentPage+1} + ')'">Next</a>
+				<span th:unless="${currentPage < totalPages}">Next</span>
+			</div>
+			<div class="col-sm-1"  id="divlast">
+				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${totalPages} + ')'">Last</a>
+				<span th:unless="${currentPage < totalPages}">Last</span>
+			</div>
+		
+		</div>
+		
+    </div>
+</div>
+</div>
+</div>
+
+<!-- Modal -->
+
+<div class="alert alert-success alert-dismissible fade bottom-right" role="alert" >
+  <div style="text-align: center;">
+    <strong>Succès!</strong><br><span class="alert-text" id="alerttext"> Fournisseur ajouté avec succès !.</span>
+  </div>
+  <button type="button" class="close" onclick="hideCustomAlert()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable custom-modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary text-center">
+        <h3 class="modal-title w-100" id="exampleModalScrollableTitle" style="color: #fff">Nouveau Fournisseur</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+    
+        <div class="card2 card-1" style="border:none">
+               
+                <div class="card-body" style="padding-top: 10px">
+                   
+                    <form method="POST" id="four-form" th:action="@{/user/addFournisseur}" th:object="${newfour}">
+	                   
+                       <div class="profile-pic" style=" color: transparent;transition: all 0.3s ease;display: flex; justify-content: center;align-items: center;position: relative;transition: all 0.3s ease;width: 180px;left: 35%;">
+						  <label class="-label" for="file">
+						    <span class="glyphicon glyphicon-camera spanpro" ></span>
+						    <span class="spanpro">Change Image</span>
+						  </label>
+						  <input id="file" type="file" onchange="uploadFile()" style="display: none;"/>
+						  <img src="https://cdn.pixabay.com/photo/2017/08/06/21/01/louvre-2596278_960_720.jpg" id="output" width="200" class="imgpro" />
+						</div>
+						
+						
+                     <div class="input-group" style="width: 600px">
+                            <input class="input--style-1" type="text" placeholder="Libelle" id="fourlib" th:field="*{libelle}"  required >
+                            <i class="uil uil-user input-icon"></i>
+                        </div>
+                    
+                    	 <div style="display: flex">
+                            
+                               <div class="input-group" style="width: 300px">
+                            <input class="input--style-1" type="text" placeholder="Adressee" id="fouraddresse" th:field="*{addresse}"required>
+                            <i class="uil uil-envelope input-icon"></i> 
+                        
+                            </div>
+                            
+                         
+                               <div class="input-group" style="width: 300px;margin-left:100px">
+                            <input class="input--style-1" type="text" placeholder="TEL" id="fourtel"  th:field="*{tel}" required>
+                            <i class="uil uil-credit-card input-icon"></i>
+                        </div>
+                            
+                            </div>
+                               <div class="input-group" style="width: 600px">
+                            <input class="input--style-1" type="text" placeholder="RIB" id="clientrib" th:field="*{RIB}"  required >
+                            <i class="uil uil-location-point input-icon"></i>
+                        </div>
+
+                      
+                      <div class="p-t-20" style="float: right" >
+                            <button class="btn btn--radius btn--green"  th:onclick="addFournisseur(event)"  id="btnsubmit">Ajouter</button>
+                            
+                        </div>
+                       
+                    </form>
+                </div>
+            </div>
+      </div>
+   
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="exampleModalScrollable1" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable custom-modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary text-center">
+        <h3 class="modal-title w-100" id="exampleModalScrollableTitle1" style="color: #fff">Fournisseur</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+    
+        <div class="card2 card-1" style="border:none">
+               
+                <div class="card-body" style="padding-top: 10px">
+                    
+                    <form method="POST" id="fourup-form" th:action="@{/user/updateFournisseur}" th:object="${newfour}">
+	                   
+                       <div class="profile-pic" style=" color: transparent;transition: all 0.3s ease;display: flex; justify-content: center;align-items: center;position: relative;transition: all 0.3s ease;width: 180px;left: 35%;">
+						  <label class="-label" for="file">
+						    <span class="glyphicon glyphicon-camera spanpro" ></span>
+						    <span class="spanpro">Change Image</span>
+						  </label>
+						  <input id="file" type="file" onchange="uploadFile()" style="display: none;"/>
+						  <img src="https://cdn.pixabay.com/photo/2017/08/06/21/01/louvre-2596278_960_720.jpg" id="output1" width="200" class="imgpro" />
+						</div>
+						
+						
+                     <div class="input-group" style="width: 600px">
+                            <input class="input--style-1" type="text" placeholder="Libelle" id="updlib" th:field="*{libelle}"  required >
+                            <i class="uil uil-user input-icon"></i>
+                        </div>
+                    
+                    	 <div style="display: flex">
+                            
+                               <div class="input-group" style="width: 300px">
+                            <input class="input--style-1" type="text" placeholder="Adressee" id="updaddr" th:field="*{addresse}"required>
+                            <i class="uil uil-envelope input-icon"></i> 
+                        
+                            </div>
+                            
+                         
+                               <div class="input-group" style="width: 300px;margin-left:100px">
+                            <input class="input--style-1" type="text" placeholder="TEL" id="updtel"  th:field="*{tel}" required>
+                            <i class="uil uil-credit-card input-icon"></i>
+                        </div>
+                            
+                            </div>
+                               <div class="input-group" style="width: 600px">
+                            <input class="input--style-1" type="text" placeholder="RIB" id="ribupd" th:field="*{RIB}"  required >
+                            <i class="uil uil-location-point input-icon"></i>
+                        </div>
+
+                      
+                      <div class="p-t-20" style="float: right" >
+                            <button class="btn btn--radius btn-primary"  onclick="updateFournisseur(event)"  id="btnsubmit">Modifier</button>
+                            
+                        </div>
+                       
+                    </form>
+                </div>
+            </div>
+      </div>
+   
+    </div>
+  </div>
+</div>
+
+<div class="alert alert-success alert-dismissible fade bottom-right" role="alert" >
+  <div style="text-align: center;">
+    <strong>Succès!</strong><br><span class="alert-text"> Client ajouté avec succès !.</span>
+  </div>
+  <button type="button" class="close" onclick="hideCustomAlert()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+  
+    
+
+  <script type="text/javascript">
+  var token=sessionStorage.getItem('token');
+  var image ="anonymous.png";
+  var idf=0;
+  function downloadImage(name){
+		
+console.log(name)
+		fetch('/ERPPro/downloadImage?name='+name, {
+	        method: 'GET',
+	        headers: {
+	        	 'Authorization': `Bearer ${token}`
+	        	    },
+	    })
+	    .then(response => response.text())
+	    .then(data => {
+	        
+	        document.getElementById('output').src =data
+	        document.getElementById('output1').src =data
+	    })
+	    .catch(error => {
+	        console.error('Error downloading file:', error);
+	    });
+	}
+  function hideCustomAlert(){
+		 const alert = document.querySelector(".alert");
+		 alert.classList.remove("show");
+	}
+  async function updateFournisseurTable(fournisseurs) {
+	    var tableBody = document.getElementById('fourniseeurtablebody');
+	    var backgroundDiv = document.getElementById('backgroundDiv');
+
+	    // Masquer le contenu avec une transition d'opacité
+	    tableBody.style.opacity = 0;
+
+	    setTimeout(async function() {
+	        // Vider le tableau
+	        tableBody.innerHTML = '';
+
+	        // Ajouter de nouvelles lignes
+	        for (var i = 0; i < fournisseurs.length; i++) {
+	            var four = fournisseurs[i];
+	            var newRow = tableBody.insertRow(tableBody.rows.length);
+
+	            const response = await fetch('/ERPPro/downloadImage?name=' + four.image, {
+	                method: 'GET',
+	                headers: {
+	                    'Authorization': `Bearer ${token}`
+	                },
+	            }).catch(error => {
+	                console.error('Error downloading file:', error);
+	            });
+
+	            const img = await response.text();
+
+	            // Remplir les cellules avec les détails du fournisseur
+	            var libelleCell = newRow.insertCell(0);
+	            libelleCell.classList.add('d-flex', 'align-items-center');
+	            libelleCell.innerHTML = `
+	                <div class="img" style="background-image: url('${img}');"></div>
+	                <div class="pl-3 email">
+	                    <span>${four.libelle}</span>
+	                </div>
+	            `;
+
+	            var addresseCell = newRow.insertCell(1);
+	            addresseCell.innerHTML = four.addresse;
+
+	            var telCell = newRow.insertCell(2);
+	            telCell.innerHTML = four.tel;
+
+	            var ribCell = newRow.insertCell(3);
+	            ribCell.innerHTML = four.rib;
+
+	            var statusCell = newRow.insertCell(4);
+	            statusCell.classList.add('status');
+
+	            var actionCell = newRow.insertCell(5);
+
+	            if (four.archived) {
+	                statusCell.innerHTML = `<span class="unactive">Archive</span>`;
+	                
+	                var activateButton = document.createElement('button');
+	                activateButton.type = 'button';
+	                activateButton.className = 'open';
+	                activateButton.ariaLabel = 'Activer';
+	                activateButton.style.marginLeft = '15px';
+	                activateButton.innerHTML = '<span aria-hidden="true"><i class="fa-solid fa-check"></i></span>';
+	                activateButton.onclick = function() {
+	                    activerFour(four.idF);
+	                };
+
+	                var updateButton = document.createElement('button');
+	                updateButton.type = 'button';
+	                updateButton.className = 'update';
+	                updateButton.ariaLabel = 'Modifier';
+	                updateButton.innerHTML = '<span aria-hidden="true"><i class="fa-solid fa-pen"></i></span>';
+	                updateButton.onclick = function() {
+	                    fourDetails(four.idF);
+	                };
+	                actionCell.appendChild(activateButton);
+	                actionCell.appendChild(updateButton);
+	            } else {
+	                statusCell.innerHTML = `<span class="active">Active</span>`;
+	                var archiveButton = document.createElement('button');
+	                archiveButton.type = 'button';
+	                archiveButton.className = 'close';
+	                archiveButton.ariaLabel = 'archiver';
+	                archiveButton.style.marginLeft = '15px';
+	                archiveButton.innerHTML = '<span aria-hidden="true"><i class="fa fa-close"></i></span>';
+	                archiveButton.onclick = function() {
+	                    DesactiverFour(four.idF);
+	                };
+
+	                var updateButton = document.createElement('button');
+	                updateButton.type = 'button';
+	                updateButton.className = 'update';
+	                updateButton.ariaLabel = 'Modifier';
+	                updateButton.innerHTML = '<span aria-hidden="true"><i class="fa-solid fa-pen"></i></span>';
+	                updateButton.onclick = function() {
+	                    fourDetails(four.idF);
+	                };
+	                actionCell.appendChild(archiveButton);
+	                actionCell.appendChild(updateButton);
+	            }
+	        }
+
+	        // Afficher le contenu du `tbody` avec une transition d'opacité
+	        tableBody.style.opacity = 1;
+	    }, 1000); // Délai pour correspondre à la durée de la transition
+	}
+
+  
+	function archiveFournisseur(id){
+
+
+		
+		fetch('/ERPPro/user/archiveFournisseur/'+id, {
+            method: 'PUT',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+           
+        })
+        .then(response => response.json())
+        .then(data => {
+        	
+        	updateFournisseurTable(data)
+        	
+        })
+		}
+
+
+function activerFournisseur(id){
+
+
+		
+		fetch('/ERPPro/user/NotarchiveFournisseur/'+id, {
+            method: 'PUT',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+           
+        })
+        .then(response => response.json())
+        .then(data => {
+        	
+        	updateFournisseurTable(data)
+        	
+        })
+		}
+
+function addFournisseur(e){
+	e.preventDefault();
+	const alert = document.querySelector(".alert");
+	 var formData = new FormData(document.getElementById('four-form'));
+	 formData.append('image', image);
+console.log("cool")
+	
+	fetch('/ERPPro/user/addFournisseur', {
+		 method: 'POST',
+		 headers: {
+		 	 'Authorization': `Bearer ${token}`
+		 	    },
+         body: formData
+       
+    })
+    .then(response => response.json())
+    .then(data => {
+    	$('#exampleModalScrollable').modal('hide');
+    	updateFournisseurTable(data)
+    	alert.classList.add("show");
+
+        // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+        setTimeout(function () {
+            alert.classList.remove("show");
+        }, 5000);
+    	
+    })
+	}
+
+
+function updateFournisseur(e,id){
+	e.preventDefault();
+	const alert = document.querySelector(".alert");
+	 var formData = new FormData(document.getElementById('fourup-form'));
+	 console.log(image);
+	 formData.append('image', image);
+	 formData.append('idF', idf);
+
+	
+	fetch('/ERPPro/user/updateFournisseur', {
+		 method: 'POST',
+		 headers: {
+		 	 'Authorization': `Bearer ${token}`
+		 	    },
+         body: formData
+       
+    })
+    .then(response => response.json())
+    .then(data => {
+    	$('#exampleModalScrollable1').modal('hide');
+    	
+    	
+    	updateFournisseurTable(data)
+    	alert.querySelector('.alert-text').textContent="Fournisseur modifié"
+    	alert.classList.add("show");
+
+        // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+        setTimeout(function () {
+            alert.classList.remove("show");
+        }, 5000);
+    	
+    })
+	}
+
+
+function fourDetails(id){
+	
+	fetch('/ERPPro/user/FourById/'+id, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        
+    })
+    .then(response => response.json())
+    .then(data => { 
+	   
+    	idf=id
+    	document.getElementById('updlib').value=data.libelle;
+    	document.getElementById('updaddr').value=data.addresse;
+    	document.getElementById('updtel').value=data.tel;
+    	document.getElementById('ribupd').value=data.rib; 
+    	downloadImage(data.image)
+    	image=data.image   	
+    	$('#exampleModalScrollable1').modal('show');
+    })
+    
+	}
+
+function uploadFile() {
+    // Get the selected file
+    var fileInput = document.getElementById('file');
+    var file = fileInput.files[0];
+
+    // Create a FormData object to append the file
+    var formData = new FormData();
+    formData.append('imageFile', file);
+
+    // Perform an asynchronous request (e.g., using Fetch API or XMLHttpRequest)
+    fetch('/ERPPro/uploadImage', {
+        method: 'POST',
+        headers: {
+        	 'Authorization': `Bearer ${token}`
+        	    },
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+       
+        image=data
+        downloadImage(data)
+    })
+    .catch(error => {
+        console.error('Error uploading file:', error);
+    });
+}
+
+function activerFour(id){
+	console.log("heerrre")
+	 fetch('/ERPPro/user/ActiverFour/'+id, {
+	        method: 'PUT',
+	        headers: {
+	        	 'Authorization': `Bearer ${token}`
+	        	    },
+	      
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	    	updateFournisseurTable(data)
+	        
+	    })
+	    .catch(error => {
+	        console.error('Error uploading file:', error);
+	    });
+	
+}
+
+
+function DesactiverFour(id){
+	
+	 fetch('/ERPPro/user/DesactiverFour/'+id, {
+	        method: 'PUT',
+	        headers: {
+	        	 'Authorization': `Bearer ${token}`
+	        	    },
+	      
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	    	console.log(data.length);
+	    	console.log(data);
+	    	updateFournisseurTable(data)
+	        
+	    })
+	    .catch(error => {
+	        console.error('Error uploading file:', error);
+	    });
+	
+}
+
+function newFournisseur(){
+	downloadImage("anonymous.png");
+	$('#exampleModalScrollable').modal('show');
+}
+
+function search(){
+	const search=document.getElementById('inputsearch').value
+	 const formData = new URLSearchParams();
+	    formData.append("search", search);
+	 fetch('/ERPPro/user/SearchFour', {
+	        method: 'POST',
+	        headers: {
+	        	'Content-Type': 'application/x-www-form-urlencoded',
+	        	 'Authorization': `Bearer ${token}`
+	        	    },
+	        body: formData
+	      
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	    	
+	    	updateFournisseurTable(data)
+	        
+	    })
+	    .catch(error => {
+	        console.error('Error uploading file:', error);
+	    });
+}
+
+
+
+
+
+
+  </script>
+  
+  
+  <script type="text/javascript">
+
+
+  jQuery(document).ready(function ($) {
+
+  	if(sessionStorage.getItem("email") ==null){
+  		window.location.href = '/ERPPro/home/login'
+  		}
+  	else{
+  		fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+  	        method: 'GET',
+  	     
+  	       
+  	    })
+  	    .then(response => response.text())
+  	    .then(data => {
+  	       
+  	        if(data =="Client"){
+  	    
+
+  	        	window.location.href = '/ERPPro/home/login'
+  	           
+  	            }
+  	     
+  	    })
+  		}
+  })
+  </script>
+
+
+
+
+
+	
+
+ 
+    
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+	
+	
+	
+	
+</div>
+
+</body>
+</html>

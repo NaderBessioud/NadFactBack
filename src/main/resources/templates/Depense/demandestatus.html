@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+<meta charset="UTF-8">
+<title>Demandes</title>
+<link rel="stylesheet" href="/ERPPro/css/Depense/demandestatus.css">
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+	
+	
+	<div class="row" style="display: flex;margin-top: 20px">
+	<h3>Demandes</h3>
+		
+	</div>
+	<div class="card">
+    <div class="card-header">
+     <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-report-search" style="color:#fff;margin-right: 2px">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M8 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h5.697" />
+        <path d="M18 12v-5a2 2 0 0 0 -2 -2h-2" />
+        <path d="M8 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+        <path d="M8 11h4" />
+        <path d="M8 15h3" />
+        <path d="M16.5 17.5m-2.5 0a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0" />
+        <path d="M18.5 19.5l2.5 2.5" />
+    </svg> Liste des demandes
+    </div>
+    <div class="rounded-rectangle1">
+    
+
+    <div class="inputs">
+	   <label style="color: #2d3539">Recherche:</label>  
+	   <input id="inputsearch" type="text" onkeyup="search()" style="margin-top: 7px;height: 35px;margin-right: 5px">
+   </div>
+    </div>
+    
+    
+    
+    
+
+    
+    
+    
+   
+    
+    
+    <div class="card-body">
+    
+     
+       <table class="table table-striped table-bordered" id="facturetable">
+		<thead class="table-dark">
+			<tr>
+				<th>Employée</th>
+				<th>Date emission</th>
+				
+				<th>Motif</th>
+				<th>Catégorie</th>
+				<th>Montant</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody id="invoiceTableBody">
+		 <th:block th:each="dem: ${demandes}">
+			<tr>
+				<td th:text="${dem.userde.firstname} + ' ' + ${dem.userde.lastname}"></td>
+				
+				<td th:text="${#dates.format(dem.date, 'yyyy/MM/dd')}"></td>
+				
+				<td th:text="${dem.motif}"></td>
+				<td th:text = "${dem.cat}"></td>
+				
+				
+							<td th:text = "${dem.budget}">
+				</td>
+				<td>
+				
+				
+
+					 
+					 
+					
+					
+
+										 
+				
+					<button style="border: none; background: none;" th:onclick="'acceptDem(' + ${dem.idDD} + ')'" ><i style="color:green;" class="fa-solid fa-check"></i></button>
+					<button style="border: none; background: none;" th:onclick="'refuseDem(' + ${dem.idDD} + ')'" ><i style="color:red" class="fa-solid fa-x"></i></button>
+					
+					
+					
+			</td>
+				
+			</tr>
+			
+  </th:block>
+			
+		</tbody>
+	
+	</table>
+	
+	<div th:if = "${totalPages > 1}">
+		<div class="row col-sm-12">
+			<div class="col-sm-2" id="divrows" >
+				Total Rows : [[${totalItems}]]
+			</div>
+			<div class="col-auto" id="divnumbers">
+				<span th:each="i:${#numbers.sequence(1,totalPages)}">
+					<a th:if="${currentPage != i}" href="" th:onclick="'movePageination(event, ' + ${i} + ')'">[[${i}]]</a>
+					<span th:unless="${currentPage != i}">[[${i}]]</span> 
+					&nbsp;
+				 	&nbsp;
+				</span>
+			</div>
+			<div class="col-sm-1" id="divnext">
+				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${currentPage+1} + ')'">Next</a>
+				<span th:unless="${currentPage < totalPages}">Next</span>
+			</div>
+			<div class="col-sm-1"  id="divlast">
+				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${totalPages} + ')'">Last</a>
+				<span th:unless="${currentPage < totalPages}">Last</span>
+			</div>
+		
+		</div>
+		
+    </div>
+</div>
+</div>
+</div>
+
+
+<div class="alert alert-success alert-dismissible fade bottom-right" role="alert" >
+  <div style="text-align: center;">
+    <strong>Succès!</strong><br><span class="alert-text"> Demande accepté avec succès !.</span>
+  </div>
+  <button type="button" class="close" onclick="hideCustomAlert()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+  
+    
+<script>
+var token=sessionStorage.getItem('token');
+function hideCustomAlert(){
+	 const alert = document.querySelector(".alert");
+	 alert.classList.remove("show");
+}
+
+
+</script>
+  
+  <script th:inline="javascript">
+ function generateTd(demid) {
+	 var td = document.createElement('td');
+      var AcceptButton = document.createElement('button');
+      AcceptButton.innerHTML = '<i style="color:green" class="fa-solid fa-check"></i>';
+     
+     
+      AcceptButton.onclick = function() {
+          acceptDem(demid); 
+      };
+
+      td.appendChild(AcceptButton);
+     
+     
+
+      
+  		var CancelButton = document.createElement('button');
+  	      
+  		CancelButton.innerHTML = '<i style="color:red" class="fa-solid fa-x"></i>';
+  		
+  		CancelButton.onclick = function() {
+  	    	CancelDem(demid); 
+  	      };
+  	      td.appendChild(CancelButton);
+  
+ 
+    
+
+     
+      
+
+      return td;
+  
+  }
+
+
+
+ 
+
+  function updateDemandeTable(demandes) {
+	  
+      var tableBody = document.getElementById('invoiceTableBody');
+
+      tableBody.style.opacity = 0;
+      tableBody.innerHTML = ''; // Clear existing rows
+
+      for (var i = 0; i < demandes.length; i++) {
+          var demande = demandes[i];
+          var newRow = tableBody.insertRow(tableBody.rows.length);
+
+          // Add cells and populate with facture details
+          // Example:
+          var userCell = newRow.insertCell(0);
+          
+          userCell.innerHTML = demande.userde.firstname+" "+demande.userde.lastname;
+
+          var dateCell = newRow.insertCell(1);
+          var dateObject = new Date(demande.date);
+          var formattedDate = dateObject.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+          dateCell.innerHTML = formattedDate;
+
+           
+          var MotifCell = newRow.insertCell(2);
+          MotifCell.innerHTML=demande.motif
+         
+
+          var CatCell = newRow.insertCell(3);
+          CatCell.innerHTML = demande.cat;
+
+          var MontantCell = newRow.insertCell(4);
+          MontantCell.innerHTML = demande.budget;
+
+          var actionCell=newRow.insertCell(5);
+          const acceptButton = document.createElement('button');
+          acceptButton.style.border = 'none';
+          acceptButton.style.background = 'none';
+          acceptButton.onclick = () => acceptDem(demande.idDD);
+          
+          const acceptIcon = document.createElement('i');
+          acceptIcon.className = 'fa-solid fa-check';
+          acceptIcon.style.color = 'green';
+          acceptButton.appendChild(acceptIcon);
+          
+          // Create the refuse button
+          const refuseButton = document.createElement('button');
+          refuseButton.style.border = 'none';
+          refuseButton.style.background = 'none';
+          refuseButton.onclick = () => refuseDem(demande.idDD);
+          
+          const refuseIcon = document.createElement('i');
+          refuseIcon.className = 'fa-solid fa-x';
+          refuseIcon.style.color = 'red';
+          refuseButton.appendChild(refuseIcon);
+          actionCell.appendChild(acceptButton);
+          actionCell.appendChild(refuseButton);
+          
+         
+         
+          
+
+          
+         
+
+          
+      }
+      tableBody.addEventListener('transitionend', function() {
+    	    tableBody.style.transition = '';
+    	}, { once: true });
+      setTimeout(function() {
+    	    tableBody.style.cssText = 'opacity: 1; transition: opacity 1s ease-in-out;';
+    	}, 100);
+  }
+  </script>
+  
+  <script>
+    function createPaginationElement(pageNumber, isCurrentPage) {
+        if (isCurrentPage) {
+            var spanElement = document.createElement('span');
+            spanElement.innerText = pageNumber;
+            return spanElement;
+        } else {
+            var linkElement = document.createElement('a');
+            linkElement.href = '';
+            linkElement.innerText = pageNumber;
+            linkElement.setAttribute('onclick', 'movePageination(event,' + pageNumber + ');');
+
+            // Add non-breaking spaces
+            
+
+            return linkElement;
+        }
+    }
+	function updatePagination(totalPages,currentpage,list){
+		
+		 var divRows = document.getElementById('divrows');
+		 var divNumber = document.getElementById('divnumbers');
+		 var divNext = document.getElementById('divnext');
+		 var divLast = document.getElementById('divlast');
+		 if(divRows != null){
+		 divRows.innerText = "Total Rows : "+list.length
+		 divNumber.innerHTML ="";
+		 for (var i = 1; i <= totalPages; i++) {
+			 
+	            var isCurrentPage = (i === currentpage);
+	            var paginationElement = createPaginationElement(i, isCurrentPage);
+	            
+	            // Append the element to the container
+	            divNumber.appendChild(paginationElement);
+	            if(i != totalPages){
+	            	 var space1 = document.createTextNode('\u00a0'+'\u00a0'+'\u00a0'+'\u00a0'+'\u00a0'); // &nbsp;    
+	 	            divNumber.appendChild(space1);
+		            }
+	           
+	            
+	      
+	            
+	        }
+
+	     if(currentpage < totalPages){
+	    	 var linkElementNext = document.createElement('a');
+	    	 linkElementNext.href = '';
+	    	 linkElementNext.innerText = "Next";
+	    	 linkElementNext.setAttribute('onclick', 'movePageination(event,' + (currentpage+1) + ');');
+	    	 divNext.innerHTML ="";
+	            // Append the element to the container
+	          divNext.appendChild(linkElementNext);
+	          
+
+	    	 var linkElementLast = document.createElement('a');
+	    	 linkElementLast.href = '';
+	    	 linkElementLast.innerText = "Last";
+	    	 linkElementLast.setAttribute('onclick', 'movePageination(event,' + totalPages + ');');
+	    	 divLast.innerHTML ="";
+	            // Append the element to the container
+	          divLast.appendChild(linkElementLast);
+		     }
+	     else{
+
+	    	
+	    	 var spanElementNext = document.createElement('span');
+	    	 spanElementNext.innerText = "Next";
+	    	 divNext.innerHTML ="";
+	          
+	         divNext.appendChild(spanElementNext);
+
+	         var spanElementLast = document.createElement('span');
+	         spanElementLast.innerText = "Last";
+	    	 divLast.innerHTML ="";
+	            // Append the element to the container
+	          divLast.appendChild(spanElementLast);
+		     
+		     }
+		 }
+		}
+
+	function updatePag(pageNumber){
+		var list = window.demandesList 
+			
+		
+		
+		
+		fetch('/ERPPro/user/DempageList/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.json())
+        .then(data => {
+        	
+        	
+        	updateDemandeTable(data)
+        	
+        	
+        })
+        
+
+	 fetch('/ERPPro/user/Dempagetotal/'+pageNumber, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(list)
+        })
+        .then(response => response.text())
+        .then(data => {
+        	
+        	updatePagination(data,pageNumber,list)
+        	
+        })
+		}
+	
+
+
+	function movePageination(e,pageNumber){
+		e.preventDefault();
+		updatePag(pageNumber)
+		 
+	        
+		}
+    </script>
+
+
+<script>
+   
+function search(){
+	
+	
+	var search = document.getElementById('inputsearch').value;
+	if(search == ""){
+		window.demandesList=window.alldemandes
+		updatePag(1)
+		}
+	else{
+	 fetch('/ERPPro/user/DemandeSearch?search=' + search, {
+            method: 'GET',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+            
+        })
+    
+     .then(response => response.json())
+     .then(data => {
+    	
+    	
+     	window.demandesList=data
+     	
+     	updatePag(1)
+     })
+}
+	}
+
+
+
+    function acceptDem(id) {
+
+    	const alert = document.querySelector(".alert");
+        fetch('/ERPPro/user/AcceptDem/'+id, {
+            method: 'GET',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+            
+          
+        })
+        .then(response => response.json())
+        .then(data => {
+        	window.demandesList=data
+        	updatePag(1)
+        	alert.querySelector('.alert-text').textContent="Demande accepté avec succées";
+        	alert.classList.add("show");
+
+            // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+            setTimeout(function () {
+                alert.classList.remove("show");
+            }, 5000);
+
+ 		        
+
+        });
+        
+     
+        
+    }
+
+    function refuseDem(id) {
+    	const alert = document.querySelector(".alert");
+
+        fetch('/ERPPro/user/RefuseDem/'+id, {
+            method: 'GET',
+            headers: {
+            	 'Authorization': `Bearer ${token}`
+            	    },
+            
+          
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            window.demandesList=data
+        	updatePag(1)
+            alert.querySelector('.alert-text').textContent="Demande refusée avec succées";
+        	alert.classList.add("show");
+
+            // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+            setTimeout(function () {
+                alert.classList.remove("show");
+            }, 5000);
+
+        });
+        
+     
+        
+    }
+
+   
+
+
+
+
+    
+ 
+    
+
+
+    
+</script>
+
+
+<script>
+
+
+
+
+
+
+
+
+
+
+
+</script>
+ 
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    <script th:inline="javascript">
+jQuery(document).ready(function ($) {
+
+	if(sessionStorage.getItem("email") ==null){
+		window.location.href = '/ERPPro/home/login'
+		}
+	else{
+		fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+	        method: 'GET',
+	     
+	       
+	    })
+	    .then(response => response.text())
+	    .then(data => {
+	       
+	        if(data =="Client"){
+	    
+
+	        	window.location.href = '/ERPPro/home/login'
+	           
+	            }
+	     
+	    })
+		}
+	
+	/*<![CDATA[*/
+	// var factureList = /*[[${factures}]]*/ null;
+	 var demandesList = /*[[${Alldemandes}]]*/ null;
+	 
+	 
+	  
+	 
+	window.alldemandes=demandesList
+	 window.demandesList = demandesList;
+	 
+	
+	    /*]]>*/
+	  
+	  
+	  
+	 
+})
+
+
+
+</script>
+
+
+
+
+
+	
+
+ 
+    
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+	
+	
+	
+	
+</div>
+
+</body>
+</html>
