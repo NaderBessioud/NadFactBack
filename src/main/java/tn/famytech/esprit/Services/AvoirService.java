@@ -1419,7 +1419,7 @@ public class AvoirService {
 			     try {
 			    	
 			    	 
-			         ftpClient.connect("192.168.1.18", 21);
+			         ftpClient.connect("192.168.1.31", 21);
 			         ftpClient.login("ftp-user", "ftpuser");
 			         ftpClient.enterLocalPassiveMode();
 

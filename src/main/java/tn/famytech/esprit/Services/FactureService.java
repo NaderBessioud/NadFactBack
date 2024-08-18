@@ -2371,7 +2371,7 @@ totalBigDecimal = BigDecimal.valueOf(CalculTotalTTC(f));
 		     try {
 		    	
 		    	 
-		         ftpClient.connect("192.168.1.18", 21);
+		         ftpClient.connect("192.168.1.31", 21);
 		         ftpClient.login("ftp-user", "ftpuser");
 		         ftpClient.enterLocalPassiveMode();
 
@@ -2413,7 +2413,7 @@ totalBigDecimal = BigDecimal.valueOf(CalculTotalTTC(f));
     public boolean deleteFile(String fileName) {
         FTPClient ftpClient = new FTPClient();
         try {
-        	 ftpClient.connect("192.168.1.18", 21);
+        	 ftpClient.connect("192.168.1.31", 21);
 	         ftpClient.login("ftp-user", "ftpuser");
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
@@ -2632,7 +2632,7 @@ totalBigDecimal = BigDecimal.valueOf(CalculTotalTTC(f));
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
     try {
-    	ftpClient.connect("192.168.1.18", 21);
+    	ftpClient.connect("192.168.1.31", 21);
         ftpClient.login("ftp-user", "ftpuser");
         ftpClient.enterLocalPassiveMode();
         ftpClient.setFileType(FTP.BINARY_FILE_TYPE);

@@ -130,7 +130,7 @@ async function sendMessage(){
 	formData.append('idr', idr);
 	
 	formData.append('ids', sessionStorage.getItem("id"));
-	const url = new URL('http://127.0.0.1:5000/api/cencor');
+	const url = new URL('http://192.168.1.31:5000/api/cencor');
     const params = { text: content };
     url.search = new URLSearchParams(params).toString();
 
