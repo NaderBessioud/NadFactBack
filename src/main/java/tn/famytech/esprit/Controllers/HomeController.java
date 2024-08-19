@@ -121,7 +121,7 @@ public class HomeController {
 	public String addUser(@ModelAttribute("user") Personel user) {
 		
 		userService.AddUser(user);
-		return "redirect:/login?success";
+		return "redirect:/home/login?success";
 	}
 	
 	
