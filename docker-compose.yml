@@ -31,7 +31,7 @@ services:
      - MYSQL_ROOT_PASSWORD=guessitplease
      - MYSQL_DATABASE=erppro
      - MYSQL_USER=root
-     - MYSQL_PASSWORD=guessitplease
+     - MYSQL_PASSWORD=""
     command: --bind-address=0.0.0.0
     volumes:
       - db_data:/var/lib/mysql
@@ -59,7 +59,7 @@ services:
       SPRING_APPLICATION_JSON: '{
         "spring.datasource.url"  : "jdbc:mysql://192.168.1.17:3306/erppro?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
         "spring.datasource.username" : "root",
-        "spring.datasource.password" : "guessitplease",
+        "spring.datasource.password" : "",
         "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQL5InnoDBDialect",
         "spring.jpa.hibernate.ddl-auto" : "create"
       }'
