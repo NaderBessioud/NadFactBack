@@ -61,7 +61,7 @@ services:
         "spring.datasource.username" : "root",
         "spring.datasource.password" : "guessitplease",
         "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQL5Dialect",
-        "spring.jpa.hibernate.ddl-auto" : "create"
+        "spring.jpa.hibernate.ddl-auto" : "update"
       }'
       
       
