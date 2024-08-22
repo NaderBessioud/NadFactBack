@@ -140,10 +140,7 @@ public class UserService implements UserDetailsService {
 				Personel per=personelRepo.findByEmail(usr.getEmail());
 				result.add(new UserAndName(usr,per.getFirstname()+" "+per.getLastname()));
 			}
-			else {
-				Client cl=clientRepo.findById(usr.getIdU()).get();
-				result.add(new UserAndName(usr,cl.getLibelle()));
-			}
+		
 			
 		}
 		return result;
