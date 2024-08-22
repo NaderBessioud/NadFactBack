@@ -309,7 +309,7 @@
   function downloadImage(name){
 		
 console.log(name)
-		fetch('/ERPPro/downloadImage?name='+name, {
+		fetch('/ERPPro/home/downloadImage?name='+name, {
 	        method: 'GET',
 	        headers: {
 	        	 'Authorization': `Bearer ${token}`
@@ -345,7 +345,7 @@ console.log(name)
 	            var four = fournisseurs[i];
 	            var newRow = tableBody.insertRow(tableBody.rows.length);
 
-	            const response = await fetch('/ERPPro/downloadImage?name=' + four.image, {
+	            const response = await fetch('/ERPPro/home/downloadImage?name=' + four.image, {
 	                method: 'GET',
 	                headers: {
 	                    'Authorization': `Bearer ${token}`
@@ -573,7 +573,7 @@ function uploadFile() {
     formData.append('imageFile', file);
 
     // Perform an asynchronous request (e.g., using Fetch API or XMLHttpRequest)
-    fetch('/ERPPro/uploadImage', {
+    fetch('/ERPPro/home/uploadImage', {
         method: 'POST',
         headers: {
         	 'Authorization': `Bearer ${token}`
