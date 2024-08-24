@@ -220,7 +220,7 @@ public class UserService implements UserDetailsService {
     public void createUserCertif(String name,String lastname) {
     	System.out.println("Creating Certif");
     	String pass=name.toLowerCase()+lastname.toLowerCase();
-    	String folderPath="C:\\Users\\ASUS\\Desktop\\PFE_Work\\"+name+"_"+lastname;
+    	String folderPath="/opt/certificates/"+name+"_"+lastname;
     	String opensslCommand = "openssl req -x509 -newkey rsa:4096 -keyout ca/key.pkcs1.pem -out ca/certificate.crt.pem -days 1825 -subj \"/C=TN/ST=Tunisia/L=Tunisia/O=Famytech/OU=SpringPro/CN=CA for "+name+"_"+lastname+"\" -passout pass:ca_key_password_"+pass;
     	String opensslPkcs12Command = "openssl pkcs12 -export -out ca/keystore.p12 -inkey ca/key.pkcs1.pem -in ca/certificate.crt.pem -passin pass:ca_key_password_"+pass+" -passout pass:ca_p12_password_"+pass;
     	String keytoolCommand = "keytool -importkeystore -srckeystore ca/keystore.p12 -srcstorepass ca_p12_password_"+pass+" -srcstoretype pkcs12 -alias 1 -destalias ca_alias -destkeystore keystore.jks -deststorepass keystore_password_"+pass;
