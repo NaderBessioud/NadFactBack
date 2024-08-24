@@ -1,7 +1,6 @@
 FROM openjdk:17-jdk-alpine
-RUN apt-get update && \
-    apt-get install -y openssl && \
-    apt-get clean
+RUN apk update && \
+    apk add --no-cache openssl
 RUN mkdir -p /opt/certificates
 RUN mkdir -p /opt/images
 ARG JAR_FILE=target/*.jar
