@@ -66,7 +66,7 @@
 				<td th:text="${#dates.format(facture.dateemission, 'yyyy/MM/dd')}"></td>
 				
 				<td>
-				<span  th:if="${facture.status.toString() == 'Proforma_envoyee_validee'}" class="badge badge-danger">Proforma</span>
+				<span  th:if="${facture.status.toString() == 'Proforma_envoyee'}" class="badge badge-danger">Proforma</span>
 				<span  th:if="${facture.status.toString() == 'Facture_envoye'}" class="badge badge-success">Facture</span>
 				
     			
