@@ -72,6 +72,8 @@ services:
      - mysqldb
      - ftp-server
      - python_app
+     volumes:
+      - C:/Users/ASUS/Desktop/PFE_Work/usercertificate:/opt/certificates
      
      
 volumes:
