@@ -68,12 +68,13 @@ services:
       
     ports:
      - 8082:8082
+    volumes:
+     - C:/Users/ASUS/Desktop/PFE_Work/usercertificate:/opt/certificates 
     depends_on:
      - mysqldb
      - ftp-server
      - python_app
-     volumes:
-      - C:/Users/ASUS/Desktop/PFE_Work/usercertificate:/opt/certificates
+     
      
      
 volumes:
