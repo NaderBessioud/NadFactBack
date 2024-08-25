@@ -3,7 +3,8 @@ version: "3"
 services:
   ftp-server:
     image: stilliard/pure-ftpd:latest
-    
+    volumes:
+      - /c/Users/ASUS/Desktop/PFE_Work/ftp:/home/ftpuser
     ports:
       - "21:21"
       - "30000-30009:30000-30009"
