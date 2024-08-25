@@ -70,7 +70,7 @@ services:
     ports:
      - 8082:8082
     volumes:
-     - /c/Users/ASUS/Desktop/PFE_Work/usercertificate:/opt/certificates
+     - /mnt/certificate:/opt/certificates
     depends_on:
      - mysqldb
      - ftp-server
