@@ -461,7 +461,7 @@ var eventhand="";
 	    
         .then(response => response.json())
         .then(data => {
-        	
+        	window.ClientList=data;
         	updatePag(1,data)
         })}
 </script>
