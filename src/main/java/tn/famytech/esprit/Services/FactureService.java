@@ -2497,7 +2497,7 @@ totalBigDecimal = BigDecimal.valueOf(CalculTotalTTC(f));
 		
          
          newFacture.setType(proforma.getType());
-        
+        newFacture.setDateemission(proforma.getDateemission());
  		if(newFacture.getType() == TypeFacture.Export) {
  			newFacture.setDatecv(proforma.getDatecv());
  			newFacture.setCours(proforma.getCours());
