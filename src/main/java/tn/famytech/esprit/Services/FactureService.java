@@ -1469,7 +1469,7 @@ totalBigDecimal = BigDecimal.valueOf(CalculTotalTTC(f));
     	
     }*/
     private TypeFacture mapStringtoTypeFacture(String type) {
-    	 if (type.equals("EURO")) {
+    	 if (type.equals("Export")) {
              return TypeFacture.Export;
          } else  {
              return TypeFacture.National;
