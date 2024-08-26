@@ -63,13 +63,13 @@ public interface FactureRepo extends CrudRepository<Facture, Long>, PagingAndSor
 	    
 	    Facture findByNumber(long number);
 	    Facture findByNumberAndStatus(long number,FactureStatus status);
-	    @Query(value = "SELECT * FROM Facture WHERE (status = 7 OR status = 6) AND traited=false AND number = :number  LIMIT 1", nativeQuery = true)
+	    @Query(value = "SELECT * FROM facture WHERE (status = 7 OR status = 6) AND traited=false AND number = :number  LIMIT 1", nativeQuery = true)
 	    Facture findFactureByNumber(long number);
 	    
-	    @Query(value = "SELECT * FROM Facture WHERE (f.status = 0 OR f.status = 1 OR f.status = 2 OR f.status = 3 OR f.status = 4)  AND number = :number  LIMIT 1", nativeQuery = true)
+	    @Query(value = "SELECT * FROM facture WHERE (f.status = 0 OR f.status = 1 OR f.status = 2 OR f.status = 3 OR f.status = 4)  AND number = :number  LIMIT 1", nativeQuery = true)
 	    Facture findProformaByNumber(long number);
 	    
-	    @Query(value = "SELECT * FROM Facture WHERE (status = 7 OR status = 6) AND traited=false AND number = (SELECT MAX(number) FROM Facture)  LIMIT 1", nativeQuery = true)
+	    @Query(value = "SELECT * FROM facture WHERE (status = 7 OR status = 6) AND traited=false AND number = (SELECT MAX(number) FROM Facture)  LIMIT 1", nativeQuery = true)
 	    Facture findFactureWithMaxNumber();
 	    
 	    @Query("Select f FROM Facture f WHERE f.dateemission BETWEEN :startDate AND :endDate And (f.status = :status) AND f.type=:type")
