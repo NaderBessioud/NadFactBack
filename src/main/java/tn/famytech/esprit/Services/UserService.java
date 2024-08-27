@@ -235,9 +235,9 @@ public class UserService implements UserDetailsService {
     	String folderPath="/opt/certificates/"+name+"_"+lastname;
     	   String caFolderPath = folderPath + "\\ca"; // Use full path for ca folder
 
-    String opensslCommand = "openssl req -x509 -newkey rsa:4096 -keyout " + caFolderPath + "\\key.pkcs1.pem -out " + caFolderPath + "\\certificate.crt.pem -days 1825 -subj \"/C=TN/ST=Tunisia/L=Tunisia/O=Famytech/OU=SpringPro/CN=CA for " + name + "_" + lastname + "\" -passout pass:ca_key_password_" + pass;
-    String opensslPkcs12Command = "openssl pkcs12 -export -out " + caFolderPath + "\\keystore.p12 -inkey " + caFolderPath + "\\key.pkcs1.pem -in " + caFolderPath + "\\certificate.crt.pem -passin pass:ca_key_password_" + pass + " -passout pass:ca_p12_password_" + pass;
-    String keytoolCommand = "keytool -importkeystore -srckeystore " + caFolderPath + "\\keystore.p12 -srcstorepass ca_p12_password_" + pass + " -srcstoretype pkcs12 -alias 1 -destalias ca_alias -destkeystore " + folderPath + "\\keystore.jks -deststorepass keystore_password_" + pass;
+  String opensslCommand = "openssl req -x509 -newkey rsa:4096 -keyout " + caFolderPath + "/key.pkcs1.pem -out " + caFolderPath + "/certificate.crt.pem -days 1825 -subj \"/C=TN/ST=Tunisia/L=Tunisia/O=Famytech/OU=SpringPro/CN=CA for " + name + "_" + lastname + "\" -passout pass:ca_key_password_" + pass;
+    	    String opensslPkcs12Command = "openssl pkcs12 -export -out " + caFolderPath + "/keystore.p12 -inkey " + caFolderPath + "/key.pkcs1.pem -in " + caFolderPath + "/certificate.crt.pem -passin pass:ca_key_password_" + pass + " -passout pass:ca_p12_password_" + pass;
+    	    String keytoolCommand = "keytool -importkeystore -srckeystore " + caFolderPath + "/keystore.p12 -srcstorepass ca_p12_password_" + pass + " -srcstoretype pkcs12 -alias 1 -destalias ca_alias -destkeystore " + folderPath + "/keystore.jks -deststorepass keystore_password_" + pass;
 
     	   if(createFolder(folderPath)) {
     		       		   System.out.println("Current working directory: " + new File(".").getAbsolutePath());
