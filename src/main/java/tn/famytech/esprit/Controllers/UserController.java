@@ -1526,7 +1526,7 @@ public class UserController {
 			public ResponseEntity<ByteArrayResource> previewDepensePaymentJPG(@PathVariable("id") long id) throws FileNotFoundException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, DocumentException, SerialException, SQLException{
 				
 				DepenseReelle d=depenseReelleService.getDepenseById(id);
-				byte[] imageBytes = factureService.downloadFile(d.getFacture());
+				byte[] imageBytes = factureService.downloadFile(d.getPapierpay());
 				HttpHeaders headers = new HttpHeaders();
 			    headers.setContentType(MediaType.IMAGE_JPEG); // 
 			    headers.setContentDispositionFormData("image.jpg", "image.jpg");
