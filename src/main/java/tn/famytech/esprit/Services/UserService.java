@@ -233,9 +233,15 @@ public class UserService implements UserDetailsService {
     		       		   System.out.println("Current working directory: " + new File(".").getAbsolutePath());
 
     	   
-    	    executeCommandInDirectory(opensslCommand, folderPath);
-    	    executeCommandInDirectory(opensslPkcs12Command, folderPath);
-    	    executeCommandInDirectory(keytoolCommand, folderPath);
+    	       File caFolder = new File(caFolderPath);
+    		   if (!caFolder.exists()) {
+    		       System.err.println("CA folder does not exist: " + caFolder.getAbsolutePath());
+    		   }
+    		   else {
+    			   executeCommandInDirectory(opensslCommand, folderPath);
+    	    	    executeCommandInDirectory(opensslPkcs12Command, folderPath);
+    	    	    executeCommandInDirectory(keytoolCommand, folderPath);
+    		   }
     	   }
     	
     	
