@@ -188,44 +188,34 @@ public class UserService implements UserDetailsService {
         return false;
     }
  
-      public static void executeCommandInDirectory(String command, String directory) {
-        try {
-            System.out.println("Executing command: " + command);
-            System.out.println("In directory: " + directory);
+     public static void executeCommandInDirectory(String command, String directory) {
+    try {
+        // Execute the command in a shell context
+        String[] shellCommand = {"/bin/sh", "-c", command};
+        ProcessBuilder processBuilder = new ProcessBuilder(shellCommand);
+        processBuilder.directory(new File(directory));
 
-            // Split the command and setup the process builder
-            ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
-            processBuilder.directory(new File(directory));
+        Process process = processBuilder.start();
 
-            // Start the process
-            Process process = processBuilder.start();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-            // Capture standard output
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line); // Print standard output to stdout
-            }
-
-            // Capture error output
-            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            while ((line = errorReader.readLine()) != null) {
-                System.err.println(line); // Print error output to stderr
-            }
-
-            // Wait for the process to complete and get the exit code
-            int exitCode = process.waitFor();
-            System.out.println("Command executed with exit code: " + exitCode);
-
-            // Check if the command was successful
-            if (exitCode != 0) {
-                System.err.println("Command failed with exit code: " + exitCode);
-            }
-
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
         }
+        while ((line = errorReader.readLine()) != null) {
+            System.err.println(line);
+        }
+
+        int exitCode = process.waitFor();
+        System.out.println("Command executed with exit code: " + exitCode);
+
+    } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
     }
+}
+
 
 
 
