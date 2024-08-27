@@ -139,7 +139,7 @@ async function uploadFile(file) {
     formData.append('imageFile', file);
 
     try {
-        const response = await fetch('/ERPPro/uploadImage', {
+        const response = await fetch('/ERPPro/home/uploadImage', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`
