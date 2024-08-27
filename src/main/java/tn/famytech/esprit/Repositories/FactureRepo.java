@@ -81,10 +81,10 @@ public interface FactureRepo extends CrudRepository<Facture, Long>, PagingAndSor
 	    @Query("Select f FROM Facture f WHERE f.dateemission BETWEEN :startDate AND :endDate And (f.status = :status) AND f.type=:type")
 	    List<Facture> FactureByDateAndTypeAndStatus(Date startDate,Date endDate,TypeFacture type,FactureStatus status);
 	    
-	    @Query("Select f.number,f.dateemission FROM Facture f WHERE f.dateemission BETWEEN :startDate AND :endDate And (f.status = 7)")
+	    @Query("SELECT new tn.famytech.esprit.DTO.FactureDateAndNumber(f.number, f.dateemission) FROM Facture f WHERE f.dateemission BETWEEN :startDate AND :endDate And (f.status = 7)")
 	    List<FactureDateAndNumber> FactureBydate(Date startDate,Date endDate);
 	    
-	    @Query("Select f.number,f.dateemission FROM Facture f WHERE YEAR(f.dateemission) = :year And (f.status = 7)")
+	    @Query("SELECT new tn.famytech.esprit.DTO.FactureDateAndNumber(f.number, f.dateemission) FROM Facture f WHERE YEAR(f.dateemission) = :year And (f.status = 7)")
 	    List<FactureDateAndNumber> FactureByYear(int year);
 	    
 	    @Query("Select f FROM Facture f WHERE YEAR(f.dateemission) = :year And (f.status = :status) AND f.type=:type")
