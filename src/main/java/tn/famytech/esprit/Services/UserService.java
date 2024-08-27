@@ -233,7 +233,7 @@ public class UserService implements UserDetailsService {
     	System.out.println("Creating Certif");
     	String pass=name.toLowerCase()+lastname.toLowerCase();
     	String folderPath="/opt/certificates/"+name+"_"+lastname;
-    	   String caFolderPath = folderPath + "\\ca"; // Use full path for ca folder
+    	   String caFolderPath = folderPath + "/ca"; 
 
   String opensslCommand = "openssl req -x509 -newkey rsa:4096 -keyout " + caFolderPath + "/key.pkcs1.pem -out " + caFolderPath + "/certificate.crt.pem -days 1825 -subj \"/C=TN/ST=Tunisia/L=Tunisia/O=Famytech/OU=SpringPro/CN=CA for " + name + "_" + lastname + "\" -passout pass:ca_key_password_" + pass;
     	    String opensslPkcs12Command = "openssl pkcs12 -export -out " + caFolderPath + "/keystore.p12 -inkey " + caFolderPath + "/key.pkcs1.pem -in " + caFolderPath + "/certificate.crt.pem -passin pass:ca_key_password_" + pass + " -passout pass:ca_p12_password_" + pass;
