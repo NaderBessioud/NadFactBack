@@ -37,7 +37,7 @@ public interface AvoirRepo extends CrudRepository<Avoir, Long> {
     @Query("SELECT new tn.famytech.esprit.DTO.FactureDateAndNumber(a.number, a.dateemission) FROM Avoir a WHERE a.dateemission BETWEEN :startDate AND :endDate And (a.status = 2)")
     List<FactureDateAndNumber> AvoirBydate(Date startDate,Date endDate);
     
-    @Query("Select a.number,a.dateemission FROM Avoir a WHERE YEAR(a.dateemission) = :year And (a.status = 2)")
+   @Query("SELECT new tn.famytech.esprit.DTO.FactureDateAndNumber(a.number, a.dateemission) FROM Avoir a WHERE YEAR(a.dateemission) = :year And (a.status = 2)")
     List<FactureDateAndNumber> AvoirByYear(int year);
     
     List<Avoir> findByFact(Facture fact);
