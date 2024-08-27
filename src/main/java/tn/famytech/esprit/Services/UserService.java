@@ -188,27 +188,39 @@ public class UserService implements UserDetailsService {
         return false;
     }
  
-    public static void executeCommandInDirectory(String command, String directory) {
+      public static void executeCommandInDirectory(String command, String directory) {
         try {
+            System.out.println("Executing command: " + command);
+            System.out.println("In directory: " + directory);
+
+            // Split the command and setup the process builder
             ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
             processBuilder.directory(new File(directory));
 
+            // Start the process
             Process process = processBuilder.start();
 
+            // Capture standard output
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                System.out.println(line); // Print standard output to stdout
             }
 
+            // Capture error output
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             while ((line = errorReader.readLine()) != null) {
                 System.err.println(line); // Print error output to stderr
             }
 
+            // Wait for the process to complete and get the exit code
             int exitCode = process.waitFor();
             System.out.println("Command executed with exit code: " + exitCode);
+
+            // Check if the command was successful
+            if (exitCode != 0) {
+                System.err.println("Command failed with exit code: " + exitCode);
+            }
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -221,11 +233,15 @@ public class UserService implements UserDetailsService {
     	System.out.println("Creating Certif");
     	String pass=name.toLowerCase()+lastname.toLowerCase();
     	String folderPath="/opt/certificates/"+name+"_"+lastname;
-    	String opensslCommand = "openssl req -x509 -newkey rsa:4096 -keyout ca/key.pkcs1.pem -out ca/certificate.crt.pem -days 1825 -subj \"/C=TN/ST=Tunisia/L=Tunisia/O=Famytech/OU=SpringPro/CN=CA for "+name+"_"+lastname+"\" -passout pass:ca_key_password_"+pass;
-    	String opensslPkcs12Command = "openssl pkcs12 -export -out ca/keystore.p12 -inkey ca/key.pkcs1.pem -in ca/certificate.crt.pem -passin pass:ca_key_password_"+pass+" -passout pass:ca_p12_password_"+pass;
-    	String keytoolCommand = "keytool -importkeystore -srckeystore ca/keystore.p12 -srcstorepass ca_p12_password_"+pass+" -srcstoretype pkcs12 -alias 1 -destalias ca_alias -destkeystore keystore.jks -deststorepass keystore_password_"+pass;
+    	   String caFolderPath = folderPath + "\\ca"; // Use full path for ca folder
+
+    String opensslCommand = "openssl req -x509 -newkey rsa:4096 -keyout " + caFolderPath + "\\key.pkcs1.pem -out " + caFolderPath + "\\certificate.crt.pem -days 1825 -subj \"/C=TN/ST=Tunisia/L=Tunisia/O=Famytech/OU=SpringPro/CN=CA for " + name + "_" + lastname + "\" -passout pass:ca_key_password_" + pass;
+    String opensslPkcs12Command = "openssl pkcs12 -export -out " + caFolderPath + "\\keystore.p12 -inkey " + caFolderPath + "\\key.pkcs1.pem -in " + caFolderPath + "\\certificate.crt.pem -passin pass:ca_key_password_" + pass + " -passout pass:ca_p12_password_" + pass;
+    String keytoolCommand = "keytool -importkeystore -srckeystore " + caFolderPath + "\\keystore.p12 -srcstorepass ca_p12_password_" + pass + " -srcstoretype pkcs12 -alias 1 -destalias ca_alias -destkeystore " + folderPath + "\\keystore.jks -deststorepass keystore_password_" + pass;
+
     	   if(createFolder(folderPath)) {
-    		   
+    		       		   System.out.println("Current working directory: " + new File(".").getAbsolutePath());
+
     	   
     	    executeCommandInDirectory(opensslCommand, folderPath);
     	    executeCommandInDirectory(opensslPkcs12Command, folderPath);
