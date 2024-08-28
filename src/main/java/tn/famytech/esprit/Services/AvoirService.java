@@ -280,18 +280,30 @@ public class AvoirService {
 	public long AvoirNumber() {
 		Calendar calendar = Calendar.getInstance();
         int currentYear = calendar.get(Calendar.YEAR);
-		/*if(factureRepo.facturenumber(currentYear) > avoirRepo.Avoirnumber(currentYear)) {
-			return factureRepo.facturenumber(currentYear)+1 ;
-		}
-		else {
-			return avoirRepo.Avoirnumber(currentYear)+1;
-		}*/
-        if(avoirRepo.findMaxNumberByYearAndStatus(currentYear) != null) {
-        	return avoirRepo.findMaxNumberByYearAndStatus(currentYear)+1;
+        long number=0;
+        Optional<Long> firstElement1 = factureRepo.findTheGapNumber(currentYear).isEmpty() ? Optional.empty() : Optional.of(factureRepo.findTheGapNumber(currentYear).get(0));
+        Optional<Long> firstElement2 = avoirRepo.findTheGapNumber(currentYear).isEmpty() ? Optional.empty() : Optional.of(avoirRepo.findTheGapNumber(currentYear).get(0));
+      
+        Long number1= Stream.of(firstElement1, firstElement2)
+        .flatMap(Optional::stream)
+        .max(Long::compare)
+        .orElse(null);
+        if(number1 != null ) {
+        	
+        	number =number1;
+        	
         }
         else {
-        	return 1;
+        	if(avoirRepo.Avoirnumber(currentYear) != null) {
+        		number=Math.max(factureRepo.countByDateemissionAndType(currentYear,false)+1, avoirRepo.Avoirnumber(currentYear)+1);
+        		
+        	}
+        	else {
+        		number=factureRepo.countByDateemissionAndType(currentYear,false)+1;
+        	}
         }
+       
+		return number;
         
 		
 	}
