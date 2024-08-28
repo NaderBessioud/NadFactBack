@@ -54,8 +54,8 @@ public class DepenseReelleService {
     public List<DepenseReelle> Search(String search){
     	List<DepenseReelle> result=new ArrayList<DepenseReelle>();
     	for (DepenseReelle dep  : getDepenseOrderByDate()) {
-			if(String.valueOf(dep.getMontant()).contains(search) || dep.getBlss().getBcliv().getDdepense().getMotif().contains(search)
-					|| String.valueOf(dep.getDate()).contains(search) || dep.getTypepay().toString().contains(search)) {
+				if(String.valueOf(dep.getMontant()).contains(search) || dep.getBlss().getBcliv().getDdepense().getMotif().toLowerCase().contains(search.toLowerCase())
+					|| String.valueOf(dep.getDate()).contains(search) || dep.getTypepay().toString().toLowerCase().contains(search.toLowerCase())) {
 				result.add(dep);
 			}
 		}
