@@ -94,6 +94,9 @@ import tn.famytech.esprit.Entites.User;
 import tn.famytech.esprit.Repositories.AvoirRepo;
 import tn.famytech.esprit.Repositories.FactureRepo;
 import tn.famytech.esprit.Repositories.PersonelRepo;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 
 @Service
 public class AvoirService {
