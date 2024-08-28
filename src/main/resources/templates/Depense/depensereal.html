@@ -403,7 +403,7 @@ function search(){
 		updatePag(1)
 		}
 	else{
-	 fetch('/ERPPro/user/DepenseSearch?search=' + search, {
+	 fetch('/ERPPro/user/DepenseSearch/' + search, {
             method: 'GET',
             headers: {
             	 'Authorization': `Bearer ${token}`
