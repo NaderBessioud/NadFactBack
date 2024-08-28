@@ -1071,6 +1071,7 @@ public class UserController {
 		    	 model.addAttribute("factureid", id);
 		    	 model.addAttribute("type", f.getType());
 		    	 model.addAttribute("avoir", new Avoir());
+			model.addAttribute("mindate", f.getDateemission());
 		    	 
 		    	
 		    	 return "Avoir/create_avoir";
