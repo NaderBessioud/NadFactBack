@@ -155,7 +155,7 @@
 					<button  th:if="${facture.status.toString() == 'Facture_valide'}" th:onclick="'cancelinvoiceNotSend(' + ${facture.idF} + ')'" class="btnsupp">
 										   <i class="fa-solid fa-trash"></i> Annuler
 					</button>
-					      <button th:if="${ facture.status.toString() == 'Facture_envoye'}"  th:onclick="'toggleAvoirs(' + ${facture.idF} + ')'" class="btn btn-info btn-sm"><i class="fa-solid fa-list"></i> Avoirs</button>
+					      <button th:if="${ facture.status.toString() == 'Facture_envoye' && #lists.size(facture.avoirs) != 0}"  th:onclick="'toggleAvoirs(' + ${facture.idF} + ')'" class="btn btn-info btn-sm"><i class="fa-solid fa-list"></i> Avoirs</button>
 				</td>
 				
 			</tr>
@@ -465,7 +465,7 @@ function toggleAvoirs(invoiceId) {
 			}
 	      
 
-	      if(status=="Facture_envoye"){
+	      if(status=="Facture_envoye" && data.avoirs.length != 0){
 	 		 var avoirsButton = document.createElement('button');
 	 	      
 	 		avoirsButton.innerHTML = '<i class="fa-solid fa-list"></i>Avoirs';
@@ -503,7 +503,7 @@ function toggleAvoirs(invoiceId) {
 	 var status=avoir.status;
 	
 	 var td = document.createElement('td');
-	 
+	 td.className = 'button-wrapper';
 	 var avoirid=avoir.idC
 	 
 	
@@ -687,9 +687,12 @@ if(status=="Avoir"){
           for (var j = 0; j < facture.avoirs.length; j++) {
               var avoir = facture.avoirs[j];
               var newRow1 = tableBody.insertRow(tableBody.rows.length);
+		     newRow1.setAttribute('data-group', 'avoirs-' + facture.idF);
 
-              // Add cells and populate with facture details
-              // Example:
+           
+           newRow1.style.display = 'none';
+
+              
               var numberCell = newRow1.insertCell(0);
               numberCell.innerHTML = avoir.number;
 
@@ -1983,15 +1986,29 @@ document.addEventListener('DOMContentLoaded', function() {
         if(data =="Manager" || data =="Admin"){
         	
            
-            document.getElementById('btnval').style.display = 'block'
-            document.getElementById('btnvalfact').style.display = 'block'
-            	document.getElementById('btnvalavoir').style.display = 'block'
+               if(document.getElementById('btnval') != null){
+        	   document.getElementById('btnval').style.display = 'block'
+               }
+
+           if(document.getElementById('btnvalavoir') != null){
+        	   document.getElementById('btnvalavoir').style.display = 'block'
+               }
+           if(document.getElementById('btnvalfact') != null){
+        	   document.getElementById('btnvalfact').style.display = 'block'
+               }
            
             }
         else{
-        	document.getElementById('btnval').style.display = 'none'
-                document.getElementById('btnvalfact').style.display = 'none'
-                	document.getElementById('btnvalavoir').style.display = 'none'
+        	if(document.getElementById('btnval') != null){
+            	   document.getElementById('btnval').style.display = 'none'
+                   }
+
+               if(document.getElementById('btnvalavoir') != null){
+            	   document.getElementById('btnvalavoir').style.display = 'none'
+                   }
+               if(document.getElementById('btnvalfact') != null){
+            	   document.getElementById('btnvalfact').style.display = 'none'
+                   }
             	
         	
             }
