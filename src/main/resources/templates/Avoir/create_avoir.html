@@ -16,7 +16,7 @@
                 <i class="fas fa-file-invoice"></i>
                 <h2 id="h2title">Ajouter un Avoir</h2>
             </div>
-            <form id="addAvoirForm" th:action="@{/user/avoir}" th:object="${avoir}" method="POST">
+            <form id="addAvoirForm" th:action="@{/user/avoir}" th:object="${avoir}" method="POST" style="margin-top: 21px">
                <input type="text"  id="id" hidden th:field=*{idC}>
             
                 <div class="form-group">
@@ -57,7 +57,7 @@
                         <input type="number" class="form-control" id="montant" name="montant" placeholder="Enter montant" th:field=*{montant} required>
                     </div>
                 </div>
-                <button type="button" id="actionbtn" class="btn btn-primary" onclick="enregister(event)">Ajouter </button>
+                <button type="button" id="actionbtn" class="btn btn-primary1" onclick="enregister(event)">Ajouter </button>
             </form>
         </div>
     </div>   
