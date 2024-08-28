@@ -71,9 +71,7 @@
    		if(window.type == "Export"){
    			var date = document.getElementById("date").value
    			  			
-   			const dateString = String(date);
-   			const parts = dateString.split('-');
-   			date=parts[2]+"//"+parts[1]+"//"+parts[0]
+   			
    			formData.append("datecv",date)
    			formData.append("montant",montant)
    			
