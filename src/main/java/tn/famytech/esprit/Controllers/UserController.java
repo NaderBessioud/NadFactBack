@@ -1073,7 +1073,7 @@ public class UserController {
 		    	 model.addAttribute("avoir", new Avoir());
 		    	 
 		    	
-		    	 return "avoir/create_avoir";
+		    	 return "Avoir/create_avoir";
 		     }
 		   
 		   @PostMapping("avoir/{id}")
@@ -1097,7 +1097,7 @@ public class UserController {
 		    	 model.addAttribute("avoir",new Avoir() );
 		    	 
 		    	
-		    	 return "avoir/create_avoir";
+		    	 return "Avoir/create_avoir";
 		     }
 		   
 		   @PostMapping("updateavoir")
