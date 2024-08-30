@@ -16,8 +16,14 @@ import tn.famytech.esprit.Entites.ReglementType;
 
 @Repository
 public interface ReglementRepo extends CrudRepository<Reglement, Long> {
-	List<Reglement> findByRegclientAndStatus(Client c,ReglementStatus s);
+	
 	List<Reglement> findByStatus(ReglementStatus s);
+	
+	 @Query("Select r FROM Reglement r WHERE r.idc=:idc AND r.status = :status")
+	    List<Reglement> ReglementByClientandstatus(long idc,ReglementStatus status);
+	 
+	 @Query("Select r FROM Reglement r WHERE r.idc=:idc AND r.status = :status and r.type = :type")
+	    List<Reglement> ReglementByClientandstatus(long idc,ReglementStatus status,ReglementType type);
 	
 	 @Query("Select r.montant FROM Reglement r WHERE r.datepayement BETWEEN :startDate AND :endDate AND r.type=:type")
 	    List<Double> TotalMonth(Date startDate,Date endDate,ReglementType type);
@@ -25,23 +31,23 @@ public interface ReglementRepo extends CrudRepository<Reglement, Long> {
 	 @Query("Select r.montant FROM Reglement r WHERE YEAR(r.datepayement) = :year AND r.type=:type")
 	    List<Double> TotalYear(int year,ReglementType type);
 	 
-	 @Query("Select r.montant FROM Reglement r join r.regclient c WHERE c.idU = :id AND r.datepayement BETWEEN :startDate AND :endDate AND r.type=:type")
+	 @Query("Select r.montant FROM Reglement r  WHERE r.idc = :id AND r.datepayement BETWEEN :startDate AND :endDate AND r.type=:type")
 	    List<Double> TotalMonthByClient(Date startDate,Date endDate,ReglementType type,long id);
 	 
-	 @Query("Select r.montant FROM Reglement r join r.regclient c WHERE c.idU = :id AND YEAR(r.datepayement) = :year AND r.type=:type")
+	 @Query("Select r.montant FROM Reglement r  WHERE r.idc = :id AND YEAR(r.datepayement) = :year AND r.type=:type")
 	    List<Double> TotalYearByClient(int year,ReglementType type,long id);
 	 
 	 
 	 @Query("Select r.fb FROM Reglement r WHERE r.datepayement BETWEEN :startDate AND :endDate AND r.type=:type")
 	    List<Double> TotalFbByMonth(Date startDate,Date endDate,ReglementType type);
 	 
-	 @Query("Select r.fb FROM Reglement r join r.regclient c WHERE c.idU = :id AND r.datepayement BETWEEN :startDate AND :endDate AND r.type=:type")
+	 @Query("Select r.fb FROM Reglement r  WHERE r.idc = :id AND r.datepayement BETWEEN :startDate AND :endDate AND r.type=:type")
 	    List<Double> TotalFbMonthByClient(Date startDate,Date endDate,ReglementType type,long id);
 	 
 	 @Query("Select r.fb FROM Reglement r WHERE YEAR(r.datepayement) = :year AND r.type=:type")
 	    List<Double> TotalFbYear(int year,ReglementType type);
 	 
-	 @Query("Select r.fb FROM Reglement r join r.regclient c WHERE c.idU = :id AND YEAR(r.datepayement) = :year AND r.type=:type")
+	 @Query("Select r.fb FROM Reglement r  WHERE r.idc = :id AND YEAR(r.datepayement) = :year AND r.type=:type")
 	    List<Double> TotalFbYearByClient(int year,ReglementType type,long id);
 }
 
