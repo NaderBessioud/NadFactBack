@@ -43,11 +43,11 @@ public class Reglement implements Serializable {/**
 	private Date datepayement;
 	private ReglementType type;
 	private double fb;
+	private long idc;
 	
 	@ManyToMany
 	private List<Facture>  regFactures;
 	
-	@ManyToOne
-	private Client regclient;
+	
 
 }
