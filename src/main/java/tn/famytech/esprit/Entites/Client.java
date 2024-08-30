@@ -40,9 +40,7 @@ public class Client extends User implements Serializable{
 	@JsonIgnore
 	@OneToMany(mappedBy = "client")
 	private Set<Facture> factures;
-	@JsonIgnore
-	@OneToMany(mappedBy = "regclient")
-	private Set<Reglement> reglements;
+	
 	
 	
 	
