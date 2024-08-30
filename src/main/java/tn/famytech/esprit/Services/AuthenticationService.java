@@ -3,7 +3,9 @@ package tn.famytech.esprit.Services;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -65,7 +67,7 @@ public class AuthenticationService {
 		
 	}
 	
-public JwtAuthenticationResponse signin(String email, String password) {
+public JwtAuthenticationResponse signin(String email, String password, HttpServletResponse response) {
 	JwtAuthenticationResponse authenticationResponse = new JwtAuthenticationResponse();
 		
 		int result=authenticate(email, password);
@@ -76,6 +78,11 @@ public JwtAuthenticationResponse signin(String email, String password) {
 			authenticationResponse.setMsg("good");
 			authenticationResponse.setUser(user);
 			authenticationResponse.setToken(jwt);
+			Cookie cookie = new Cookie("auth_token", jwt);
+		    cookie.setHttpOnly(true);
+		    
+		    cookie.setPath("/");
+		    response.addCookie(cookie);
 			
 			template.convertAndSend("/topic/online", user.getIdU());
 		}
@@ -107,17 +114,22 @@ public JwtAuthenticationResponse signin(String email, String password) {
 		
 	}
 
-public JwtAuthenticationResponse signinWithGoogle(String email) {
+public JwtAuthenticationResponse signinWithGoogle(String email,HttpServletResponse response) {
 	User user = rep.findByEmail(email);
 	JwtAuthenticationResponse authenticationResponse = new JwtAuthenticationResponse();
 	var jwt =jwtService.generateToken(user);
 	authenticationResponse.setMsg("good");
 	authenticationResponse.setUser(user);
 	authenticationResponse.setToken(jwt);
+	Cookie cookie = new Cookie("auth_token", jwt);
+    cookie.setHttpOnly(true);
+    
+    cookie.setPath("/");
+    response.addCookie(cookie);
 	return authenticationResponse;
 }
 
-public void logout( String email) {
+public void logout( String email,HttpServletRequest request, HttpServletResponse response) {
 	User user = rep.findByEmail(email);
 	
 	
@@ -127,7 +139,22 @@ public void logout( String email) {
 		}
 	}
 	
-	System.out.println("hadha eli khraj===="+user.getIdU());
+	Cookie[] cookies = request.getCookies();
+	if (cookies != null) {
+        for (Cookie cookie : cookies) {
+            if ("auth_token".equals(cookie.getName())) {
+                // Create a new cookie with the same name
+                Cookie deleteCookie = new Cookie("auth_token", null);
+                deleteCookie.setHttpOnly(true); // Ensure that the cookie is HTTP-only
+                deleteCookie.setSecure(true);  // Ensure that the cookie is sent over HTTPS
+                deleteCookie.setPath(cookie.getPath()); // Use the same path as the original cookie
+                deleteCookie.setMaxAge(0);     // Set the maximum age to 0 to delete the cookie
+
+                response.addCookie(deleteCookie); // Add the cookie to the response
+                break; // Exit loop after deleting the cookie
+            }
+        }
+    }
 	template.convertAndSend("/topic/offline", user.getIdU());
 }
 
