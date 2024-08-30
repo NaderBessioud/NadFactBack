@@ -3203,7 +3203,37 @@ List<Facture> result = new ArrayList<Facture>();
 		}
     	return result;
     }
-    
+      public List<Facture> DisplayFactureByReglement(long idr){
+    	List<Facture> result=new ArrayList<Facture>();
+    	Reglement r=reglementRepo.findById(idr).get();
+    	Client c = clientRepo.findById(r.getIdc()).get();
+    	
+    	
+
+    	if(r.getType().toString().equals("TND")) {
+    		result = factureRepo.findByClientAndArchivedAndStatusAndPayementstatusAndType(c, false,FactureStatus.Facture_envoye,FacturePayementStatus.Non_Paye,TypeFacture.National);
+        	
+
+        	result.addAll(factureRepo.findByClientAndArchivedAndStatusAndPayementstatusAndType(c, false,FactureStatus.Facture_envoye,FacturePayementStatus.Paye_Partiel,TypeFacture.National));
+        	
+    	}
+    	else {
+    		result = factureRepo.findByClientAndArchivedAndStatusAndPayementstatusAndType(c, false,FactureStatus.Facture_envoye,FacturePayementStatus.Non_Paye,TypeFacture.Export);
+        	result.addAll(factureRepo.findByClientAndArchivedAndStatusAndPayementstatusAndType(c, false,FactureStatus.Facture_envoye,FacturePayementStatus.Paye_Partiel,TypeFacture.Export));
+
+    	}
+    	Collections.sort(result, Comparator.comparing(Facture::getNumber).reversed());
+    	
+    	List<Facture> facts=r.getRegFactures();
+    	Collections.sort(facts, Comparator.comparing(Facture::getNumber));
+    	
+    	for (Facture facture : facts) {
+			if(facture.getClient().getIdU()==c.getIdU() && facture.getPayementstatus()==FacturePayementStatus.Paye) {
+				result.add(0, facture);
+			}
+		}
+    	return result;
+    }
     public String getFactureTypeByClient(long id) {
     	Client c=clientRepo.findById(id).get();
     	if(c.getType() == TypeClient.International) {
