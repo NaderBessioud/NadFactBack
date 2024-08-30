@@ -48,20 +48,20 @@
         </div>
         <ul class="list" id="paymentsList">
             <!-- Payment items will be dynamically added here -->
-            <li th:each="regl: ${reglements}" onclick="selectItem(this)" th:data-idr="${regl.idR}" th:data-montant="${regl.montantrestant}" th:data-client="${regl.regclient.libelle}" th:data-type="${regl.type}">
+            <li th:each="regl: ${reglements}" onclick="selectItem(this)" th:data-idr="${regl.reglement.idR}" th:data-montant="${regl.reglement.montantrestant}" th:data-client="${regl.reglement.idc}" th:data-type="${regl.reglement.type}">
               <div class="info">
              
                
-                <span style="margin-right: 20px"><i class="fas fa-money-bill-wave"></i><span th:text= "${#numbers.formatDecimal(regl.montantrestant, 1, 'POINT', 2, 'COMMA')}"></span>
-                <span th:if="${regl.type.toString() == 'Euro'}" > $</span>
-                        <span th:if="${regl.type.toString() == 'TND'}"> TND</span></span>
+                <span style="margin-right: 20px"><i class="fas fa-money-bill-wave"></i><span th:text= "${#numbers.formatDecimal(regl.reglement.montantrestant, 1, 'POINT', 2, 'COMMA')}"></span>
+                <span th:if="${regl.reglement.type.toString() == 'Euro'}" > $</span>
+                        <span th:if="${regl.reglement.type.toString() == 'TND'}"> TND</span></span>
                 
-                <span style="margin-right: 20px"><i class="far fa-calendar-alt"></i><span th:text="${#dates.format(regl.datepayement, 'yyyy/MM/dd')}"></span></span>
-                <span><i class="fa-solid fa-user"></i><span th:text = "${regl.regclient.libelle}"></span></span>
+                <span style="margin-right: 20px"><i class="far fa-calendar-alt"></i><span th:text="${#dates.format(regl.reglement.datepayement, 'yyyy/MM/dd')}"></span></span>
+                <span><i class="fa-solid fa-user"></i><span th:text = "${regl.lib}"></span></span>
             </div>
-            <div class="actions" th:if="${#lists.isEmpty(regl.regFactures)}">
-            <button  th:if="${regl.status.toString()=='Reglement'}" th:onclick="'openUpdateModal(' + ${regl.idR} + ')'"><i class="fa-solid fa-pen"></i></button>
-                <button th:if="${regl.status.toString()=='Reglement'}"  th:onclick="'deleteRegl(' + ${regl.idR} + ')'"><i class="fas fa-trash-alt"></i></button>
+            <div class="actions" th:if="${#lists.isEmpty(regl.reglement.regFactures)}">
+            <button  th:if="${regl.reglement.status.toString()=='Reglement'}" th:onclick="'openUpdateModal(' + ${regl.reglement.idR} + ')'"><i class="fa-solid fa-pen"></i></button>
+                <button th:if="${regl.reglement.status.toString()=='Reglement'}"  th:onclick="'deleteRegl(' + ${regl.reglement.idR} + ')'"><i class="fas fa-trash-alt"></i></button>
                  
                 
             </div>
@@ -151,7 +151,7 @@
                              
                         
                             <div style="width: 400px">
-                                   <select class="clientselect" id="clientselect" th:field="*{regclient}" required>
+                                   <select class="clientselect" id="clientselect" th:field="*{idc}" required>
 		        <option value="0" selected disabled>Choisie un client</option>
 		         <option th:each="client : ${Clients}" th:value="${client.idU}" th:text="${client.libelle}"></option>
 		        
@@ -236,7 +236,7 @@
                              
                         
                             <div style="width: 400px">
-                                   <select class="clientselect" id="clientselectupd" th:field="*{regclient}" required>
+                                   <select class="clientselect" id="clientselectupd" th:field="*{idc}" required>
 		        <option value="0" selected disabled>Choisie un client</option>
 		         <option th:each="client : ${Clients}" th:value="${client.idU}" th:text="${client.libelle}"></option>
 		        
@@ -472,23 +472,24 @@ function hideCustomAlert(){
             }
     	else{
     		
-	if(document.getElementById("selectlib").textContent != "Tous" && document.getElementById("selectlib").textContent != "Filter by"){
 		var formData = new FormData();
-		formData.append('lib', clientlib);
-		formData.append('type', type);
-      	  fetch('/ERPPro/user/FactureByClient/'+idR, {
-             method: 'POST',
+		
+		
+		
+		
+      	  fetch('/ERPPro/user/FactureByReglement/'+idR, {
+             method: 'GET',
              headers: {
              	 'Authorization': `Bearer ${token}`
              	    },
-             body:formData
+            
             
          })
          .then(response => response.json())
          .then(data => {
        	  updateInvoiceList(data)
          });
-    	}
+    	
         
 	}
 	}
@@ -531,9 +532,8 @@ function hideCustomAlert(){
             	openModalR()
                 }
         	else{
-        		if(document.getElementById("selectlib").textContent != "Tous" && document.getElementById("selectlib").textContent != "Filter by"){
                 	
-        		fetch('/ERPPro/user/GetReglementByClient/'+clientlib, {
+        		fetch('/ERPPro/user/ReglementByFacture/'+idF, {
                     method: 'GET',
                     headers: {
                     	 'Authorization': `Bearer ${token}`
@@ -543,7 +543,7 @@ function hideCustomAlert(){
                 .then(data => {
               	  updateReglementList(data)
                 });
-            	}
+            	
         	}
             
     	}
@@ -554,15 +554,15 @@ function hideCustomAlert(){
 		}
 
 	function createItemReglement(item) {
-		const date = new Date(item.datepayement);
+		const date = new Date(item.reglement.datepayement);
 		const year = date.getFullYear();
 		const month = ('0' + (date.getMonth() + 1)).slice(-2); // Ensure two digits for month
 		const day = ('0' + date.getDate()).slice(-2); // Ensure two digits for day
 
 		const formattedDate = `${year}/${month}/${day}`;
-		var formattedMontant = formatNumber(item.montantrestant);
+		var formattedMontant = formatNumber(item.reglement.montantrestant);
         const li = document.createElement('li');
-        if(item.type.toString() == "Euro"){
+        if(item.reglement.type.toString() == "Euro"){
         	formattedMontant=formattedMontant+" $"
 			
 			}
@@ -570,18 +570,18 @@ function hideCustomAlert(){
 			formattedMontant=formattedMontant+" TND"
 			
 			}
-       if(item.regFactures  != null){
+       if(item.reglement.regFactures  != null){
     	   li.innerHTML = `
            	<div class="info">
            	
                <span style="margin-right: 20px"><i class="fas fa-money-bill-wave"></i><span>${formattedMontant}</span></span>
                <span style="margin-right: 20px"><i class="far fa-calendar-alt"></i><span>${formattedDate}</span></span>
-               <span><i class="fa-solid fa-user"></i><span>${item.regclient.libelle}</span></span>
+               <span><i class="fa-solid fa-user"></i><span>${item.lib}</span></span>
            </div>
            <div class="actions">
 
-           <button class="update-button" th:onclick="openUpdateModal(${item.idR})"><i class="fa-solid fa-pen"></i></button>
-           <button class="delete-button" th:onclick="deleteRegl(${item.idR})"><i class="fas fa-trash-alt"></i></button>
+           <button class="update-button" th:onclick="openUpdateModal(${item.reglement.idR})"><i class="fa-solid fa-pen"></i></button>
+           <button class="delete-button" th:onclick="deleteRegl(${item.reglement.idR})"><i class="fas fa-trash-alt"></i></button>
            </div>
            `;
 
@@ -589,7 +589,7 @@ function hideCustomAlert(){
     if (updateButton) {
         updateButton.onclick = function(event) {
             event.stopPropagation();
-            openUpdateModal(item.idR);
+            openUpdateModal(item.reglement.idR);
         };
     }
 
@@ -597,7 +597,7 @@ function hideCustomAlert(){
     if (deleteButton) {
         deleteButton.onclick = function(event) {
             event.stopPropagation();
-            deleteRegl(item.idR);
+            deleteRegl(item.reglement.idR);
         };
     }
            }
@@ -607,17 +607,17 @@ function hideCustomAlert(){
            	
                <span><i class="fas fa-money-bill-wave"></i><span>${formattedMontant}</span></span>
                <span style="margin-right: 20px"><i class="far fa-calendar-alt"></i><span>${formattedDate}</span></span>
-               <span><i class="fa-solid fa-user"></i><span>${item.regclient.libelle}</span></span>
+               <span><i class="fa-solid fa-user"></i><span>${item.lib}</span></span>
            </div>
          
            `;
 
            }
         
-        li.setAttribute('data-idr', item.idR);
-        li.setAttribute('data-montant', item.montantrestant);
-        li.setAttribute('data-client', item.regclient.libelle);
-        li.setAttribute('data-type', item.type.toString());
+        li.setAttribute('data-idr', item.reglement.idR);
+        li.setAttribute('data-montant', item.reglement.montantrestant);
+        li.setAttribute('data-client', item.lib);
+        li.setAttribute('data-type', item.reglement.type.toString());
         li.onclick = function() {
     // Your onclick logic here
   
@@ -646,14 +646,14 @@ function hideCustomAlert(){
 			const dateString = String(date);
 			const parts = dateString.split('-');
 			date=parts[2]+"/"+parts[1]+"/"+parts[0]
-			const cl={
-					idU: parseInt(formData.get('regclient'), 10)}
+			
 			
 			 const reglement1 = {
 				montant:formData.get('montant'),
 				datepayement:formData.get('datepayement'),
 				type:formData.get('type'),
-				regclient: cl
+				idc: formData.get('idc'),
+				fb:formData.get('fb')
 				};
 			 const lib = libc
 	const Reglement =formData
@@ -918,7 +918,7 @@ function hideCustomAlert(){
 	    	document.getElementById('regmontantupd').value=data.montant;
 	    
 	    	document.getElementById('regdateupd').value=formattedDate;
-	    	document.getElementById('typeRegupd').value=data.regclient.idU;
+	    	document.getElementById('clientselectupd').value=data.idc;
 	    	document.getElementById('typeRegupd').value=data.type;
 	    	document.getElementById('regfbup').value=data.fb;
 	    	 $('#updatemodal').modal('show');
@@ -948,7 +948,7 @@ function hideCustomAlert(){
 				datepayement:formData.get('datepayement'),
 				type:formData.get('type'),
 				fb:formData.get('fb'),
-				regclient: cl
+				idc: formData.get('idc')
 				};
 			 const lib = libc
 	const Reglement =formData
