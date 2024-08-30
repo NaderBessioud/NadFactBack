@@ -30,7 +30,7 @@ private static final long serialVersionUID = 1L;
 
 	private String firstname;
 	private String lastname;
-	private double salaire;
+	
 	private String rib;
 	
 	@JsonIgnore
