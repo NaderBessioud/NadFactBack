@@ -746,20 +746,25 @@ public class UserController {
 		 
 		 @PostMapping("/addReglement")
 		 @ResponseBody
-		 public List<Reglement> addReglement(@RequestBody ClientAndReglement reglement) {
+		 public List<ClientAndReglement> addReglement(@RequestBody ClientAndReglement reglement) {
 			 return reglementService.addReglement(reglement);
 		 }
 		 
 		 @GetMapping("/GetReglementByClient/{lib}")
 		 @ResponseBody
-		 public List<Reglement> getReglementByClient(@PathVariable("lib") String lib){
+		 public List<ClientAndReglement> getReglementByClient(@PathVariable("lib") String lib){
 			 return reglementService.DisplayClientReglement(lib);
 		 }
-
+	
+ 		@GetMapping("/ReglementByFacture/{idf}")
+		 @ResponseBody
+		 public List<ClientAndReglement> getReglementByFacture(@PathVariable("idf") long idf){
+			 return reglementService.DisplayReglementByFacture(idf);
+		 }
 		 	
 		 @GetMapping("/DisplayReglement")
 		 @ResponseBody
-		 public List<Reglement> getReglements(){
+		 public List<ClientAndReglement> getReglements(){
 			 return reglementService.DisplayReglemensNotAffected();
 		 }
 		 
@@ -783,13 +788,13 @@ public class UserController {
 		 
 		 @PostMapping("/updateReglement")
 		 @ResponseBody
-		 public List<Reglement> updateReglement(@RequestBody ClientAndReglement reglement) {
+		 public List<ClientAndReglement> updateReglement(@RequestBody ClientAndReglement reglement) {
 			 return reglementService.updateReglement(reglement);
 		 }
 		 
 		 @PostMapping("/deleteRegl/{id}")
 		 @ResponseBody
-		 public List<Reglement> DeleteReglement(@RequestParam("lib") String lib,@PathVariable("id") long id) {
+		 public List<ClientAndReglement> DeleteReglement(@RequestParam("lib") String lib,@PathVariable("id") long id) {
 			 return reglementService.DeleteReglement(lib,id);
 		 }
 		 
