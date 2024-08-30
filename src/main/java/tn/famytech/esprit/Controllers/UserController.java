@@ -553,6 +553,12 @@ public class UserController {
 	 public List<Facture> getFactureByClient(@PathVariable("lib") String lib){
 		 return factureService.DisplayInvoiceNotArchivedAndNotPayedByClient(lib);
 	 }
+
+	 @GetMapping("/FactureByReglement/{idr}")
+	 @ResponseBody
+	 public List<Facture> getFactureByReglement(@PathVariable("idr") long idr){
+		 return factureService.DisplayFactureByReglement(idr);
+	 }
 	 
 	 @GetMapping("/Allfactures")
 	 @ResponseBody
