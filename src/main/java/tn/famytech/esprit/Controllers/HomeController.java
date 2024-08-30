@@ -6,7 +6,8 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 import java.util.List;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,22 +86,22 @@ public class HomeController {
    	 return "home";
     }
     
-    @PostMapping("/login")
+   @PostMapping("/login")
     @ResponseBody
-	public JwtAuthenticationResponse signin(@RequestParam("email") String email, @RequestParam("password") String password) {
-		return authenticationService.signin(email, password);
+	public JwtAuthenticationResponse signin(@RequestParam("email") String email, @RequestParam("password") String password, HttpServletResponse response) {
+		return authenticationService.signin(email, password,response);
 	}
     
     @PostMapping("/loginWithGoogle")
     @ResponseBody
-	public JwtAuthenticationResponse signinWithGoogle(@RequestParam("email") String email) {
-		return authenticationService.signinWithGoogle(email);
+	public JwtAuthenticationResponse signinWithGoogle(@RequestParam("email") String email,HttpServletResponse response) {
+		return authenticationService.signinWithGoogle(email,response);
 	}
     
-    @PostMapping("/logout/{email}")
+   @PostMapping("/logout/{email}")
     @ResponseBody
-	public void logout(@PathVariable("email") String email) {
-		 authenticationService.logout(email);
+	public void logout(@PathVariable("email") String email,HttpServletRequest request, HttpServletResponse response) {
+		 authenticationService.logout(email,request,response);
 	}
  
     @GetMapping("home")
