@@ -58,51 +58,102 @@ public class ReglementService {
         return new RestTemplate();
     }
 	
-	public List<Reglement> addReglement(ClientAndReglement reg) {
+	public List<ClientAndReglement> addReglement(ClientAndReglement reg) {
 		List<Reglement> result=new ArrayList<Reglement>();
+		List<ClientAndReglement> result1=new ArrayList<ClientAndReglement>();
 		reg.getReglement().setStatus(ReglementStatus.Reglement);
 		reg.getReglement().setMontantrestant(reg.getReglement().getMontant()-reg.getReglement().getFb());
-		reg.getReglement().setRegclient(clientRepo.findById(reg.getReglement().getRegclient().getIdU()).get());
+		
 		 reglementRepo.save(reg.getReglement());
 		 if(reg.getLib().length() == 0) {
 			 result=reglementRepo.findByStatus(ReglementStatus.Reglement);
 			 result.addAll(reglementRepo.findByStatus(ReglementStatus.Reglement_Affecte_Partiel));
 			 Collections.sort(result, Comparator.comparing(Reglement::getDatepayement)
 		                .thenComparing(Reglement::getIdR).reversed());
-			 return  result;
+			 for (Reglement reglement : result) {
+				result1.add(new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(),reglement));
+			}
+			 return  result1;
 		 }
 		 else {
-			 result=reglementRepo.findByRegclientAndStatus(clientRepo.findByLibelle(reg.getLib()), ReglementStatus.Reglement);
-			 result.addAll(reglementRepo.findByRegclientAndStatus(clientRepo.findByLibelle(reg.getLib()), ReglementStatus.Reglement_Affecte_Partiel));
+			 result=reglementRepo.ReglementByClientandstatus(clientRepo.findByLibelle(reg.getLib()).getIdU(), ReglementStatus.Reglement);
+			 result.addAll(reglementRepo.ReglementByClientandstatus(clientRepo.findByLibelle(reg.getLib()).getIdU(), ReglementStatus.Reglement_Affecte_Partiel));
 			 Collections.sort(result, Comparator.comparing(Reglement::getDatepayement)
 		                .thenComparing(Reglement::getIdR).reversed());
-			 return result;
+			 for (Reglement reglement : result) {
+					result1.add(new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(),reglement));
+				}
+				 return  result1;
 		 }
 		
 	}
 	
-	public List<Reglement> DisplayAll(){
-		return (List<Reglement>) reglementRepo.findAll();
-	}
-	
-	
-	
-	public List<Reglement> DisplayClientReglement(String lib){
-		List<Reglement> result=new ArrayList<Reglement>();
-		result=reglementRepo.findByRegclientAndStatus(clientRepo.findByLibelle(lib), ReglementStatus.Reglement);
-		 result.addAll(reglementRepo.findByRegclientAndStatus(clientRepo.findByLibelle(lib), ReglementStatus.Reglement_Affecte_Partiel));
-		 Collections.sort(result, Comparator.comparing(Reglement::getDatepayement)
-	                .thenComparing(Reglement::getIdR).reversed());
-		 return result;
+	public List<ClientAndReglement> DisplayAll(){
+		List<ClientAndReglement> result=new ArrayList<ClientAndReglement>();
+		 for (Reglement reglement : reglementRepo.findAll()) {
+				result.add(new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(),reglement));
+			}
+			 return  result;
 		
 	}
 	
-	public List<Reglement> DisplayReglemensNotAffected(){
+	
+	
+	public List<ClientAndReglement> DisplayClientReglement(String lib){
+		List<Reglement> result=new ArrayList<Reglement>();
+		List<ClientAndReglement> result1=new ArrayList<ClientAndReglement>();
+		result=reglementRepo.ReglementByClientandstatus(clientRepo.findByLibelle(lib).getIdU(), ReglementStatus.Reglement);
+		 result.addAll(reglementRepo.ReglementByClientandstatus(clientRepo.findByLibelle(lib).getIdU(), ReglementStatus.Reglement_Affecte_Partiel));
+		 Collections.sort(result, Comparator.comparing(Reglement::getDatepayement)
+	                .thenComparing(Reglement::getIdR).reversed());
+		 for (Reglement reglement : result) {
+			 result1.add(new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(),reglement));
+			}
+			 return  result1;
+		
+		
+	}
+	
+	
+	public List<ClientAndReglement> DisplayReglementByFacture(long idf){
+		
+		List<Reglement> result=new ArrayList<Reglement>();
+		List<ClientAndReglement> result1=new ArrayList<ClientAndReglement>();
+		Facture f=factureRepo.findById(idf).get();
+		long idu=f.getClient().getIdU();
+		if(f.getType()==TypeFacture.Export) {
+			
+			result=reglementRepo.ReglementByClientandstatus(idu, ReglementStatus.Reglement,ReglementType.Euro);
+			 result.addAll(reglementRepo.ReglementByClientandstatus(idu, ReglementStatus.Reglement_Affecte_Partiel,ReglementType.Euro));
+		}
+		else {
+			result=reglementRepo.ReglementByClientandstatus(idu, ReglementStatus.Reglement,ReglementType.TND);
+			 result.addAll(reglementRepo.ReglementByClientandstatus(idu, ReglementStatus.Reglement_Affecte_Partiel,ReglementType.TND));
+		}
+		
+		 Collections.sort(result, Comparator.comparing(Reglement::getDatepayement)
+	                .thenComparing(Reglement::getIdR).reversed());
+		 for (Reglement reglement : result) {
+			 result1.add(new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(),reglement));
+			}
+			 return  result1;
+		
+		
+	}
+	
+	
+	
+	public List<ClientAndReglement> DisplayReglemensNotAffected(){
+		List<ClientAndReglement> result1=new ArrayList<ClientAndReglement>();
 		List<Reglement> result=reglementRepo.findByStatus(ReglementStatus.Reglement);
 		result.addAll(reglementRepo.findByStatus(ReglementStatus.Reglement_Affecte_Partiel));
 		Collections.sort(result, Comparator.comparing(Reglement::getDatepayement)
                 .thenComparing(Reglement::getIdR).reversed());
-	 return result;
+		 for (Reglement reglement : reglementRepo.findAll()) {
+			 result1.add(new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(),reglement));
+			}
+			 return  result1;
+	
 	}
 	
 	@Transactional
@@ -142,8 +193,8 @@ public class ReglementService {
 			facture= factureRepo.save(facture);
 		}
 		for (int i=0;i<frr.getReglements().size();i++) {
-			if(frr.getReglements().get(i).getIdR() == idR) {
-				frr.getReglements().set(i, reglement);
+			if(frr.getReglements().get(i).getReglement().getIdR() == idR) {
+				frr.getReglements().set(i, new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(), reglement));
 			}
 		}
 		
@@ -188,8 +239,8 @@ public class ReglementService {
 			facture= factureRepo.save(facture);
 		}
 		for (int i=0;i<frr.getReglements().size();i++) {
-			if(frr.getReglements().get(i).getIdR() == idR) {
-				frr.getReglements().set(i, reglement);
+			if(frr.getReglements().get(i).getReglement().getIdR() == idR) {
+				frr.getReglements().set(i, new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(), reglement));
 			}
 		}
 		
@@ -436,13 +487,13 @@ public class ReglementService {
 	 }
 	 
 	 
-		public List<Reglement> updateReglement(ClientAndReglement reg) {
-			
+		public List<ClientAndReglement> updateReglement(ClientAndReglement reg) {
+			List<ClientAndReglement> result1=new ArrayList<ClientAndReglement>();
 			List<Reglement> result=new ArrayList<Reglement>();
 			reg.getReglement().setStatus(ReglementStatus.Reglement);
 			reg.getReglement().setMontantrestant(reg.getReglement().getMontant()-reg.getReglement().getFb());
 			
-			reg.getReglement().setRegclient(clientRepo.findById(reg.getReglement().getRegclient().getIdU()).get());
+			
 			 reglementRepo.save(reg.getReglement());
 			 
 			 
@@ -451,21 +502,29 @@ public class ReglementService {
 				 result.addAll(reglementRepo.findByStatus(ReglementStatus.Reglement_Affecte_Partiel));
 				 Collections.sort(result, Comparator.comparing(Reglement::getDatepayement)
 			                .thenComparing(Reglement::getIdR).reversed());
-				 return  result;
+
+				for (Reglement reglement : result) {
+							 result1.add(new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(),reglement));
+							}
+			 return  result1;
 			 }
 			 else {
-				 result=reglementRepo.findByRegclientAndStatus(clientRepo.findByLibelle(reg.getLib()), ReglementStatus.Reglement);
-				 result.addAll(reglementRepo.findByRegclientAndStatus(clientRepo.findByLibelle(reg.getLib()), ReglementStatus.Reglement_Affecte_Partiel));
+				 result=reglementRepo.ReglementByClientandstatus(clientRepo.findByLibelle(reg.getLib()).getIdU(), ReglementStatus.Reglement);
+				 result.addAll(reglementRepo.ReglementByClientandstatus(clientRepo.findByLibelle(reg.getLib()).getIdU(), ReglementStatus.Reglement_Affecte_Partiel));
 				 Collections.sort(result, Comparator.comparing(Reglement::getDatepayement)
 			                .thenComparing(Reglement::getIdR).reversed());
-				 return result;
+				 for (Reglement reglement : result) {
+					 result1.add(new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(),reglement));
+					}
+				 return  result1;
 			 }
 			
 		}
 		
 		
-		public List<Reglement> DeleteReglement(String lib,long id) {
+		public List<ClientAndReglement> DeleteReglement(String lib,long id) {
 			List<Reglement> result=new ArrayList<Reglement>();
+			List<ClientAndReglement> result1=new ArrayList<ClientAndReglement>();
 			
 			 reglementRepo.deleteById(id);
 			 if(lib.length() == 0) {
@@ -473,14 +532,20 @@ public class ReglementService {
 				 result.addAll(reglementRepo.findByStatus(ReglementStatus.Reglement_Affecte_Partiel));
 				 Collections.sort(result, Comparator.comparing(Reglement::getDatepayement)
 			                .thenComparing(Reglement::getIdR).reversed());
-				 return  result;
+				 for (Reglement reglement : result) {
+					 result1.add(new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(),reglement));
+					}
+				 return  result1;
 			 }
 			 else {
-				 result=reglementRepo.findByRegclientAndStatus(clientRepo.findByLibelle(lib), ReglementStatus.Reglement);
-				 result.addAll(reglementRepo.findByRegclientAndStatus(clientRepo.findByLibelle(lib), ReglementStatus.Reglement_Affecte_Partiel));
+				 result=reglementRepo.ReglementByClientandstatus(clientRepo.findByLibelle(lib).getIdU(), ReglementStatus.Reglement);
+				 result.addAll(reglementRepo.ReglementByClientandstatus(clientRepo.findByLibelle(lib).getIdU(), ReglementStatus.Reglement_Affecte_Partiel));
 				 Collections.sort(result, Comparator.comparing(Reglement::getDatepayement)
 			                .thenComparing(Reglement::getIdR).reversed());
-				 return result;
+				 for (Reglement reglement : result) {
+					 result1.add(new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(),reglement));
+					}
+				 return  result1;
 			 }
 			
 		}
