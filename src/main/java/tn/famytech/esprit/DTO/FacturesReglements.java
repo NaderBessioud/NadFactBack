@@ -13,7 +13,7 @@ import tn.famytech.esprit.Entites.Reglement;
 @Setter
 public class FacturesReglements {
 	
-	private List<Reglement> reglements;
+	private List<ClientAndReglement> reglements;
 	private List<Facture> factures;
 
 }
