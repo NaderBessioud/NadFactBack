@@ -145,8 +145,7 @@ public void logout( String email,HttpServletRequest request, HttpServletResponse
             if ("auth_token".equals(cookie.getName())) {
                 // Create a new cookie with the same name
                 Cookie deleteCookie = new Cookie("auth_token", null);
-                deleteCookie.setHttpOnly(true); // Ensure that the cookie is HTTP-only
-                deleteCookie.setSecure(true);  // Ensure that the cookie is sent over HTTPS
+              
                 deleteCookie.setPath(cookie.getPath()); // Use the same path as the original cookie
                 deleteCookie.setMaxAge(0);     // Set the maximum age to 0 to delete the cookie
 
