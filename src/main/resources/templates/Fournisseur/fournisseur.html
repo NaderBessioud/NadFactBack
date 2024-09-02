@@ -23,122 +23,39 @@
 		</div>
 		
 	</div>
-	<div class="card">
-    <div class="card-header">
-       <i class="menu-icon uil uil-user"></i> Liste des fournisseurs
-    </div>
-    <div class="rounded-rectangle">
-  
-    
-
-
-
-    <div class="inputs">
-	   <label style="color:white">Recherche:</label>  
-	   <input id="inputsearch" type="text" onkeyup="search()" style="margin-top: 7px;padding:0;margin-bottom: 7px;margin-left: 5px">
-   </div>
-    </div>
-    
-    
-    
-    
-  
-    
-    
-    
-   
-    
-    
-    <div class="card-body">
-    
-    
-    	<div class="row" id="facturetable">
-				<div class="col-md-12">
-					<div class="table-wrap">
-					<div class="table-responsive">
-						<table class="table" style="z-index: 1">
-						  <thead style="z-index: 2; position: relative; " class="table-dark">
-						    <tr>
-						    
-						    <th>Libelle</th>
-						      <th>Adresse</th>
-						      <th>Tel</th>
-						      <th>RIB</th>
-						      <th>Status</th>
-						      <th>&nbsp;</th>
-						    </tr>
-						  </thead>
-<tbody id="fourniseeurtablebody" style="position: relative; z-index: 1; opacity: 1; transition: opacity 1s ease-in-out; z-index: 1;">						    <tr  role="alert" th:each="four : ${fournisseurs}">
-						    	
-						      <td class="d-flex align-items-center">
-						      	<div class="img" th:style="'background-image: url(' + ${four.image} + ');'"></div>
-						      	<div class="pl-3 email">
-						      		<span th:text = "${four.libelle}" style="font-weight: bold"></span>
-						      		
-						      	</div>
-						      </td>
-						      <td th:text = "${four.addresse}"></td>
-						      <td th:text = "${four.tel}"></td>
-						      <td th:text = "${four.RIB}"></td>
-						      <td class="status" th:unless="${four.archived}"><span class="active">Active</span></td>
-						      <td class="status" th:if="${four.archived}"><span class="unactive">Archivé</span></td>
-						      <td>
-						      
-						     
-				          	
-						      	<button th:unless="${four.archived}" type="button" class="close"  aria-label="desarchiver" style="margin-left: 15px" th:onclick="'DesactiverFour(' + ${four.idF} + ')'">
-				            	<span aria-hidden="true"><i class="fa fa-close"></i></span>
-				          	</button>
-				          	
-				          	<button th:if="${four.archived}" type="button" class="open"  aria-label="Activer" style="margin-left: 15px" th:onclick="'activerFour(' + ${four.idF} + ')'">
-				            	<span aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-				            	
-				          	</button>
-				          	
-				          	 <button  type="button" class="update"  aria-label="Modifier"  th:onclick="'fourDetails(' + ${four.idF} + ')'">
-				            	<span aria-hidden="true"><i class="fa-solid fa-pen"></i></span>
-				          	</button>
-				        	</td>
-						    </tr>
-						   
-						    
-						    
-						    
-						  </tbody>
-						</table>
-						
-						</div>
-					</div>
-				</div>
-			</div>
 	
-	<div th:if = "${totalPages > 1}">
-		<div class="row col-sm-12">
-			<div class="col-sm-2" id="divrows" >
-				Total Rows : [[${totalItems}]]
-			</div>
-			<div class="col-auto" id="divnumbers">
-				<span th:each="i:${#numbers.sequence(1,totalPages)}">
-					<a th:if="${currentPage != i}" href="" th:onclick="'movePageination(event, ' + ${i} + ')'">[[${i}]]</a>
-					<span th:unless="${currentPage != i}">[[${i}]]</span> 
-					&nbsp;
-				 	&nbsp;
-				</span>
-			</div>
-			<div class="col-sm-1" id="divnext">
-				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${currentPage+1} + ')'">Next</a>
-				<span th:unless="${currentPage < totalPages}">Next</span>
-			</div>
-			<div class="col-sm-1"  id="divlast">
-				<a th:if="${currentPage < totalPages}" href="" th:onclick="'movePageination(event, ' + ${totalPages} + ')'">Last</a>
-				<span th:unless="${currentPage < totalPages}">Last</span>
-			</div>
-		
-		</div>
-		
+	<div class="container">
+  <div class="row" id="fourrow">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="four : ${fournisseurs}">
+      <div class="our-team">
+        <div class="picture">
+          <img class="img-fluid" th:src="${four.image}">
+        </div>
+        <div class="team-content">
+          <h3 class="name" th:text = "${four.libelle}"></h3>
+          <h4 class="title" th:text = "${four.tel}"></h4>
+        </div>
+        <ul class="social">
+        <li th:unless="${four.archived}"><a href="" class="fa fa-close" aria-hidden="true" th:onclick="'DesactiverFour(' + ${four.idF} + ', event)'"></a></li>
+          <li th:if="${four.archived}"><a href="" class="fa-solid fa-check" aria-hidden="true" th:onclick="'activerFour(' + ${four.idF} + ', event)'"></a></li>
+          <li><a href="" class="fa-solid fa-pen" aria-hidden="true" th:onclick="'fourDetails(' + ${four.idF} + ', event)'"></a></li>
+        </ul>
+      </div>
     </div>
+    
+
+    
+    
+    
+  
+    
+     
+    
+     
+  </div>
 </div>
-</div>
+	
+	
 </div>
 
 <!-- Modal -->
@@ -330,22 +247,24 @@ console.log(name)
 		 alert.classList.remove("show");
 	}
   async function updateFournisseurTable(fournisseurs) {
-	    var tableBody = document.getElementById('fourniseeurtablebody');
-	    var backgroundDiv = document.getElementById('backgroundDiv');
+	  
+	  var rowDiv = document.getElementById('fourrow');
+	    
 
 	    // Masquer le contenu avec une transition d'opacité
-	    tableBody.style.opacity = 0;
+	    rowDiv.style.opacity = 0;
+	   
+	  	rowDiv.innerHTML = ''; 
+	  
 
-	    setTimeout(async function() {
-	        // Vider le tableau
-	        tableBody.innerHTML = '';
+	  
+	      
 
 	        // Ajouter de nouvelles lignes
 	        for (var i = 0; i < fournisseurs.length; i++) {
-	            var four = fournisseurs[i];
-	            var newRow = tableBody.insertRow(tableBody.rows.length);
-
-	            const response = await fetch('/ERPPro/home/downloadImage?name=' + four.image, {
+		        console.log(i)
+		        var four=fournisseurs[i]
+		        const response = await fetch('/ERPPro/home/downloadImage?name=' + four.image, {
 	                method: 'GET',
 	                headers: {
 	                    'Authorization': `Bearer ${token}`
@@ -354,83 +273,95 @@ console.log(name)
 	                console.error('Error downloading file:', error);
 	            });
 
-	            const img = await response.text();
+	            const imgf = await response.text();
+	        	const colDiv = document.createElement('div');
+	            colDiv.className = 'col-12 col-sm-6 col-md-4 col-lg-3';
 
-	            // Remplir les cellules avec les détails du fournisseur
-	            var libelleCell = newRow.insertCell(0);
-	            libelleCell.classList.add('d-flex', 'align-items-center');
-	            libelleCell.innerHTML = `
-	                <div class="img" style="background-image: url('${img}');"></div>
-	                <div class="pl-3 email">
-	                    <span>${four.libelle}</span>
-	                </div>
-	            `;
+	            // Create the 'our-team' div
+	            const ourTeamDiv = document.createElement('div');
+	            ourTeamDiv.className = 'our-team';
 
-	            var addresseCell = newRow.insertCell(1);
-	            addresseCell.innerHTML = four.addresse;
+	            // Create the 'picture' div and the img inside it
+	            const pictureDiv = document.createElement('div');
+	            pictureDiv.className = 'picture';
+	            const img = document.createElement('img');
+	            img.className = 'img-fluid';
+	            img.src = imgf; // Set image source
+	            pictureDiv.appendChild(img);
 
-	            var telCell = newRow.insertCell(2);
-	            telCell.innerHTML = four.tel;
+	            // Create the 'team-content' div with name and title
+	            const teamContentDiv = document.createElement('div');
+	            teamContentDiv.className = 'team-content';
 
-	            var ribCell = newRow.insertCell(3);
-	            ribCell.innerHTML = four.rib;
+	            const nameH3 = document.createElement('h3');
+	            nameH3.className = 'name';
+	            nameH3.textContent = four.libelle; // Set libelle text
 
-	            var statusCell = newRow.insertCell(4);
-	            statusCell.classList.add('status');
+	            const titleH4 = document.createElement('h4');
+	            titleH4.className = 'title';
+	            titleH4.textContent = four.tel; // Set tel text
 
-	            var actionCell = newRow.insertCell(5);
+	            teamContentDiv.appendChild(nameH3);
+	            teamContentDiv.appendChild(titleH4);
 
-	            if (four.archived) {
-	                statusCell.innerHTML = `<span class="unactive">Archive</span>`;
-	                
-	                var activateButton = document.createElement('button');
-	                activateButton.type = 'button';
-	                activateButton.className = 'open';
-	                activateButton.ariaLabel = 'Activer';
-	                activateButton.style.marginLeft = '15px';
-	                activateButton.innerHTML = '<span aria-hidden="true"><i class="fa-solid fa-check"></i></span>';
-	                activateButton.onclick = function() {
-	                    activerFour(four.idF);
+	            // Create the 'social' ul
+	            const socialUl = document.createElement('ul');
+	            socialUl.className = 'social';
+
+	            // Create list items (li) and links (a)
+	            if (!four.archived) {
+	                const deactivateLi = document.createElement('li');
+	                const deactivateA = document.createElement('a');
+	                deactivateA.href = '';
+	                deactivateA.className = 'fa fa-close';
+	                deactivateA.setAttribute('aria-hidden', 'true');
+	                deactivateA.onclick = function(event) {
+	                    event.preventDefault();
+	                    DesactiverFour(four.idF, event);
 	                };
-
-	                var updateButton = document.createElement('button');
-	                updateButton.type = 'button';
-	                updateButton.className = 'update';
-	                updateButton.ariaLabel = 'Modifier';
-	                updateButton.innerHTML = '<span aria-hidden="true"><i class="fa-solid fa-pen"></i></span>';
-	                updateButton.onclick = function() {
-	                    fourDetails(four.idF);
-	                };
-	                actionCell.appendChild(activateButton);
-	                actionCell.appendChild(updateButton);
+	                deactivateLi.appendChild(deactivateA);
+	                socialUl.appendChild(deactivateLi);
 	            } else {
-	                statusCell.innerHTML = `<span class="active">Active</span>`;
-	                var archiveButton = document.createElement('button');
-	                archiveButton.type = 'button';
-	                archiveButton.className = 'close';
-	                archiveButton.ariaLabel = 'archiver';
-	                archiveButton.style.marginLeft = '15px';
-	                archiveButton.innerHTML = '<span aria-hidden="true"><i class="fa fa-close"></i></span>';
-	                archiveButton.onclick = function() {
-	                    DesactiverFour(four.idF);
+	                const activateLi = document.createElement('li');
+	                const activateA = document.createElement('a');
+	                activateA.href = '';
+	                activateA.className = 'fa-solid fa-check';
+	                activateA.setAttribute('aria-hidden', 'true');
+	                activateA.onclick = function(event) {
+	                    event.preventDefault();
+	                    activerFour(four.idF, event);
 	                };
-
-	                var updateButton = document.createElement('button');
-	                updateButton.type = 'button';
-	                updateButton.className = 'update';
-	                updateButton.ariaLabel = 'Modifier';
-	                updateButton.innerHTML = '<span aria-hidden="true"><i class="fa-solid fa-pen"></i></span>';
-	                updateButton.onclick = function() {
-	                    fourDetails(four.idF);
-	                };
-	                actionCell.appendChild(archiveButton);
-	                actionCell.appendChild(updateButton);
+	                activateLi.appendChild(activateA);
+	                socialUl.appendChild(activateLi);
 	            }
+
+	            const editLi = document.createElement('li');
+	            const editA = document.createElement('a');
+	            editA.href = '';
+	            editA.className = 'fa-solid fa-pen';
+	            editA.setAttribute('aria-hidden', 'true');
+	            editA.onclick = function(event) {
+	                event.preventDefault();
+	                fourDetails(four.idF, event);
+	            };
+	            editLi.appendChild(editA);
+	            socialUl.appendChild(editLi);
+
+	            // Assemble the card
+	            ourTeamDiv.appendChild(pictureDiv);
+	            ourTeamDiv.appendChild(teamContentDiv);
+	            ourTeamDiv.appendChild(socialUl);
+	            colDiv.appendChild(ourTeamDiv);
+	            rowDiv.appendChild(colDiv)
 	        }
 
-	        // Afficher le contenu du `tbody` avec une transition d'opacité
-	        tableBody.style.opacity = 1;
-	    }, 1000); // Délai pour correspondre à la durée de la transition
+	        rowDiv.addEventListener('transitionend', function() {
+	      	  rowDiv.style.transition = '';
+	      	}, { once: true });
+	        setTimeout(function() {
+	      	  rowDiv.style.cssText = 'opacity: 1; transition: opacity 1s ease-in-out;';
+	      	}, 100);
+	     // Délai pour correspondre à la durée de la transition
 	}
 
   
@@ -538,8 +469,8 @@ function updateFournisseur(e,id){
 	}
 
 
-function fourDetails(id){
-	
+function fourDetails(id,event){
+	 event.preventDefault();
 	fetch('/ERPPro/user/FourById/'+id, {
         method: 'GET',
         headers: {
@@ -591,8 +522,8 @@ function uploadFile() {
     });
 }
 
-function activerFour(id){
-	console.log("heerrre")
+function activerFour(id,event){
+	 event.preventDefault();
 	 fetch('/ERPPro/user/ActiverFour/'+id, {
 	        method: 'PUT',
 	        headers: {
@@ -612,8 +543,8 @@ function activerFour(id){
 }
 
 
-function DesactiverFour(id){
-	
+function DesactiverFour(id,event){
+	 event.preventDefault();
 	 fetch('/ERPPro/user/DesactiverFour/'+id, {
 	        method: 'PUT',
 	        headers: {
