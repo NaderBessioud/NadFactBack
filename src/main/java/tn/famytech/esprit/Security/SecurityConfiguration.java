@@ -82,6 +82,8 @@ public class SecurityConfiguration {
 		
 		http.csrf().disable().cors(getcorss()).authorizeHttpRequests(request -> request.requestMatchers("/css/**").permitAll()
 	            .requestMatchers("/js/**").permitAll()
+		    .requestMatchers("/assets/**").permitAll()
+	            .requestMatchers("/home/**").permitAll()
 				.requestMatchers("/admin").hasAnyAuthority(UserType.Admin.name())
 				.requestMatchers("/user").hasAnyAuthority(UserType.Employee.name(),UserType.Manager.name(),UserType.Admin.name())
 				.requestMatchers("/client").hasAnyAuthority(UserType.Client.name())
@@ -89,8 +91,8 @@ public class SecurityConfiguration {
 
 				
 				
-				.requestMatchers("/home/**").permitAll()
-				.requestMatchers("/**").permitAll()
+				
+				
 				.anyRequest().authenticated())
 				
 				.sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
