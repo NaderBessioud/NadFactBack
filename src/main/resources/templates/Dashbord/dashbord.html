@@ -1528,12 +1528,12 @@ jQuery(document).ready(function ($) {
 	const currentDate = new Date();
 
 	// Get the current month (0-11) and add 1 (1-12)
-	const currentMonth = currentDate.getMonth();
+	const currentMonth = currentDate.getMonth()+ 1;
 
 	// Convert the month to a two-digit string
 	const formattedMonth = currentMonth < 10 ? '0' + currentMonth : currentMonth.toString();
 	const currentYear = new Date().getFullYear();
-	var month=monthNamesFrench[currentMonth]
+	var month=monthNamesFrench[currentMonth-1]
 	document.getElementById('bdaymonth').value=currentYear+"-"+formattedMonth
 
 	document.getElementById('datetext').textContent="1 "+month+" "+currentYear+"-28 "+month+" "+currentYear
