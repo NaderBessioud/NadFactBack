@@ -144,7 +144,7 @@ public class AvoirService {
 		avoir.setStatus(AvoirStatus.Avoir);
 		avoir= avoirRepo.save(avoir);
 		facture.getAvoirs().add(avoir);
-		
+		facture.setTotalrestant(facture.getTotalrestant()-avoir.getMontant());
 		factureRepo.save(facture);
 		Facture profoma=factureRepo.findByNumberAndStatus(facture.getRef(),FactureStatus.Proforma_envoyee_validee);
 		profoma.setTraited(false);
