@@ -4,7 +4,7 @@ package tn.famytech.esprit.Services;
 import java.io.BufferedReader;
 
 import java.io.ByteArrayOutputStream;
-
+import java.io.OutputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
