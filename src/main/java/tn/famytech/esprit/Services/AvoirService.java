@@ -146,6 +146,38 @@ public class AvoirService {
 		
 		
 	}
+
+	public Image downloadAndUseImage() {
+		  
+		   
+		String localFilePath = "/opt/images/famytech.png";
+	    FTPClient ftpClient = new FTPClient();
+
+	    try {
+	    	 ftpClient.connect("192.168.1.21", 21);
+	         ftpClient.login("ftp-user", "ftpuser");
+	        ftpClient.enterLocalPassiveMode();
+
+	        try (OutputStream outputStream = new FileOutputStream(localFilePath)) {
+	            boolean success = ftpClient.retrieveFile("famytech.png", outputStream);
+	            if (success) {
+	                System.out.println("Image downloaded successfully.");
+	            } else {
+	                System.out.println("Failed to download the image.");
+	            }
+	        }
+
+	        ftpClient.logout();
+	        ftpClient.disconnect();
+
+	        // Use the downloaded image in your PDF
+	        return Image.getInstance(localFilePath);
+
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	        return null;
+	    }
+	}
 	
 	public  String convertToWords(int number) {
         if (number == 0) {
@@ -391,7 +423,7 @@ public class AvoirService {
 
 	           // Add image to the first cell
 	           
-	           com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance("C:\\Users\\ASUS\\Desktop\\workspace\\famytech.png"); // Provide the correct path
+	           com.itextpdf.text.Image image = downloadAndUseImage();
 	           image.scaleAbsoluteWidth(230f);
 	           image.scaleAbsoluteHeight(100f);
 	         
@@ -608,7 +640,7 @@ public class AvoirService {
 
 	           // Add image to the first cell
 	           
-	           com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance("C:\\Users\\ASUS\\Desktop\\workspace\\famytech.png"); // Provide the correct path
+	           com.itextpdf.text.Image image = downloadAndUseImage();
 	           image.scaleAbsoluteWidth(230f);
 	           image.scaleAbsoluteHeight(100f);
 	         
@@ -920,7 +952,7 @@ public class AvoirService {
 
 	           // Add image to the first cell
 	           
-	           com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance("C:\\Users\\ASUS\\Desktop\\workspace\\famytech.png"); // Provide the correct path
+	           com.itextpdf.text.Image image =downloadAndUseImage();
 	           image.scaleAbsoluteWidth(230f);
 	           image.scaleAbsoluteHeight(100f);
 	         
@@ -1141,7 +1173,7 @@ public class AvoirService {
 
 	           // Add image to the first cell
 	           
-	           com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance("C:\\Users\\ASUS\\Desktop\\workspace\\famytech.png"); // Provide the correct path
+	           com.itextpdf.text.Image image = downloadAndUseImage();
 	           image.scaleAbsoluteWidth(230f);
 	           image.scaleAbsoluteHeight(100f);
 	         
