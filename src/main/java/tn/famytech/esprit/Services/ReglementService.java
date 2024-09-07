@@ -298,7 +298,9 @@ public class ReglementService {
 		     double result=reglementRepo.TotalYear(year, ReglementType.Euro) .stream()
 	        .mapToDouble(Double::doubleValue).sum();
 		     result=result*cours;
-		     
+		    double resulttnd=reglementRepo.TotalYear(year, ReglementType.TND) .stream()
+		 	        .mapToDouble(Double::doubleValue).sum();
+		     result+=resulttnd;  
 	   	return result ;
 	   }
 	 
