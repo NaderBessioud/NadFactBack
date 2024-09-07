@@ -82,13 +82,14 @@ public class SecurityConfiguration {
 		
 		http.csrf().disable().cors(getcorss()).authorizeHttpRequests(request -> request.requestMatchers("/css/**").permitAll()
 	            .requestMatchers("/js/**").permitAll()
+		    .requestMatchers("/vendors/**").permitAll()
 		    .requestMatchers("/assets/**").permitAll()
 		    .requestMatchers("/images/**").permitAll()
 	            .requestMatchers("/home/**").permitAll()
-				.requestMatchers("/admin").hasAnyAuthority(UserType.Admin.name())
-				.requestMatchers("/user").hasAnyAuthority(UserType.Employee.name(),UserType.Manager.name(),UserType.Admin.name())
-				.requestMatchers("/client").hasAnyAuthority(UserType.Client.name())
-				.requestMatchers("/chat").hasAnyAuthority(UserType.Employee.name(),UserType.Manager.name(),UserType.Admin.name(),UserType.Client.name())
+				.requestMatchers("/admin/**").hasAnyAuthority(UserType.Admin.name())
+				.requestMatchers("/user/**").hasAnyAuthority(UserType.Employee.name(),UserType.Manager.name(),UserType.Admin.name())
+				.requestMatchers("/client/**").hasAnyAuthority(UserType.Client.name())
+				.requestMatchers("/chat/**").hasAnyAuthority(UserType.Employee.name(),UserType.Manager.name(),UserType.Admin.name(),UserType.Client.name())
 
 				
 				
