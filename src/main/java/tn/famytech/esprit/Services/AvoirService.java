@@ -1574,7 +1574,7 @@ public class AvoirService {
 	    		else
 	    			outputStream=generateAvoirAfterSign(avoir);
 	    		
-	    		 String keystorePath = "C:\\Users\\ASUS\\Desktop\\PFE_Work\\"+name.toLowerCase()+"_"+lastname.toLowerCase()+"\\ca\\keystore.p12";
+	    		 String keystorePath = "/opt/certificates/"+name.toLowerCase()+"_"+lastname.toLowerCase()+"/ca/keystore.p12";
 	             String keystorePassword = "ca_p12_password_"+name.toLowerCase()+lastname.toLowerCase();
 	             KeyStore keystore = KeyStore.getInstance("PKCS12");
 	             keystore.load(new FileInputStream(keystorePath), keystorePassword.toCharArray());
