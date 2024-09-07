@@ -769,7 +769,8 @@ input {
 
 .text-container {
   margin-left: 2px; /* Espace fixe entre l'image et le texte */
-  margin-top: 4px
+  margin-top: 4px;
+white-space: nowrap;
 }
 
 
