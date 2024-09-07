@@ -768,7 +768,7 @@ input {
 }
 
 .text-container {
-  margin-left: 10px; /* Espace fixe entre l'image et le texte */
+  margin-left: 2px; /* Espace fixe entre l'image et le texte */
   margin-top: 4px
 }
 
