@@ -1442,7 +1442,7 @@ public class UserController {
 				return  blService.createBonLivraison(id,bl,depreal);
 			}
 			
-			@GetMapping("/DemandeFromDevis")
+			@PostMapping("/DemandeFromDevis")
 			@ResponseBody
 			public DemandeDepense getStringFromImage(@RequestParam("imageDevis") MultipartFile image) throws TesseractException, IOException, InterruptedException  {
 				
