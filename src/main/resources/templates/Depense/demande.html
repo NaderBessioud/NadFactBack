@@ -126,12 +126,20 @@
 	        body: formData
 	       
 	    })
-	    .then(response => response.text())
+	    .then(response => response.json())
 	    .then(data => {
 	       
-	        document.getElementById('montant').value =data.montant
-	        document.getElementById('fournisseur').value =data.fournisseur.idF
-	        document.getElementById('motif').value =data.motif
+	        if(data.budget != null){
+	    	   document.getElementById('montant').value =data.budget
+		       }
+
+	        if(data.fournisseur != null){
+		        document.getElementById('fournisseur').value =data.fournisseur.idF
+		        
+		        }
+	        if(data.motif != null){
+	        	 document.getElementById('motif').value =data.motif
+		        }
 	    })
 	    .catch(error => {
 	        console.error('Error downloading file:', error);
