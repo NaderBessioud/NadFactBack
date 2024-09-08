@@ -1,13 +1,14 @@
 # Use the OpenJDK 17 Alpine base image
 FROM openjdk:17-jdk-alpine
 
-# Install Tesseract and its dependencies
+# Install Tesseract, its dependencies, and OpenSSL
 RUN apk update && \
     apk add --no-cache \
     tesseract-ocr \
     tesseract-ocr-data \
     leptonica-dev \
-    && rm -rf /var/cache/apk/*
+    openssl && \
+    rm -rf /var/cache/apk/*
 
 # Create necessary directories
 RUN mkdir -p /opt/certificates /opt/images
