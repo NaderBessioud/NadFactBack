@@ -224,13 +224,22 @@ public class DemandeDepenseService {
     	 }}
 
          // Variable to track if we are capturing lines
-         boolean captureLines = false;
+         // boolean captureLines = false;
 
          // Iterate through the lines
         for (int i = 0; i < lines.length; i++) {
+        	 for (int i = 0; i < lines.length; i++) {
         	
+        	long count = lines[i].chars()
+                    .filter(ch -> ch == '€')
+                    .count();
+        	
+        	if(count >1) {
+        		res.add(getProductElement(lines[i]));
+        		
+        	}	
              // Check if the line contains "Description"
-             if (lines[i].contains("Description")) {
+            /* if (lines[i].contains("Description")) {
                  captureLines = true; // Start capturing lines after this line
                  continue; // Skip processing this line
              }
@@ -247,7 +256,7 @@ public class DemandeDepenseService {
                  
                  res.add(getProductElement(lines[i]));
              }
-             
+             */
             
          }
          demande.setBudget(montant);
@@ -319,7 +328,15 @@ public class DemandeDepenseService {
        }
     
     private String getFournisseurLibelle(String text) {
-    	int index = text.indexOf("Devis");
+    	int index=0;
+    	if(text.contains("DEVIS")) {
+    		 index = text.indexOf("DEVIS");
+    	}
+    	else if(text.contains("Devis")) {
+    		 index = text.indexOf("Devis");
+    	}
+    	else {
+    		index=text.length()+1;    	}
     	String result="";
     	if(index != -1) {
     		 int endIndex = index - 1;
