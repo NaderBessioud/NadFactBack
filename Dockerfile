@@ -1,6 +1,6 @@
 FROM openjdk:17-jdk-alpine
 RUN apk update && \
-    apk add --no-cache openssl
+    apk add --no-cache openssl tesseract-ocr tesseract-ocr-dev
 RUN mkdir -p /opt/certificates
 RUN mkdir -p /opt/images
 ARG JAR_FILE=target/*.jar
