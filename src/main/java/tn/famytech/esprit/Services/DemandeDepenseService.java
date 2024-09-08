@@ -228,7 +228,7 @@ public class DemandeDepenseService {
 
          // Iterate through the lines
         for (int i = 0; i < lines.length; i++) {
-        	 for (int i = 0; i < lines.length; i++) {
+        	 
         	
         	long count = lines[i].chars()
                     .filter(ch -> ch == '€')
