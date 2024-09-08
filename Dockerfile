@@ -6,6 +6,7 @@ RUN apk update && \
     apk add --no-cache \
     tesseract-ocr \
     tesseract-ocr-data \
+    libtesseract-dev \
     leptonica-dev \
     openssl && \
     rm -rf /var/cache/apk/*
