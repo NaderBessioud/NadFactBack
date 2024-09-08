@@ -1,27 +1,14 @@
-# Use a base image with Java (OpenJDK 17 in this case)
-FROM openjdk:17-jdk-slim
+FROM openjdk:17-jdk-alpine
 
-# Install required packages and Tesseract OCR
-RUN apt-get update && \
-    apt-get install -y \
-    tesseract-ocr \
-    libtesseract-dev \
-    openssl \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Update and install necessary packages, including Tesseract
+RUN apk update && \
+    apk add --no-cache openssl tesseract-ocr tesseract-ocr-dev
 
-# Create directories for certificates and images
-RUN mkdir -p /opt/certificates \
-    && mkdir -p /opt/images
+RUN mkdir -p /opt/certificates
+RUN mkdir -p /opt/images
 
-# Copy your application JAR and other necessary files
-COPY nadfact.jar /app/nadfact.jar
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} nadfact.jar
 
-# Set the working directory
-WORKDIR /app
-
-# Expose the port on which the application will run
+ENTRYPOINT ["java","-jar","/nadfact.jar"]
 EXPOSE 8082
-
-# Define the entry point for the container
-ENTRYPOINT ["java", "-jar", "nadfact.jar"]
