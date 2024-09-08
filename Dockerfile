@@ -1,28 +1,27 @@
-# Use the OpenJDK 17 Alpine base image
-FROM openjdk:17-jdk-alpine
+# Use a base image with Java (OpenJDK 17 in this case)
+FROM openjdk:17-jdk-slim
 
-# Install Tesseract, its dependencies, and OpenSSL
-RUN apk update && \
-    apk add --no-cache \
+# Install required packages and Tesseract OCR
+RUN apt-get update && \
+    apt-get install -y \
     tesseract-ocr \
-    tesseract-ocr-data \
     libtesseract-dev \
-    leptonica-dev \
-    openssl && \
-    rm -rf /var/cache/apk/*
+    openssl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create necessary directories
-RUN mkdir -p /opt/certificates /opt/images
+# Create directories for certificates and images
+RUN mkdir -p /opt/certificates \
+    && mkdir -p /opt/images
 
-# Set the environment variable for Tesseract
-ENV TESSDATA_PREFIX=/usr/share/tessdata
+# Copy your application JAR and other necessary files
+COPY nadfact.jar /app/nadfact.jar
 
-# Copy your Spring Boot application jar file
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} nadfact.jar
+# Set the working directory
+WORKDIR /app
 
-# Expose the port your Spring Boot app runs on
+# Expose the port on which the application will run
 EXPOSE 8082
 
-# Run the Spring Boot application
-ENTRYPOINT ["java", "-jar", "/nadfact.jar"]
+# Define the entry point for the container
+ENTRYPOINT ["java", "-jar", "nadfact.jar"]
