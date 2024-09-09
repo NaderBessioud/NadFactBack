@@ -45,6 +45,7 @@ public class BLService {
 		dep.setMontant(bc.getMontant());
 		dep.setBlss(bl);
 		dep.setDate(bl.getDate());
+		dep.setTypepay(bl.getTypepay());
 		dep=deprelrep.save(dep);
 		bl.setDepreal(dep);
 		blRepo.save(bl);
