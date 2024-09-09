@@ -36,7 +36,7 @@ public class BonLivraison implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long idBL;
 	private String addresse;
-	
+	private TypePayment typepay;
 	@Temporal(TemporalType.DATE)
 	private Date date;
 	
