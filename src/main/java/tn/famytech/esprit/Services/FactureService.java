@@ -4060,7 +4060,17 @@ List<Facture> result = new ArrayList<Facture>();
     	
     }
     
-    
+     public List<Facture> getFacturePayed(){
+    	List<Facture> result=factureRepo.findByPayementstatus(FacturePayementStatus.Paye);
+    	result.addAll(factureRepo.findByPayementstatus(FacturePayementStatus.Paye_Partiel));
+    	for(int i=0;i<result.size();i++) {
+    		if(result.get(i).getRetenuepath() == null || result.get(i).getRetenuepath() == "") {
+    			result.remove(i);
+    		}
+    	}
+    	Collections.sort(result, Comparator.comparing(Facture::getNumber).reversed());
+    	return result;
+    			}
     
    
    
