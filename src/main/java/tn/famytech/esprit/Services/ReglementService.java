@@ -149,7 +149,7 @@ public class ReglementService {
 		result.addAll(reglementRepo.findByStatus(ReglementStatus.Reglement_Affecte_Partiel));
 		Collections.sort(result, Comparator.comparing(Reglement::getDatepayement)
                 .thenComparing(Reglement::getIdR).reversed());
-		 for (Reglement reglement : reglementRepo.findAll()) {
+		 for (Reglement reglement : result) {
 			 result1.add(new ClientAndReglement(clientRepo.findById(reglement.getIdc()).get().getLibelle(),reglement));
 			}
 			 return  result1;
