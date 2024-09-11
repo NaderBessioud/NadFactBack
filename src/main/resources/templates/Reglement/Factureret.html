@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="home">
+<head>
+<meta charset="UTF-8">
+<title>Users</title>
+<link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+<link rel="stylesheet" href="/ERPPro/css/Userlist.css">
+  <link rel=" shortcut icon" type="image/png" href="/ERPPro/images/logo2.png">
+
+
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+	
+	
+	<div class="row" style="display: flex;margin-top: 20px">
+	<h3>Retenues</h3>
+
+
+
+
+
+
+	</div>
+	<div class="card">
+    <div class="card-header">
+        Liste des retenues
+    </div>
+  
+    
+    
+    
+    
+   
+    
+    
+    
+   
+    
+    
+    <div class="card-body">
+    
+     
+       <table class="table table-striped table-bordered" id="usertable">
+		<thead class="table-dark">
+			<tr>
+				<th>Nombre</th>
+				<th>Date creation</th>
+				<th>Type</th>
+				
+				<th>Etat</th>
+				<th>Action</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each = "fact : ${factures}">
+				
+				<td th:text="${fact.number}">
+			
+				</td>
+				
+				<td th:text="${#dates.format(fact.dateemission, 'yyyy/MM/dd')}"></td>
+				
+				<td th:text="${fact.type.toString()}"></td>
+				<td th:text = "${fact.payementstatus.toString()}"></td>
+				
+				<td>
+	
+					<button th:if="${fact.retenuepath != null && @fileUtils.getFileExtension(fact.retenuepath) == 'pdf'}" th:onclick="'FacturePDF(' + ${fact.idF} + ')'" class="btnpreview"><i class="fa-solid fa-file-invoice"></i>Retenue</button>
+					<button th:if="${fact.retenuepath != null && @fileUtils.getFileExtension(fact.retenuepath) != 'pdf'}" th:onclick="'FactureJPG(' + ${fact.idF} + ')'" class="btnpreview"><i class="fa-solid fa-file-invoice"></i>Retenue</button>
+				</td>
+				
+				
+				
+			</tr>
+			
+		</tbody>
+	
+	</table>
+	
+	
+</div>
+</div>
+</div>
+
+
+<script
+  src="https://code.jquery.com/jquery-3.6.4.js"
+  integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+  crossorigin="anonymous"></script>
+  
+<script>
+function hideCustomAlert(){
+	 const alert = document.querySelector(".alert");
+	 alert.classList.remove("show");
+}</script>
+  
+  <script>
+  var token=sessionStorage.getItem('token');
+
+
+  function FacturePDF(id){
+	   fetch('/ERPPro/user/FactureRetPDF/'+id, {
+          method: 'GET',
+          headers: {
+       	 	 'Authorization': `Bearer ${token}`
+       	 	    },             
+      })
+      .then(response => response.blob())
+      .then(blob => {
+          const pdfUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          
+          a.href = pdfUrl;
+          a.download = 'FactureRet' + id + '.pdf';
+
+          document.body.appendChild(a);
+
+          a.click();
+
+          document.body.removeChild(a);
+
+      });
+   }
+
+function FactureJPG(id){
+   fetch('/ERPPro/user/FactureRetJPG/'+id, {
+       method: 'GET',
+       headers: {
+    	 	 'Authorization': `Bearer ${token}`
+    	 	    },             
+   })
+   .then(response => response.blob())
+   .then(blob => {
+   	  const url = window.URL.createObjectURL(blob);
+         const a = document.createElement('a');
+         a.href = url;
+         a.download = 'FactureRet' + id + '.jpg';
+         document.body.appendChild(a);
+         a.click();
+         document.body.removeChild(a);
+       
+      
+     
+
+    
+
+   });
+}
+
+
+
+
+  
+  
+
+
+
+  </script>
+
+  
+
+<script>
+function ClearFilters(list){
+	updatePag(1)
+	
+}
+
+</script>
+   
+
+
+
+ 
+    
+  
+    
+    <script th:inline="javascript">
+jQuery(document).ready(function ($) {
+	/*<![CDATA[*/
+	// var factureList = /*[[${users}]]*/ null;
+	 var usersList = /*[[${Allfactures}]]*/ null;
+	 window.usersList = usersList;
+	
+	
+	 
+	    /*]]>*/
+
+	    
+	  
+	
+
+	 
+	
+})
+</script>
+
+
+
+
+
+
+
+<script>
+  $(document).ready(function() {
+
+	  if(sessionStorage.getItem("email") ==null){
+	  		window.location.href = '/ERPPro/home/login'
+	  		}
+	  	else{
+	  		fetch('/ERPPro/home/getUserType?email='+sessionStorage.getItem("email"), {
+	  	        method: 'GET',
+	  	     
+	  	       
+	  	    })
+	  	    .then(response => response.text())
+	  	    .then(data => {
+	  	       
+	  	        if(data !="Admin" &&  data !="Manager" &&  data !="Employee"){
+	  	    
+
+	  	        	window.location.href = '/ERPPro/home/login'
+	  	           
+	  	            }
+	  	     
+	  	    })
+	  		}
+    $('#exampleModalScrollable').on('hide.bs.modal', function(e) {
+      $('.modal-backdrop').remove(); // Remove the modal backdrop
+    });
+
+    $('#exampleModalScrollable').on('show.bs.modal', function (e) {
+    	  // Your function here
+    	  image ="anonymous.png";
+ 		downloadImage(image)
+    	  console.log('Modal is being shown');
+    	  // You can execute any other JavaScript code you want here
+    	});
+
+
+  });
+</script>
+	
+
+ 
+    
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+	
+	
+	
+	
+
+
+</body>
+</html>
