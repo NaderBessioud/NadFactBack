@@ -821,7 +821,7 @@ function hideCustomAlert(){
     		    formData.append('imageFile', file);
 
     		    // Perform an asynchronous request (e.g., using Fetch API or XMLHttpRequest)
-    		    fetch('/ERPPro/home/uploadFile', {
+    		    fetch('/ERPPro/home/uploadImage', {
     		        method: 'POST',
     		        headers: {
     		        	 'Authorization': `Bearer ${token}`
@@ -850,6 +850,9 @@ function hideCustomAlert(){
     	    				  updateReglementList(data1.reglements);
     	    	 			updateInvoiceList(data1.factures);
     	    	 			filterItems(document.getElementById("selectlib").textContent);
+				    	idRS=0;
+    	    	 			idFS=0
+    	    	 	    	uploadedFile=null;
         	    			  
         	    		  })
     		    })
@@ -879,12 +882,12 @@ function hideCustomAlert(){
  				 updateReglementList(data1.reglements);
  				updateInvoiceList(data1.factures);
  				 filterItems(document.getElementById("selectlib").textContent);
+		 idRS=0;
+    	    	 			idFS=0
 	    			  })
 	    		  
         	}
-    		idRS=0;
-    		idFS=0
-    	uploadedFile=null;
+    		
     	$("#RetenueModal").modal('hide');
     	 const invoiceItems = document.querySelectorAll('#invoicesList li');
     	  invoiceItems.forEach(item => {
