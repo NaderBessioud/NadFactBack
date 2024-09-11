@@ -1679,7 +1679,23 @@ public class UserController {
 			 }
 			
 			
-			
+			@GetMapping("/factureret")
+				public String displayRetenues(Model model) throws IOException {
+					List<Facture> factures=factureService.getFacturePayed();
+					
+					
+					 int pageSize = 5;
+			    	 Page<Facture> page = factureService.findPaginated(1, pageSize,factures);
+					
+			    	 model.addAttribute("currentPage", 1);
+			    	 model.addAttribute("totalPages", page.getTotalPages());
+			    	 model.addAttribute("totalItems", page.getTotalElements());
+			    	 model.addAttribute("factures", page.getContent());
+			    	 model.addAttribute("Allfactures", factures);
+					 model.addAttribute("activelink", "retenues");
+					
+					return "Reglement/Factureret";		
+				}
 			
 			
 			
