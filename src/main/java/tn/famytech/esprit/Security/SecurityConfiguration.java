@@ -86,10 +86,11 @@ public class SecurityConfiguration {
 		    .requestMatchers("/assets/**").permitAll()
 		    .requestMatchers("/images/**").permitAll()
 	            .requestMatchers("/home/**").permitAll()
-				.requestMatchers("/admin/**").hasAnyAuthority(UserType.Admin.name())
-				.requestMatchers("/user/**").hasAnyAuthority(UserType.Employee.name(),UserType.Manager.name(),UserType.Admin.name())
-				.requestMatchers("/client/**").hasAnyAuthority(UserType.Client.name())
-				.requestMatchers("/chat/**").hasAnyAuthority(UserType.Employee.name(),UserType.Manager.name(),UserType.Admin.name(),UserType.Client.name())
+		    .requestMatchers("/nadfactmobile/**").permitAll()
+		    .requestMatchers("/admin/**").hasAnyAuthority(UserType.Admin.name())
+		    .requestMatchers("/user/**").hasAnyAuthority(UserType.Employee.name(),UserType.Manager.name(),UserType.Admin.name())
+		    .requestMatchers("/client/**").hasAnyAuthority(UserType.Client.name())
+		    .requestMatchers("/chat/**").hasAnyAuthority(UserType.Employee.name(),UserType.Manager.name(),UserType.Admin.name(),UserType.Client.name())
 
 				
 				
