@@ -23,6 +23,7 @@ public interface FactureRepo extends CrudRepository<Facture, Long>, PagingAndSor
 	
 	 
 	    Facture findFirstByDateemissionAndType(Date date,TypeFacture type);
+	List<Facture> findByPayementstatus(FacturePayementStatus status);
 	 
 	 @Query("SELECT COUNT(f) FROM Facture f WHERE YEAR(f.dateemission) = :year AND f.archived = :archived AND(f.status = 6 OR f.status = 7) ")
 	    long countByDateemissionAndType(@Param("year") int year,@Param("archived") boolean archived);
