@@ -705,7 +705,7 @@ public class FactureService {
         .max(Long::compare)
         .orElse(null);
         if(number1 != null ) {
-        	number =number1;
+        	number =number1+1;
         	
         }
         else {
