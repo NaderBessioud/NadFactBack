@@ -17,7 +17,7 @@ import tn.famytech.esprit.Entites.TypeFacture;
 
 @Repository
 public interface AvoirRepo extends CrudRepository<Avoir, Long> {
-	
+	Avoir findByNumberAndStatus(long number,AvoirStatus status);
 	@Query("SELECT MAX(a.number) FROM Avoir a WHERE YEAR(a.dateemission) = :year ")
 	 Long Avoirnumber(@Param("year") int year);
 	
