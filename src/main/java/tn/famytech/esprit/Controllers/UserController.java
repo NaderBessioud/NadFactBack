@@ -1208,7 +1208,7 @@ public class UserController {
 		 @GetMapping("previewAvoir/{id}")
 			public ResponseEntity<ByteArrayResource> previewAvoir(@PathVariable("id") long id) throws FileNotFoundException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, DocumentException, SerialException, SQLException{
 				
-				Avoir avoir=avoirService.getAvoirById(id);
+					Avoir avoir=avoirService.getAvoirById(id);
 				if(avoir.getStatus()==AvoirStatus.Avoir_valide || avoir.getStatus()==AvoirStatus.Avoir_envoye) {
 					byte[] facturePdfBytes = factureService.downloadFile(avoir.getPdfname());
 					 HttpHeaders headers = new HttpHeaders();
