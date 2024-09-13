@@ -304,10 +304,10 @@ public class ClientService {
 		  List<FactureMobile> result=new ArrayList<FactureMobile>();
 		  Client c=(Client) userService.getUserByEmail(email);
 		  for (Facture f : factureRepo.findByClientAndArchived(c, false)) {
-			if(f.getStatus()==FactureStatus.Facture_envoye || f.getStatus()==FactureStatus.Facture_valide) {
+			if(f.getStatus()==FactureStatus.Facture_envoye ) {
 				result.add(new FactureMobile(f.getIdF(), f.getNumber(),"Facture", f.getTotalttc(), f.getDateemission(), f.getStatus().toString(), f.getType().toString(), f.getPdfname()));
 				for (Avoir av:avoirRepo.findByFact(f) ) {
-					if(av.getStatus()==AvoirStatus.Avoir_valide)
+					if(av.getStatus()==AvoirStatus.Avoir_envoye)
 					result.add(new FactureMobile(av.getIdC(), av.getNumber(),"Avoir", av.getMontant(), av.getDateemission(), av.getStatus().toString(), f.getType().toString(), av.getPdfname()));
 
 					
