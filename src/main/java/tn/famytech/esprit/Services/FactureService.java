@@ -1634,7 +1634,7 @@ public String hashString(String text) {
     public  byte[] getQRCodeImage(long id, int width, int height) throws WriterException, IOException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         
-        String URL ="http://192.168.1.22:8080/ERPPro/";
+        String URL ="http://192.168.1.31:8082/ERPPro/home";
         String mapping ="facturation/previewFacture/"+id;
         updateFacturePdfPath(id, hashString(mapping));
         BitMatrix bitMatrix = qrCodeWriter.encode(URL+hashString(mapping), BarcodeFormat.QR_CODE, width, height);
