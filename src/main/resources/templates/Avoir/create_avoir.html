@@ -66,10 +66,15 @@
     function enregister(event){
  	   event.preventDefault();
  	  var formData = new FormData(document.getElementById('addAvoirForm'));
- 	  
+ 	  var date = document.getElementById("date").value
  	 var montant = document.getElementById("montant").value 
+	     if (date === "" || montant ==0.0) {
+         alert("Veuillez verrifier vos information.");
+         
+     }
+	    else{
    		if(window.type == "Export"){
-   			var date = document.getElementById("date").value
+   			
    			  			
    			
    			formData.append("datecv",date)
@@ -119,7 +124,7 @@
 		  		}
    	
    		
-   		
+	    }
   		
  	   }
     </script>
