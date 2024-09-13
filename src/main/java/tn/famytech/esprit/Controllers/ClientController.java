@@ -164,10 +164,36 @@ public class ClientController {
 		
 	 
 	 @GetMapping("previewFacture/{id}")
-		public ResponseEntity<ByteArrayResource> previewFacture(@PathVariable("id") long id) throws FileNotFoundException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, DocumentException, SerialException, SQLException{
+		public ResponseEntity<ByteArrayResource> previewFacture(@PathVariable("id") long id,@RequestParam("status") String status) throws FileNotFoundException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, DocumentException, SerialException, SQLException{
 			
-			Facture f=factureService.getFactureById(id);
-			if(f.getStatus()==FactureStatus.Facture_valide || f.getStatus()==FactureStatus.Facture_envoye) {
+		 if(status.equals("Avoir_envoye")) {
+			 	Avoir a=avoirService.findByNumberAndStatus(id,AvoirStatus.Avoir_envoye);
+				
+				
+					byte[] facturePdfBytes = factureService.downloadFile(a.getPdfname());
+					 HttpHeaders headers = new HttpHeaders();
+			            headers.setContentType(MediaType.APPLICATION_PDF);
+			            headers.setContentDispositionFormData("avoir"+a.getFact().getType()+".pdf", "avoir"+a.getFact().getType()+".pdf");
+
+			            // Return ResponseEntity with the PDF byte array
+			            return ResponseEntity.ok()
+			                    .headers(headers)
+			                    .contentLength(facturePdfBytes.length)
+			                    .body(new ByteArrayResource(facturePdfBytes));
+				
+			 
+		 }
+		 else if(status.equals(FactureStatus.Proforma_envoyee.toString())) {
+			 Facture f=factureService.getbyNumberAndStatus(id,FactureStatus.Proforma_envoyee);
+			 if(f.getType()==TypeFacture.National) {
+					return downloadFacture(f);
+				}
+				else {
+					return downloadFactureEuro(f);
+				}
+		 }
+		 else {
+			 Facture f=factureService.getbyNumberAndStatus(id,FactureStatus.Facture_envoye);
 				byte[] facturePdfBytes = factureService.downloadFile(f.getPdfname());
 				 HttpHeaders headers = new HttpHeaders();
 		            headers.setContentType(MediaType.APPLICATION_PDF);
@@ -178,18 +204,13 @@ public class ClientController {
 		                    .headers(headers)
 		                    .contentLength(facturePdfBytes.length)
 		                    .body(new ByteArrayResource(facturePdfBytes));
-			}
-			else {
-				
+			 
+		 }
 			
-			if(f.getType()==TypeFacture.National) {
-				return downloadFacture(f);
-			}
-			else {
-				return downloadFactureEuro(f);
-			}
-			}
+			
+			
 		}
+	 
 	 
 	 
 	 
