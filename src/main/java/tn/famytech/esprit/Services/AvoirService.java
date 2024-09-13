@@ -133,13 +133,23 @@ public class AvoirService {
 	@Autowired
 	private  JavaMailSender mailSender;
 	
-	
+	public Avoir findByNumberAndStatus(long number,AvoirStatus status) {
+		return avoirRepo.findByNumberAndStatus(number,status);
+	}
 	
 	public void addAvoir(Avoir avoir,long idf) {
 		
+		double sum=0;
 		Facture facture=factureRepo.findById(idf).get();
+		for (Avoir a : facture.getAvoirs()) {
+			sum+=a.getMontant();
+		}
+		if(sum+avoir.getMontant()>facture.getTotalrestant() || avoir.getMontant() > facture.getTotalrestant()) {
+			
+		}
+		else {
 		avoir.setFact(facture);
-		avoir.setDateemission(new Date());
+		
 		avoir.setDatecv(new Date());
 		avoir.setStatus(AvoirStatus.Avoir);
 		avoir= avoirRepo.save(avoir);
@@ -150,7 +160,7 @@ public class AvoirService {
 		profoma.setTraited(false);
 		factureRepo.save(profoma);
 		
-		
+		}
 	}
 
 	public Image downloadAndUseImage() {
