@@ -232,7 +232,10 @@ public class FactureService {
 	
 	
 	public Facture getFactureById(long id) {
-		return factureRepo.findById(id).get();
+		return factureRepo.findById(id).orElse(null);
+	}
+	public Facture getbyNumberAndStatus(long number,FactureStatus status) {
+		return factureRepo.findByNumberAndStatus(number, status);
 	}
 		public Image downloadAndUseImage() {
 	  
