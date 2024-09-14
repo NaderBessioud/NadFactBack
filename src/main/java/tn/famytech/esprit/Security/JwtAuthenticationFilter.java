@@ -37,11 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-				String path = request.getRequestURI();
-				  if (path.contains("/ERPPro/home/login") || path.contains("/vendors/") || path.contains("/images/") || path.contains("/home/") || path.contains("/css/")  || path.contains("/js/") || path.contains("/css/")  || path.contains("/assets/") ) {
-	            filterChain.doFilter(request, response); // Skip filter for public endpoints
-	            return;
-	        }
+				
+			
 				Cookie[] cookies = request.getCookies();
         String jwtToken = null;
 				
