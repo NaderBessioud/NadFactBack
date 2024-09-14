@@ -276,6 +276,18 @@ public class HomeController {
 	 public String Display404Page() {
 		 return "404.html";
 	 }
+
+	 @GetMapping("/userById/{id}")
+	 @ResponseBody
+	 public User getUserById(@PathVariable("id") long id) {
+		 return userService.getUserById(id);
+	 }
+	 
+	 @PutMapping("/updatePassword")
+	 @ResponseBody
+	 public boolean updatePass(@ModelAttribute User user,@RequestParam("oldpass") String oldpass) {
+		 return userService.updatePassword(oldpass, user);
+	 }
 	 
 	}
 
