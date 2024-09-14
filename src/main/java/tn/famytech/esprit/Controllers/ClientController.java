@@ -422,9 +422,15 @@ public class ClientController {
 		 List<UserMobile> result=new ArrayList<UserMobile>();
 		 for (UserOnLineWhitMSG usr : getInteractOnLine(id)) {
 			 Message msg=messageService.getLasMessage(id, usr.getIdU());
+			  if(msg != null) {
 			result.add(new UserMobile(usr.getIdU(),usr.getFullname(), usr.getEmail(), usr.isOnline(),usr.getImage(),messageService.getMessages(id,usr.getIdU()).size(),msg.getContent(),msg.getDay(),msg.isSeen()));
-		}
-		 System.out.println("----------------->>>>>>>"+result.size());
+		 }
+			 else {
+					result.add(new UserMobile(usr.getIdU(),usr.getFullname(), usr.getEmail(), usr.isOnline(),usr.getImage(),0,"","",true));
+
+			 }
+		 }
+		
 		return result;
 	 }
 	 
