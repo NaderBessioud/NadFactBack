@@ -357,10 +357,20 @@ public class ClientController {
      		for (Personel personel : interact) {
      			Message msg=messageService.getLasMessage(id, personel.getIdU());
      			if(authenticationService.getLoggedIndUser().stream().anyMatch(user -> user.getEmail().equals(personel.getEmail()))) {
-     				result.add(new UserOnLineWhitMSG(personel.getIdU(),personel.getFirstname()+" "+personel.getLastname(),personel.getFirstname(), personel.getEmail(), true,personel.getImage(),msg.getContent(),msg.getDay(),msg.isSeen()));
+     				 if(msg != null) {
+          				result.add(new UserOnLineWhitMSG(personel.getIdU(),personel.getFirstname()+" "+personel.getLastname(),personel.getFirstname(), personel.getEmail(), true,personel.getImage(),msg.getContent(),msg.getDay(),msg.isSeen()));
+
+     				 }
+     				 else {
+          				result.add(new UserOnLineWhitMSG(personel.getIdU(),personel.getFirstname()+" "+personel.getLastname(),personel.getFirstname(), personel.getEmail(), true,personel.getImage(),"","",true));
+
+     				 }
      			}
      			else {
-     				result.add(new UserOnLineWhitMSG(personel.getIdU(),personel.getFirstname()+" "+personel.getLastname(),personel.getFirstname(), personel.getEmail(), false,personel.getImage(),msg.getContent(),msg.getDay(),msg.isSeen()));
+     				 if(msg != null) {
+          				result.add(new UserOnLineWhitMSG(personel.getIdU(),personel.getFirstname()+" "+personel.getLastname(),personel.getFirstname(), personel.getEmail(), false,personel.getImage(),"","",true));
+
+     				 }
 
      			}
 			}
@@ -380,11 +390,25 @@ public class ClientController {
              		
              		for (Personel personel : interact) {
              			Message msg=messageService.getLasMessage(userDetails.getIdU(), personel.getIdU());
-             			if(authenticationService.getLoggedIndUser().stream().anyMatch(user -> user.getEmail().equals(personel.getEmail()))) {
-             				result.add(new UserOnLineWhitMSG(personel.getIdU(),personel.getFirstname(),personel.getFirstname()+" "+personel.getLastname(), personel.getEmail(),true, downloadImage(personel.getImage()),msg.getContent(),msg.getDay(),msg.isSeen()));
+             				if(authenticationService.getLoggedIndUser().stream().anyMatch(user -> user.getEmail().equals(personel.getEmail()))) {
+             				if(msg != null) {
+                 				result.add(new UserOnLineWhitMSG(personel.getIdU(),personel.getFirstname(),personel.getFirstname()+" "+personel.getLastname(), personel.getEmail(),true, downloadImage(personel.getImage()),msg.getContent(),msg.getDay(),msg.isSeen()));
+
+             				}
+             				else {
+                 				result.add(new UserOnLineWhitMSG(personel.getIdU(),personel.getFirstname(),personel.getFirstname()+" "+personel.getLastname(), personel.getEmail(),true, downloadImage(personel.getImage()),"","",true));
+
+             				}
              			}
              			else {
-             				result.add(new UserOnLineWhitMSG(personel.getIdU(),personel.getFirstname(),personel.getFirstname()+" "+personel.getLastname(), personel.getEmail(), false,downloadImage(personel.getImage()),msg.getContent(),msg.getDay(),msg.isSeen()));
+             				if(msg != null) {
+                 				result.add(new UserOnLineWhitMSG(personel.getIdU(),personel.getFirstname(),personel.getFirstname()+" "+personel.getLastname(), personel.getEmail(), false,downloadImage(personel.getImage()),msg.getContent(),msg.getDay(),msg.isSeen()));
+
+             				}
+             				else {
+                 				result.add(new UserOnLineWhitMSG(personel.getIdU(),personel.getFirstname(),personel.getFirstname()+" "+personel.getLastname(), personel.getEmail(), false,downloadImage(personel.getImage()),"","",true));
+
+             				}
 
              			}
 					}
