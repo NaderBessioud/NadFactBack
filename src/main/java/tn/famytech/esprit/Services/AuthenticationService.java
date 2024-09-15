@@ -117,16 +117,25 @@ public JwtAuthenticationResponse signin(String email, String password, HttpServl
 public JwtAuthenticationResponse signinWithGoogle(String email,HttpServletResponse response) {
 	User user = rep.findByEmail(email);
 	JwtAuthenticationResponse authenticationResponse = new JwtAuthenticationResponse();
-	var jwt =jwtService.generateToken(user);
-	authenticationResponse.setMsg("good");
-	authenticationResponse.setUser(user);
-	authenticationResponse.setToken(jwt);
-	Cookie cookie = new Cookie("auth_token", jwt);
-    cookie.setHttpOnly(true);
-    
-    cookie.setPath("/");
-    response.addCookie(cookie);
-	return authenticationResponse;
+	if(user != null) {
+		var jwt =jwtService.generateToken(user);
+		authenticationResponse.setMsg("good");
+		authenticationResponse.setUser(user);
+		authenticationResponse.setToken(jwt);
+		Cookie cookie = new Cookie("auth_token", jwt);
+	    cookie.setHttpOnly(true);
+	    cookie.setSecure(true); 
+	    cookie.setPath("/");
+	    response.addCookie(cookie);
+	    loggedInUsers.add(user);
+	    template.convertAndSend("/topic/online", user.getIdU());
+		return authenticationResponse;
+		
+	}
+	else {
+		authenticationResponse.setMsg("false");
+		return authenticationResponse;
+	}
 }
 
 public void logout( String email,HttpServletRequest request, HttpServletResponse response) {
