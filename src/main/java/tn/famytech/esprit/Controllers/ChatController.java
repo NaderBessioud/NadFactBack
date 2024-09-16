@@ -169,6 +169,19 @@ public class ChatController {
 		
 		 return "client/chat"; 
 	 }
+
+	 @PostMapping("/serachchat")
+	 @ResponseBody
+	 public List<UserOnLineWhitMSG> searchchat(@RequestParam("search") String search,@RequestParam("email") String email) throws IOException{
+		 List<UserOnLineWhitMSG> result = new ArrayList<UserOnLineWhitMSG>();
+		 for (UserOnLineWhitMSG user :  getLoggedInUser(email)) {
+			if(user.getFullname().toUpperCase().contains(search.toUpperCase())) {
+				
+				result.add(user);
+			}
+		}
+		 return result;
+	 }
 	 
 	 @PostMapping("/Messages")
 	 
