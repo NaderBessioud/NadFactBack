@@ -25,7 +25,7 @@
       </div>
       <div class="card-body contacts_body">
         <ul class="contacts" id="contactlist">
-          <li th:each="user :${userOnLine}" th:class="'active1' + ${user.idU}" th:onclick="'ChangeUser(' + ${user.idU} + ')'">
+          <li th:each="user :${userOnLine}" th:class="'active1' + ${user.idU}" th:onclick="'ChangeUser(' + ${user.idU} + ')'" style="cursor: pointer;">
             <div class="d-flex bd-highlight">
               <div class="img_cont" >
                 <img th:src="${user.image}" class="rounded-circle user_img" >
@@ -65,10 +65,7 @@
               <span th:text = "${username}" id="username"></span>
               <p th:text = "${nb +' Messages'}" id="nbmessage"></p>
             </div>
-            <div class="video_cam">
-              <span><i class="fas fa-video"></i></span>
-              <span><i class="fas fa-phone"></i></span>
-            </div>
+           
           </div>
           <span id="action_menu_btn"><i class="fas fa-ellipsis-v"></i></span>
           <div class="action_menu">
@@ -312,6 +309,36 @@ function ChangeUser(id){
          	
 }
 
+	
+function search(){
+	var formData = new FormData();
+	var search = document.getElementById('searchinput').value;
+	var email = sessionStorage.getItem("email");
+
+	var datainput = new URLSearchParams();
+	datainput.append("search", search);
+	datainput.append("email", email);
+		
+	
+	fetch('/ERPPro/chat/serachchat', {
+	        method: 'POST',
+	        headers: {
+	        	'Content-Type': 'application/x-www-form-urlencoded',
+	            'Authorization': `Bearer ${token}`
+	        },
+	        body: datainput.toString()
+	     
+	       
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	       
+	    	updateuser(data)
+	     
+	    })
+	
+}
+
 function updateuser(users){
 	  var ullist = document.getElementById("contactlist");
 
@@ -319,32 +346,69 @@ function updateuser(users){
 	  ullist.innerHTML = ''; // Clear existing rows
 	 for (var i = 0; i < users.length; i++){
 		 user=users[i];
+		
 		  const li = document.createElement('li');
+		  li.style.cursor = 'pointer';
 	      li.className = `active1${user.idU}`;
-	      li.setAttribute('onclick', `changeUser(${user.idU})`);
-	      li.innerHTML = `
-	          <div class="d-flex bd-highlight">
-	            <div class="img_cont">
-	              <img src="{user.image}" class="rounded-circle user_img">
-	              <span class="online_icon ${user.online ? '' : 'offline'}" id="${user.idU}"></span>
-	            </div>
-	            <div class="user_info">
-	              <span th:style="'font-weight: ' + (${user.seen} ? 'normal' : 'bold') + ';'">${user.name}</span>
-	                <span th:each="user : ${userOnLine}"
-	  			      th:style="'font-size: 10px; color: rgba(255,255,255,0.6); font-weight: ' + (${user.seen} ? 'normal' : 'bold') + ';'">
-	  			  ${user.content}
-	  			</span>	              
-		  			
-	            </div>
-	          </div>
-	        `;
+	      li.setAttribute('onclick', `ChangeUser(${user.idU})`);
+	      if(user.idU==lastid){
+	    	  li.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+	    	  li.innerHTML = `
+		          <div class="d-flex bd-highlight">
+		            <div class="img_cont">
+		              <img src="${user.image}" class="rounded-circle user_img">
+		              <span class="online_icon ${user.online ? '' : 'offline'}" id="${user.idU}"></span>
+		            </div>
+		            <div class="user_info">
+		            <span 
+		            style="font-weight: ${user.seen ? 'normal' : 'bold'};" 
+		            id="username${user.idU}">
+		            ${user.name}
+		        </span>	              
+		        <div style="max-width: 80px; overflow: hidden;">
+		              <span 
+		              style="font-size: 15px; color: rgba(255,255,255,0.6); font-weight: ${user.seen ? 'normal' : 'bold'}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;" 
+		              id="lastmsg${user.idU}">
+						${user.content}
+		  			</span>	              
+		  			</div>
+		            </div>
+		          </div>
+		        `;
+		      }
+	      else{
+	    	  li.innerHTML = `
+		          <div class="d-flex bd-highlight">
+		            <div class="img_cont">
+		              <img src="${user.image}" class="rounded-circle user_img">
+		              <span class="online_icon ${user.online ? '' : 'offline'}" id="${user.idU}"></span>
+		            </div>
+		            <div class="user_info">
+		            <span 
+		            style="font-weight: ${user.seen ? 'normal' : 'bold'};" 
+		            id="username${user.idU}">
+		            ${user.name}
+		        </span>	              
+		        <div style="max-width: 80px; overflow: hidden;">
+		              <span 
+		              style="font-size: 15px; color: rgba(255,255,255,0.6); font-weight: ${user.seen ? 'normal' : 'bold'}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;" 
+		              id="lastmsg${user.idU}">
+						${user.content}
+		  			</span>	              
+		  			</div>
+		            </div>
+		          </div>
+		        `;
+		      }
+	     
+	      ullist.append(li);
 	 }
-	 ullist.append(li);
+	
 	 ullist.addEventListener('transitionend', function() {
- 	    tableBody.style.transition = '';
+		 ullist.style.transition = '';
  	}, { once: true });
    setTimeout(function() {
- 	    tableBody.style.cssText = 'opacity: 1; transition: opacity 1s ease-in-out;';
+	   ullist.style.cssText = 'opacity: 1; transition: opacity 1s ease-in-out;';
  	}, 100);
 }
 
