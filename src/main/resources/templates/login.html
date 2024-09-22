@@ -205,17 +205,17 @@
         </button>
       </div>
       <div class="modal-body">
-       <p>Entrer le token que vous avez recu par email.</p>
+       <p>Veuillez entrer votre nouveau mot de passe.</p>
         <form action="/reset_password" method="post" id="update-form">
         <input type="hidden" id="emailInputUpdate" name="email">
 		    <div class="form-group">
-			    <label for="exampleInputPassword1">Password</label>
-			    <input type="password" class="form-control" id="exampleInputPassword1" placeholder=" new Password" name="password">
+			    <label for="exampleInputPassword1">Nouveau mot de passe</label>
+			    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="nouveau mot de passe" name="password">
 			  </div>
   
 			  <div class="form-group">
-			    <label for="confirmpass">Password</label>
-			    <input type="password" class="form-control" id="confirmpass" placeholder="confirm Password">
+			    <label for="confirmpass">Répeter mot de passe</label>
+			    <input type="password" class="form-control" id="confirmpass" placeholder="confirmer mot de passe">
 			  </div>
 		    <input type="submit" value="Entrer" onclick="updatePassword(event)">
 		  </form>
