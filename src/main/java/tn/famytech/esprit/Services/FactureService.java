@@ -3582,11 +3582,15 @@ List<Facture> result = new ArrayList<Facture>();
    	     SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
    	     Date startdate=dateFormat.parse(start);
    	     Date enddate=dateFormat.parse(end);
+	    if(avoirRepo.AvoirsByMonth(startdate,enddate,AvoirStatus.Avoir_envoye).size() != 0){
+		    
    	     for (Avoir avoir : avoirRepo.AvoirsByMonth(startdate,enddate,AvoirStatus.Avoir_envoye)) {
+		     
 			if(avoir.getFact().getType()==type) {
 				result+=avoir.getMontant();
 			}
 		}
+	    }
    	  return result;
    	    
     }
