@@ -237,8 +237,67 @@ function uploadFile() {
 </script>
 <script type="text/javascript">
 var eventhand="";
+	async function checkEmail(){
+	
+	msgtitle=""
+	msg=""
+	var alert = document.querySelector(".alert");
+	
+	 var emailInput = document.getElementById('clientemail');
+	 var email =emailInput.value;
+
+	 var lib = document.getElementById('clientlib').value;
+	 
+	 
+	 
+	 if(email !=""){
+		 try {
+		   const response = await fetch('/ERPPro/user/CheckEmailAndLibelle?email=' + email+ '&lib=' + lib, {
+                method: 'GET',
+            });
+		   const isEmailUnique = await response.json();
+		      
+	            if (isEmailUnique) {
+	                // Email is unique, proceed with your logic
+	               
+	               
+	                msgtitle="Attention!";
+	                msg="Client existe déja";
+	                alert.querySelector('strong').textContent=msgtitle;
+	                alert.querySelector('.alert-text').textContent=msg;
+	                alert.classList.remove("alert-success");
+	                alert.classList.add("alert-danger");
+	                alert.classList.add("show");
+
+	                // Set a timeout to hide the alert after 5000 milliseconds (5 seconds)
+	                setTimeout(function () {
+	                    alert.classList.remove("show");
+	                }, 5000);
+	                
+	                return false;
+	            } else {
+	            	
+	                // Email is not unique, handle accordingly
+	            	return true;
+	            }
+	       
+		 }
+		 catch (error) {
+	            console.error('Error checking email:', error);
+	            return false;
+	        }
+	 }
+
+	 else{
+	 
+	   return false;
+	 }
+	
+	}
 	function AddClient(e){
 		e.preventDefault();
+		checkEmail().then(isEmailValid => {
+			  if (isEmailValid) {
 		const alert = document.querySelector(".alert");
 		 var formData = new FormData(document.getElementById('client-form'));
 		 var date = document.getElementById("clientde").value
@@ -282,7 +341,8 @@ var eventhand="";
 	            console.error('Error adding user:', error);
 	        });
 			
-		
+		  }
+		});
 			
 			
 		}
