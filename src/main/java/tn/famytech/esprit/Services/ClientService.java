@@ -357,6 +357,14 @@ public class ClientService {
 	  public Client getClientByEmail(String email) {
 		  return clientRepo.findByEmail(email);
 	  }
+
+	 public boolean CheckUserInfo(String email,String lib){
+		  boolean exist=false;
+		  if(userService.getUserByEmail(email) != null || clientRepo.findByLibelle(lib) != null) {
+			  exist=true;
+		  }
+		  return exist;
+	  }
 	  
 	  
 	  
