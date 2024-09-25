@@ -1696,6 +1696,13 @@ public class UserController {
 					
 					return "Reglement/Factureret";		
 				}
+
+
+
+	@GetMapping("/CheckEmailAndLibelle")
+	public boolean CheckEmailAndLibelle(@RequestParam("email") String email,@RequestParam("lib") String lib) {
+					return clientService.CheckUserInfo(email, lib);
+				}
 			
 			
 			
