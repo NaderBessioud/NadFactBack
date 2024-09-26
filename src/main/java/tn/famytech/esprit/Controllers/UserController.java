@@ -288,7 +288,7 @@ public class UserController {
      }
      
      @GetMapping("/factures")
-     public String DisplayFacture(Model model) {
+     public String DisplayFacture(Model model,@RequestParam("email") String email) {
     	/*model.addAttribute("factures", factureService.DisplayFactures());
     	 model.addAttribute("clients", clientService.DisplayClients());
     	 return "factures";*/
@@ -296,7 +296,7 @@ public class UserController {
          
 
     	 int pageSize = 5;
-    	 Page<Facture> page = factureService.findPaginated(1, pageSize,factureService.DisplayFacturesNotArchived());
+    	 Page<Facture> page = factureService.findPaginated(1, pageSize,factureService.DisplayFacturesNotArchived(email));
     	 
     	
     	 List<Facture> factures = page.getContent();
@@ -305,7 +305,7 @@ public class UserController {
     	 model.addAttribute("totalPages", page.getTotalPages());
     	 model.addAttribute("totalItems", page.getTotalElements());
     	 model.addAttribute("factures", factures);
-    	 model.addAttribute("Allfactures", factureService.DisplayFacturesNotArchived());
+    	 model.addAttribute("Allfactures", factureService.DisplayFacturesNotArchived(email));
     	 model.addAttribute("clients", clientService.DisplayClients());
     	 model.addAttribute("activelink", "factures");
     	
@@ -550,8 +550,8 @@ public class UserController {
 	 
 	 @GetMapping("/FactureByClient/{lib}")
 	 @ResponseBody
-	 public List<Facture> getFactureByClient(@PathVariable("lib") String lib){
-		 return factureService.DisplayInvoiceNotArchivedAndNotPayedByClient(lib);
+	 public List<Facture> getFactureByClient(@PathVariable("lib") String lib,@RequestParam("email") String email){
+		 return factureService.DisplayInvoiceNotArchivedAndNotPayedByClient(lib,email);
 	 }
 
 	 @GetMapping("/FactureByReglement/{idr}")
@@ -737,12 +737,12 @@ public class UserController {
 		 
 /*---------------------------Reglement part------------------------------------*/
 		 @GetMapping("/reglements")
-	     public String DisplayReglements(Model model) throws IOException {
+	     public String DisplayReglements(Model model,@RequestParam("email") String email) throws IOException {
 
 	    
 	    	 model.addAttribute("Clients", clientService.DisplayClients());
 	    	 model.addAttribute("reglements", reglementService.DisplayReglemensNotAffected());
-	    	 model.addAttribute("factures", factureService.DisplayInvoiceNotArchivedAndNotPayed());
+	    	 model.addAttribute("factures", factureService.DisplayInvoiceNotArchivedAndNotPayed(email));
 	    	 model.addAttribute("Reglement", new Reglement());
 	    	 model.addAttribute("activelink", "reglement");
 	    	
