@@ -48,6 +48,8 @@ public interface FactureRepo extends CrudRepository<Facture, Long>, PagingAndSor
 	    
 	    List<Facture> findByClientAndTypeAndArchivedAndUser(Client client,TypeFacture type,boolean archived,User user);
 	    List<Facture> findByClientAndTypeAndArchived(Client client,TypeFacture type,boolean archived);
+	   @Query("SELECT f FROM Facture f join f.user u where u.email=:email AND f.archived = :archived AND f.traited = 0 ")
+	    List<Facture> findFacturesByArchivedAndUser(@Param("archived") boolean archived,@Param("email") String email);
 	    
 	    @Query("SELECT f FROM Facture f WHERE f.archived = :archived AND f.traited = 0")
 	    List<Facture> findFacturesByArchived(@Param("archived") boolean archived);
