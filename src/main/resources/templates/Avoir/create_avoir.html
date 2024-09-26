@@ -105,7 +105,7 @@
 	  		     });
 		  		}
 	  		else{
-	  			 fetch('/ERPPro/user/updateavoir', {
+	  			 fetch("/ERPPro/user/updateavoir?email='"+sessionStorage.getItem("email")', {
 	  		         method: 'POST',
 	  		       headers: {
 		  		    	 'Authorization': `Bearer ${token}`
