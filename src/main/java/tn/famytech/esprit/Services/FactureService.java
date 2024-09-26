@@ -1486,45 +1486,84 @@ totalBigDecimal = BigDecimal.valueOf(CalculTotalTTC(f));
          }
     }
     
-    public List<Facture> filterFactuer(String start,String end,String type,long id,boolean archived) throws ParseException{
+      public List<Facture> filterFactuer(String start,String end,String type,long id,boolean archived,String email) throws ParseException{
     	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    	
-    	if(start=="") {
-    		if(!type.equals("null") && id != 0) {
-    			System.out.println("Here----");
-    			return factureRepo.findByClientAndTypeAndArchived(clientRepo.findById(id).get(), mapStringtoTypeFacture(type),archived);
-    		}
-    		else if(!type.equals("null")) {
-    			return factureRepo.findByTypeAndArchived(mapStringtoTypeFacture(type),archived);
-    		}
-    		else if(id != 0) {
-    			
-    			return factureRepo.findByClientAndArchived(clientRepo.findById(id).get(),archived);
-    		}
-    		else {
-    			return factureRepo.findFacturesByArchived(archived);
-    		}
-    	}
-    	
-    	else if(type.equals("null") ) {
-    		if(id != 0) {
-    			return factureRepo.findFacturesByDateEmissionRangeAndClientAndArchived(dateFormat.parse(start), dateFormat.parse(end), id,archived);
-    		}
-    		else {
-    			return factureRepo.findFacturesByDateEmissionRangeAndArchived(dateFormat.parse(start), dateFormat.parse(end),archived);
-    		}
+    	User user=userRepository.findByEmail(email);
+    	if(user.getRole() == UserType.Admin || user.getRole() == UserType.Manager) {
+    		if(start=="") {
+        		if(!type.equals("null") && id != 0) {
+        			
+        			return factureRepo.findByClientAndTypeAndArchived(clientRepo.findById(id).get(), mapStringtoTypeFacture(type),archived);
+        		}
+        		else if(!type.equals("null")) {
+        			return factureRepo.findByTypeAndArchived(mapStringtoTypeFacture(type),archived);
+        		}
+        		else if(id != 0) {
+        			
+        			return factureRepo.findByClientAndArchived(clientRepo.findById(id).get(),archived);
+        		}
+        		else {
+        			return factureRepo.findFacturesByArchived(archived);
+        		}
+        	}
+        	
+        	else if(type.equals("null") ) {
+        		if(id != 0) {
+        			return factureRepo.findFacturesByDateEmissionRangeAndClientAndArchived(dateFormat.parse(start), dateFormat.parse(end), id,archived);
+        		}
+        		else {
+        			return factureRepo.findFacturesByDateEmissionRangeAndArchived(dateFormat.parse(start), dateFormat.parse(end),archived);
+        		}
+        	}
+        	else {
+        		if(id != 0) {
+        			return factureRepo.findFacturesByDateEmissionRangeAndTypeAndClientAndArchived(dateFormat.parse(start), dateFormat.parse(end), mapStringtoTypeFacture(type),id,archived);
+        		}
+        		else {
+        			return factureRepo.findFacturesByDateEmissionRangeAndTypeAndArchived(dateFormat.parse(start), dateFormat.parse(end), mapStringtoTypeFacture(type),archived);
+        		}
+        		
+        	}
     	}
     	else {
-    		if(id != 0) {
-    			return factureRepo.findFacturesByDateEmissionRangeAndTypeAndClientAndArchived(dateFormat.parse(start), dateFormat.parse(end), mapStringtoTypeFacture(type),id,archived);
-    		}
-    		else {
-    			return factureRepo.findFacturesByDateEmissionRangeAndTypeAndArchived(dateFormat.parse(start), dateFormat.parse(end), mapStringtoTypeFacture(type),archived);
-    		}
-    		
+    		if(start=="") {
+        		if(!type.equals("null") && id != 0) {
+        			
+        			return factureRepo.findByClientAndTypeAndArchivedAndUser(clientRepo.findById(id).get(), mapStringtoTypeFacture(type),archived,user);
+        		}
+        		else if(!type.equals("null")) {
+        			return factureRepo.findByTypeAndArchivedAndUser(mapStringtoTypeFacture(type),archived,user);
+        		}
+        		else if(id != 0) {
+        			
+        			return factureRepo.findByClientAndArchivedAndUser(clientRepo.findById(id).get(),archived,user);
+        		}
+        		else {
+        			return factureRepo.findFacturesByArchivedAndUser(archived,email);
+        		}
+        	}
+        	
+        	else if(type.equals("null") ) {
+        		if(id != 0) {
+        			return factureRepo.findFacturesByDateEmissionRangeAndClientAndArchivedAndUser(dateFormat.parse(start), dateFormat.parse(end), id,archived,email);
+        		}
+        		else {
+        			return factureRepo.findFacturesByDateEmissionRangeAndArchivedAndUser(dateFormat.parse(start), dateFormat.parse(end),archived,email);
+        		}
+        	}
+        	else {
+        		if(id != 0) {
+        			return factureRepo.findFacturesByDateEmissionRangeAndTypeAndClientAndArchivedAndUser(dateFormat.parse(start), dateFormat.parse(end), mapStringtoTypeFacture(type),id,archived,email);
+        		}
+        		else {
+        			return factureRepo.findFacturesByDateEmissionRangeAndTypeAndArchivedAndUser(dateFormat.parse(start), dateFormat.parse(end), mapStringtoTypeFacture(type),archived,email);
+        		}
+        		
+        	}
     	}
+    	
+    	
     }
-    
     
     
     public List<Facture> filterSignedFactuers(List<Facture> facutres){
