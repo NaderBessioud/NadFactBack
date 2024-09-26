@@ -39,10 +39,13 @@ public interface FactureRepo extends CrudRepository<Facture, Long>, PagingAndSor
 	 
 	    List<Facture> findByClientAndArchivedAndStatusAndPayementstatusAndType(Client client,boolean archived,FactureStatus status,FacturePayementStatus payementStatus,TypeFacture type);
 	    
+	     List<Facture> findByClientAndArchivedAndUser(Client client,boolean archived,User user);
 	    List<Facture> findByClientAndArchived(Client client,boolean archived);
 	    
+	    List<Facture> findByTypeAndArchivedAndUser(TypeFacture type,boolean archived,User user);
 	    List<Facture> findByTypeAndArchived(TypeFacture type,boolean archived);
 	    
+	    List<Facture> findByClientAndTypeAndArchivedAndUser(Client client,TypeFacture type,boolean archived,User user);
 	    List<Facture> findByClientAndTypeAndArchived(Client client,TypeFacture type,boolean archived);
 	    
 	    @Query("SELECT f FROM Facture f WHERE f.archived = :archived AND f.traited = 0")
@@ -50,16 +53,23 @@ public interface FactureRepo extends CrudRepository<Facture, Long>, PagingAndSor
 	    
 	    @Query("SELECT f FROM Facture f WHERE f.dateemission BETWEEN :startDate AND :endDate AND f.archived = :archived")
 	    List<Facture> findFacturesByDateEmissionRangeAndArchived(Date startDate, Date endDate,@Param("archived") boolean archived);
-	    
+		    @Query("SELECT f FROM Facture f join f.user u WHERE u.email=:email AND f.dateemission BETWEEN :startDate AND :endDate AND f.archived = :archived")
+	    List<Facture> findFacturesByDateEmissionRangeAndArchivedAndUser(Date startDate, Date endDate,@Param("archived") boolean archived,@Param("email") String email);
+	
 	    @Query("SELECT f FROM Facture f JOIN f.client c WHERE f.dateemission BETWEEN :startDate AND :endDate AND c.idU = :client AND f.archived = :archived")
 	    List<Facture> findFacturesByDateEmissionRangeAndClientAndArchived(Date startDate, Date endDate,long client,@Param("archived") boolean archived);
-	    
+	   @Query("SELECT f FROM Facture f JOIN f.client c join f.user u WHERE f.dateemission BETWEEN :startDate AND :endDate AND c.idU = :client AND f.archived = :archived AND u.email=:email")
+	    List<Facture> findFacturesByDateEmissionRangeAndClientAndArchivedAndUser(Date startDate, Date endDate,long client,@Param("archived") boolean archived,@Param("email") String email);
+	
 	    @Query("SELECT f FROM Facture f WHERE f.dateemission BETWEEN :startDate AND :endDate AND f.type = :factureType AND f.archived = :archived")
 	    List<Facture> findFacturesByDateEmissionRangeAndTypeAndArchived(Date startDate, Date endDate, TypeFacture factureType,@Param("archived") boolean archived);
-	    
+	     @Query("SELECT f FROM Facture f join f.user u WHERE u.email=:email AND f.dateemission BETWEEN :startDate AND :endDate AND f.type = :factureType AND f.archived = :archived")
+	    List<Facture> findFacturesByDateEmissionRangeAndTypeAndArchivedAndUser(Date startDate, Date endDate, TypeFacture factureType,@Param("archived") boolean archived,@Param("email") String email);
 	    @Query("SELECT f FROM Facture f JOIN f.client c WHERE f.dateemission BETWEEN :startDate AND :endDate AND f.type = :factureType AND c.idU = :client AND f.archived = :archived ")
 	    List<Facture> findFacturesByDateEmissionRangeAndTypeAndClientAndArchived(Date startDate, Date endDate, TypeFacture factureType,long client,@Param("archived") boolean archived);
-	    
+
+	@Query("SELECT f FROM Facture f JOIN f.client c join f.user u WHERE f.dateemission BETWEEN :startDate AND :endDate AND f.type = :factureType AND c.idU = :client AND f.archived = :archived AND u.email=:email ")
+	    List<Facture> findFacturesByDateEmissionRangeAndTypeAndClientAndArchivedAndUser(Date startDate, Date endDate, TypeFacture factureType,long client,@Param("archived") boolean archived,@Param("email") String email);
 	    Facture  findByPdfpath(String pdfpath);
 	    
 	    Facture findByNumber(long number);
