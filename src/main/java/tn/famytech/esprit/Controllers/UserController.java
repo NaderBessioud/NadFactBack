@@ -562,8 +562,8 @@ public class UserController {
 	 
 	 @GetMapping("/Allfactures")
 	 @ResponseBody
-	 public List<Facture> getFactureByClient(){
-		 return factureService.DisplayInvoiceNotArchivedAndNotPayed();
+	 public List<Facture> getFactureByClient(@RequestParam("email") String email){
+		 return factureService.DisplayInvoiceNotArchivedAndNotPayed(email);
 	 }
 	 
 	 @GetMapping("/clienttype/{id}")
