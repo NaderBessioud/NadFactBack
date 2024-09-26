@@ -411,16 +411,16 @@ public class UserController {
 	 }
 	 
 
-	 
-	    @GetMapping("/facturesfilter")
+	  @GetMapping("/facturesfilter")
 	    @ResponseBody
 	     public List<Facture> DisplayFactureFiltred(@RequestParam(name = "startDate") String startDate,
 	             @RequestParam(name = "endDate") String endDate,
 	             @RequestParam(name = "factureType") String factureType,
 	             @RequestParam(name = "clientId") long clientId,
-	             @RequestParam(name = "archived") boolean archived) throws ParseException {
+	             @RequestParam(name = "archived") boolean archived,
+	             @RequestParam("email") String email) throws ParseException {
 	    	 
-	    	 return factureService.filterFactuer(startDate, endDate, factureType, clientId,archived);
+	    	 return factureService.filterFactuer(startDate, endDate, factureType, clientId,archived,email);
 	    	 
 	     }
 	    
