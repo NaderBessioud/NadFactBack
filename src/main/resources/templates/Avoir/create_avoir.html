@@ -88,7 +88,7 @@
    	  		}
   		
 	  		if(window.idf != null){
-	  			 fetch('/ERPPro/user/avoir/'+window.idf, {
+	  			 fetch('/ERPPro/user/avoir/'+window.idf+"?email='"+sessionStorage.getItem("email"), {
 	  		         method: 'POST',
 	  		       headers: {
 	  		    	 'Authorization': `Bearer ${token}`
