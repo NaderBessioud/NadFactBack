@@ -637,8 +637,15 @@ public class FactureService {
 		return (List<Facture>) factureRepo.findAll();
 	}
 	
-	public List<Facture> DisplayFacturesNotArchived() {
-		List<Facture> factures= factureRepo.findFacturesByArchived(false);
+	public List<Facture> DisplayFacturesNotArchived(String email) {
+		User user=userRepository.findByEmail(email);
+			List<Facture> factures= new ArrayList<Facture>();
+		if(user.getRole()==UserType.Admin  || user.getRole()==UserType.Manager) {
+			factures= factureRepo.findFacturesByArchived(false);
+		}
+		else {
+			factures= factureRepo.findFacturesByArchivedAndUser(false,email);
+		}
 		
 		List<Facture> result =new ArrayList<Facture>();
 		List<Facture> resultProformat =new ArrayList<Facture>();
@@ -667,8 +674,8 @@ public class FactureService {
 		return result;
 	}
 	
-	public List<Facture> DisplayInvoiceNotArchivedAndNotPayed(){
-		List<Facture> result=DisplayFacturesNotArchived();
+	public List<Facture> DisplayInvoiceNotArchivedAndNotPayed(String email){
+		List<Facture> result=DisplayFacturesNotArchived(email);
 		Iterator<Facture> iterator = result.iterator();
 		while (iterator.hasNext()) {
             Facture facture = iterator.next();
@@ -682,10 +689,10 @@ public class FactureService {
 	}
 	
 	
-	public List<Facture> DisplayInvoiceNotArchivedAndNotPayedByClient(String lib){
+	public List<Facture> DisplayInvoiceNotArchivedAndNotPayedByClient(String lib,String email){
 		Client c=clientRepo.findByLibelle(lib);
 		List<Facture> result=new ArrayList<Facture>();
-		for (Facture facture : DisplayFacturesNotArchived()) {
+		for (Facture facture : DisplayFacturesNotArchived(email)) {
 			if(facture.getStatus()==FactureStatus.Facture_envoye && facture.getPayementstatus() != FacturePayementStatus.Paye && facture.getClient().getIdU()==c.getIdU()) {
 				result.add(facture);
 			}
