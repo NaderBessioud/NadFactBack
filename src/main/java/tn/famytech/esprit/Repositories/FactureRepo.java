@@ -17,6 +17,7 @@ import tn.famytech.esprit.Entites.Facture;
 import tn.famytech.esprit.Entites.FacturePayementStatus;
 import tn.famytech.esprit.Entites.FactureStatus;
 import tn.famytech.esprit.Entites.TypeFacture;
+import tn.famytech.esprit.Entites.User;
 
 @Repository
 public interface FactureRepo extends CrudRepository<Facture, Long>, PagingAndSortingRepository<Facture, Long>  {
