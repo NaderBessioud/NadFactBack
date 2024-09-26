@@ -1114,10 +1114,10 @@ public class UserController {
 		   
 		   @PostMapping("updateavoir")
 		   @ResponseBody
-		     public ResponseEntity<Map<String, String>> UpdateAvoir(@ModelAttribute("avoir") Avoir avoir) throws UnrecoverableKeyException, FileNotFoundException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, DocumentException {
+		     public ResponseEntity<Map<String, String>> UpdateAvoir(@ModelAttribute("avoir") Avoir avoir,@RequestParam("email") String email) throws UnrecoverableKeyException, FileNotFoundException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, DocumentException {
 			   Map<String, String> response = new HashMap<>();
 			   avoirService.updateAvoir(avoir);
-			   response.put("redirect", "/ERPPro/user/factures");
+			    response.put("redirect", "/ERPPro/user/factures?email="+email);
 			   return ResponseEntity.ok(response);
 		     }
 		   
