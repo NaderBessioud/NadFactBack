@@ -159,6 +159,7 @@ import tn.famytech.esprit.Entites.TypeClient;
 import tn.famytech.esprit.Entites.TypeFacture;
 import tn.famytech.esprit.Entites.TypePayment;
 import tn.famytech.esprit.Entites.User;
+import tn.famytech.esprit.Entites.UserType;
 import tn.famytech.esprit.Repositories.AvoirRepo;
 import tn.famytech.esprit.Repositories.ClientRepo;
 
