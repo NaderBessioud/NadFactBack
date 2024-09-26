@@ -383,7 +383,7 @@ public class UserController {
      public String saveFacture(@ModelAttribute("facture") Facture facture) throws UnrecoverableKeyException, FileNotFoundException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, DocumentException {
     	factureService.AddFacture(facture);
     	 
-    	 return "redirect:/user/factures";
+    	 return "redirect:/user/factures?email="+facture.getUser().getEmail();
      }
      
    
