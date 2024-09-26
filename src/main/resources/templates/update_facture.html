@@ -36,6 +36,7 @@
                        <input type="text" hidden id="newfacturesigned" th:field=*{signed}>
                         <input type="text" hidden id="idfacture" th:field=*{idF}>
                          <input type="text" hidden id="newfactureref" th:field=*{ref}>
+			    <input type="text" hidden id="useremail" th:field=*{user.email}>
                       
                         <div class="form-row">
                             <div class="form-group" id="divtva">
@@ -622,7 +623,7 @@ jQuery(document).ready(function ($) {
 	    
 	  
 
-
+document.getElementById("useremail").value = sessionStorage.getItem("email");
 
 if(factureupdate != null){
 	
