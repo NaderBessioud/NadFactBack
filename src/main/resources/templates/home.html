@@ -78,7 +78,7 @@
                     </li>
                     
                         <li class="active emptype">
-                        <a href="/ERPPro/user/factures?email='"+sessionStorage.getItem("email")> <i class="menu-icon uil uil-invoice"></i>Factures</a>
+                        <a href="/ERPPro/user/factures" id="factslink"> <i class="menu-icon uil uil-invoice"></i>Factures</a>
                     </li>
                      
                     
@@ -89,7 +89,7 @@
                   
                        
                         <li class="active emptype">
-                        <a href="/ERPPro/user/reglements?email='"+sessionStorage.getItem("email")> <i class="menu-icon fa-solid fa-money-bill-transfer" style="margin-top: 8px"></i>Reglements</a>
+                        <a href="/ERPPro/user/reglements" id="reglink"> <i class="menu-icon fa-solid fa-money-bill-transfer" style="margin-top: 8px"></i>Reglements</a>
                     </li>
 
 			 <li class="active emptype">
@@ -270,6 +270,9 @@
     
     <script th:inline="javascript">
 document.addEventListener('DOMContentLoaded', function() {
+
+		document.getElementById("factslink").href="/ERPPro/user/factures?email="+sessionStorage.getItem("email");
+	document.getElementById("reglink").href="/ERPPro/user/reglements?email="+sessionStorage.getItem("email");	
 	$('#menuToggle').on('click', function(event) {
 		$('body').toggleClass('open');
 	});
