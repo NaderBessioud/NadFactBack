@@ -390,10 +390,10 @@ public class UserController {
      
      @PostMapping("facturesupdate")
      public String updateFacture(@ModelAttribute("facture") Facture facture) throws UnrecoverableKeyException, FileNotFoundException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, DocumentException {
-    	System.out.println("now its my turn");
+    	
     	 Facture f= factureService.UpdateFacture(facture);
     	 
-    	 return "redirect:/user/factures";
+    	return "redirect:/user/factures?email="+facture.getUser().getEmail();
      }
      
    
@@ -1090,10 +1090,10 @@ public class UserController {
 		   
 		   @PostMapping("avoir/{id}")
 		   @ResponseBody
-		     public ResponseEntity<Map<String, String>> saveAvoir(@PathVariable("id") long idf,@ModelAttribute("avoir") Avoir avoir) throws UnrecoverableKeyException, FileNotFoundException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, DocumentException {
+		     public ResponseEntity<Map<String, String>> saveAvoir(@PathVariable("id") long idf,@ModelAttribute("avoir") Avoir avoir,@RequestParam("email") String email) throws UnrecoverableKeyException, FileNotFoundException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, DocumentException {
 			   Map<String, String> response = new HashMap<>();
 			   avoirService.addAvoir(avoir,idf);
-			   response.put("redirect", "/ERPPro/user/factures");
+			    response.put("redirect", "/ERPPro/user/factures?email="+email);
 		    	 
 			   return ResponseEntity.ok(response);
 		     }
