@@ -936,7 +936,7 @@ if(status=="Avoir"){
         }
        
        
-        fetch('/ERPPro/user/facturesfilter?clientId=' + clientId + '&factureType=' + factureType + '&startDate=' + startDate + '&endDate=' + endDate + "&archived=" + archived+ "&email='"+sessionStorage.getItem("email"), {
+        fetch('/ERPPro/user/facturesfilter?clientId=' + clientId + '&factureType=' + factureType + '&startDate=' + startDate + '&endDate=' + endDate + "&archived=" + archived+ "&email="+sessionStorage.getItem("email"), {
             method: 'GET',
             headers: {
             	 'Authorization': `Bearer ${token}`
