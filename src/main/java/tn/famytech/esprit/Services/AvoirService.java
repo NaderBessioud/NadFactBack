@@ -899,7 +899,7 @@ public class AvoirService {
 	   	 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 	   	Calendar calendar = Calendar.getInstance();
 	    int currentYear = calendar.get(Calendar.YEAR);	
-	    A.setNumber(AvoirNumber());		
+	   	
 	   	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	   	if(A.getDateemission() == null) {
 		try {
@@ -1120,7 +1120,7 @@ public class AvoirService {
 	   	 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 	   	Calendar calendar = Calendar.getInstance();
 	    int currentYear = calendar.get(Calendar.YEAR);	
-	    A.setNumber(AvoirNumber());		
+	    		
 	   	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	   	if(A.getDateemission() == null) {
 		try {
