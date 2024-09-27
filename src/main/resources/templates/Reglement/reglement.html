@@ -760,7 +760,7 @@ function hideCustomAlert(){
 	        	  updateReglementList(data)
 	          });
 
-	   	  fetch('/ERPPro/user/FactureByClient/'+opt+"?email='"+sessionStorage.getItem("email"), {
+	   	  fetch('/ERPPro/user/FactureByClient/'+opt+"?email="+sessionStorage.getItem("email"), {
               method: 'GET',
               headers: {
             	 	 'Authorization': `Bearer ${token}`
@@ -783,7 +783,7 @@ function hideCustomAlert(){
 	        	  updateReglementList(data)
 	          });
 
-	   	  fetch("/ERPPro/user/Allfactures?email='"+sessionStorage.getItem("email"), {
+	   	  fetch("/ERPPro/user/Allfactures?email="+sessionStorage.getItem("email"), {
               method: 'GET',
               headers: {
             	 	 'Authorization': `Bearer ${token}`
