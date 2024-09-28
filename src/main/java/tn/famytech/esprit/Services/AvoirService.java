@@ -1575,7 +1575,7 @@ public class AvoirService {
 	    		String name=per.getFirstname();
 	    		String lastname=per.getLastname();
 	    		Avoir avoir=avoirRepo.findById(id).get();
-	    		A.setNumber(AvoirNumber());
+	    		avoir.setNumber(AvoirNumber());
 	    		
 	    		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 	    		
