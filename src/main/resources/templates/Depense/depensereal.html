@@ -53,7 +53,7 @@
 				<th>Motif</th>
 				<th>Montant</th>
 
-				<th>type payement</th>
+				<th>type paiement</th>
 				
 				<th>Action</th>
 			</tr>
@@ -84,8 +84,8 @@
 					<button th:if="${dep.facture != null && @fileUtils.getFileExtension(dep.facture) == 'pdf'}" th:onclick="'FacturePDF(' + ${dep.idDR} + ')'" class="btnpreview"><i class="fa-solid fa-file-invoice"></i>Facture</button>
 					<button th:if="${dep.facture != null && @fileUtils.getFileExtension(dep.facture) != 'pdf'}" th:onclick="'FactureJPG(' + ${dep.idDR} + ')'" class="btnpreview"><i class="fa-solid fa-file-invoice"></i>Facture</button>
 					
-					<button th:if="${dep.typepay.toString() != 'cash' && @fileUtils.getFileExtension(dep.papierpay) == 'pdf'}" th:onclick="'PaymentPDF(' + ${dep.idDR} + ')'" class="btnpdf" ><i class="fa-solid fa-credit-card"></i>Payement</button>
-					<button th:if="${dep.typepay.toString() != 'cash' && @fileUtils.getFileExtension(dep.papierpay) != 'pdf'}" th:onclick="'PaymentJPG(' + ${dep.idDR} + ')'" class="btnpdf" ><i class="fa-solid fa-credit-card"></i>Payement</button>
+					<button th:if="${dep.typepay.toString() != 'cash' && @fileUtils.getFileExtension(dep.papierpay) == 'pdf'}" th:onclick="'PaymentPDF(' + ${dep.idDR} + ')'" class="btnpdf" ><i class="fa-solid fa-credit-card"></i>paiement</button>
+					<button th:if="${dep.typepay.toString() != 'cash' && @fileUtils.getFileExtension(dep.papierpay) != 'pdf'}" th:onclick="'PaymentJPG(' + ${dep.idDR} + ')'" class="btnpdf" ><i class="fa-solid fa-credit-card"></i>paiement</button>
 					
 					
 					
@@ -191,7 +191,7 @@ function hideCustomAlert(){
       
   		var PaymentButton = document.createElement('button');
   	      
-  		PaymentButton.innerHTML = '<i class="fa-solid fa-credit-card"></i>Payement';
+  		PaymentButton.innerHTML = '<i class="fa-solid fa-credit-card"></i>paiement';
   		PaymentButton.className = 'btnpdf';
   		
   
@@ -555,7 +555,7 @@ function search(){
         	  const url = window.URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
-              a.download = 'PayementDep' + id + '.jpg';
+              a.download = 'PaiementDep' + id + '.jpg';
               document.body.appendChild(a);
               a.click();
               document.body.removeChild(a);
