@@ -362,14 +362,14 @@ public class AvoirService {
 	
 	
 	 public ByteArrayOutputStream generateAvoir(Avoir A) throws DocumentException, IOException {
-	    	System.out.println("haw number mtaa avoir=="+A.getNumber());
+	    	
 	    	Date today = new Date();
 	    	String numberString ="";
 	        BigDecimal totalBigDecimal;
 	   	 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 	   	Calendar calendar = Calendar.getInstance();
 	    int currentYear = calendar.get(Calendar.YEAR);	
-	    		
+	    		A.setNumber(AvoirNumber());	
 	   	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	   	if(A.getDateemission() == null) {
 		try {
@@ -1575,7 +1575,7 @@ public class AvoirService {
 	    		String name=per.getFirstname();
 	    		String lastname=per.getLastname();
 	    		Avoir avoir=avoirRepo.findById(id).get();
-	    		
+	    		A.setNumber(AvoirNumber());
 	    		
 	    		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 	    		
