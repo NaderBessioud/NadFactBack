@@ -721,7 +721,7 @@ public class AvoirService {
 	           Details1.setBorderWidth(1f);
 	           tableDetails.addCell(Details1);
 	          
-	           PdfPCell Total = new PdfPCell(new Phrase("Total DT",fontZ2));
+	           PdfPCell Total = new PdfPCell(new Phrase("Total €",fontZ2));
 	           Total.setHorizontalAlignment(Element.ALIGN_CENTER);
 	           Total.setBorderWidth(1f);
 	           tableDetails.addCell(Total);
@@ -1254,7 +1254,7 @@ public class AvoirService {
 	           Details1.setBorderWidth(1f);
 	           tableDetails.addCell(Details1);
 	          
-	           PdfPCell Total = new PdfPCell(new Phrase("Total DT",fontZ2));
+	           PdfPCell Total = new PdfPCell(new Phrase("Total €",fontZ2));
 	           Total.setHorizontalAlignment(Element.ALIGN_CENTER);
 	           Total.setBorderWidth(1f);
 	           tableDetails.addCell(Total);
