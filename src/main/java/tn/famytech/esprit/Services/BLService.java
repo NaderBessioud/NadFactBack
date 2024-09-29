@@ -58,6 +58,10 @@ public class BLService {
 	public List<BonLivraison> getAll(){
 		return (List<BonLivraison>) blRepo.findAll();
 	}
+
+	public BonLivraison findbyid(long id) {
+		return blRepo.findById(id).get();
+	}
 	
 	
 	
