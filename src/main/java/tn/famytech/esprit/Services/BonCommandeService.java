@@ -103,7 +103,7 @@ public class BonCommandeService {
 		BonLivraison bl=new BonLivraison();
 		bl.setDate(dep.getDate());
 		bl.setAddresse(depaddr.getAdresse());
-		
+		bl.setBldoc(depaddr.getBldoc());
 		bl.setBcliv(bc);
 		
 		bl=blrepo.save(bl);
