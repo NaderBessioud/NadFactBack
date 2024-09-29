@@ -53,7 +53,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
+import tn.famytech.esprit.Entites.BonLivraison;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.zxing.WriterException;
@@ -1705,7 +1705,37 @@ public class UserController {
 				}
 			
 			
-			
+			@GetMapping("BLdocPDF/{id}")
+				public ResponseEntity<ByteArrayResource> previewretBLpdf(@PathVariable("id") long id) throws FileNotFoundException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, DocumentException, SerialException, SQLException{
+					
+					BonLivraison bl=blService.findbyid(id);
+					byte[] depensePdfBytes = factureService.downloadFile(bl.getBldoc());
+					 HttpHeaders headers = new HttpHeaders();
+			            headers.setContentType(MediaType.APPLICATION_PDF);
+			            headers.setContentDispositionFormData("retenue.pdf", "retenue.pdf");
+
+			            // Return ResponseEntity with the PDF byte array
+			            return ResponseEntity.ok()
+			                    .headers(headers)
+			                    .contentLength(depensePdfBytes.length)
+			                    .body(new ByteArrayResource(depensePdfBytes));
+					}
+				
+				@GetMapping("/BLJPEG/{id}")
+				public ResponseEntity<ByteArrayResource> previewBLImage(@PathVariable("id") long id) throws IOException, SQLException {
+				
+					BonLivraison bl=blService.findbyid(id);
+				    byte[] imageBytes = factureService.downloadFile(bl.getBldoc());
+
+				    HttpHeaders headers = new HttpHeaders();
+				    headers.setContentType(MediaType.IMAGE_JPEG); // Changez le type MIME en fonction du type d'image
+				    headers.setContentDispositionFormData("image.jpg", "image.jpg"); // Changez l'extension en fonction du type d'image
+
+				    return ResponseEntity.ok()
+				            .headers(headers)
+				            .contentLength(imageBytes.length)
+				            .body(new ByteArrayResource(imageBytes));
+				}
 			
 			
 		 
