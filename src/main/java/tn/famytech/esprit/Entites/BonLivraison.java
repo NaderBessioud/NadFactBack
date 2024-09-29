@@ -37,6 +37,7 @@ public class BonLivraison implements Serializable{
 	private long idBL;
 	private String addresse;
 	private TypePayment typepey;
+	private String bldoc;
 	@Temporal(TemporalType.DATE)
 	private Date date;
 	
