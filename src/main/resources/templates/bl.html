@@ -18,8 +18,8 @@
         <div class="ag-courses-item_bg" th:classappend="${bc.bcliv.ddepense.cat}">
        </div>
              
-        <span th:if="${bc.bldoc != null && @fileUtils.getFileExtension(bc.bldoc) == 'pdf'}"  aria-hidden="true" style="float:right;color:white; z-index: 2;position: relative;" th:onclick="'downloadDocPDF(' + ${bc.idBL} + ')'"><i class="fa fa-close" style="margin-top: 10px"></i></span>
-             <span th:if="${bc.bldoc != null && @fileUtils.getFileExtension(bc.bldoc) != 'pdf'}"  aria-hidden="true" style="float:right;color:white; z-index: 2;position: relative;" th:onclick="'downloadDocJPEG(' + ${bc.idBL} + ')'"><i class="fa fa-close" style="margin-top: 10px"></i></span>
+        <span th:if="${bc.bldoc != null && @fileUtils.getFileExtension(bc.bldoc) == 'pdf'}"  aria-hidden="true" style="float:right;color:white; z-index: 2;position: relative;" th:onclick="'downloadDocPDF(' + ${bc.idBL} + ')'"><i class="fa-solid fa-download" style="margin-top: 10px"></i></span>
+             <span th:if="${bc.bldoc != null && @fileUtils.getFileExtension(bc.bldoc) != 'pdf'}"  aria-hidden="true" style="float:right;color:white; z-index: 2;position: relative;" th:onclick="'downloadDocJPEG(' + ${bc.idBL} + ')'"><i class="fa-solid fa-download" style="margin-top: 10px"></i></span>
 
         <div class="ag-courses-item_title" th:text ="${bc.bcliv.description}">
       
