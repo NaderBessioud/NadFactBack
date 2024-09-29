@@ -106,6 +106,9 @@
         </div>
          <label for="factrefile" class="btn1 btn-primary rounded-0 py-2 px-4" style="margin-top: 9px;margin-left:21px" >Facture</label>
 		<input type="file" id="factrefile" name="factrefile" style="display: none;">
+
+		<label for="blfile" class="btn1 btn-primary rounded-0 py-2 px-4" style="margin-top: 9px;margin-left:21px" >Bon livraison</label>
+		<input type="file" id="blfile" name="blfile" style="display: none;">
 		    </div>  
 		    </div>                
      
@@ -124,7 +127,8 @@
 <script type="text/javascript">
 var token=sessionStorage.getItem('token');
 let typepayFile = null; 
-let factureFile = null; 
+let factureFile = null;
+let blfile= null;
 var idbc=0;
 
 
@@ -168,6 +172,11 @@ document.getElementById("factrefile").addEventListener("change", function(event)
 
 document.getElementById("typepayfile").addEventListener("change", function(event) {
 	typepayFile = event.target.files[0];
+    
+});
+
+document.getElementById("blfile").addEventListener("change", function(event) {
+	blfile = event.target.files[0];
     
 });
 
@@ -316,6 +325,7 @@ async function deliverBC(){
 	
 	const modal = document.getElementById('DeliverModal');
 	var facture= await uploadFile(factureFile);
+	var bl= await uploadFile(blfile);
 	var payfile= ""
 	const formData = new FormData();
 	const date = new Date(document.getElementById('dateliv').value);
@@ -328,6 +338,7 @@ async function deliverBC(){
     	var payfile= await uploadFile(typepayFile);
     	depadr={
         		adresse:formData1.get('addresse'),
+			bldoc:bl,
         		dep :{
      	    		
      	    		date:formData1.get('date'),
@@ -342,6 +353,7 @@ async function deliverBC(){
     else{
         depadr={
         		adresse:formData1.get('addresse'),
+			bldoc:bl,
         		dep :{
      	    		
      	    		date:formData1.get('date'),
