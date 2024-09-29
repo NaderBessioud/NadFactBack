@@ -18,21 +18,22 @@
         <div class="ag-courses-item_bg" th:classappend="${bc.bcliv.ddepense.cat}">
        </div>
              
-       
+        <span th:if="${bc.bldoc != null && @fileUtils.getFileExtension(bc.bldoc) == 'pdf'}"  aria-hidden="true" style="float:right;color:white; z-index: 2;position: relative;" th:onclick="'downloadDocPDF(' + ${bc.idBC} + ')'"><i class="fa fa-close" style="margin-top: 10px"></i></span>
+             <span th:if="${bc.bldoc != null && @fileUtils.getFileExtension(bc.bldoc) != 'pdf'}"  aria-hidden="true" style="float:right;color:white; z-index: 2;position: relative;" th:onclick="'downloadDocJPEG(' + ${bc.idBC} + ')'"><i class="fa fa-close" style="margin-top: 10px"></i></span>
 
-        <div class="ag-courses-item_title" th:text ="${bc.addresse}">
+        <div class="ag-courses-item_title" th:text ="${bc.bcliv.description}">
       
         </div>
 
  <div class="ag-courses-item_date-box">
-          Start:
+          Date:
           <span class="ag-courses-item_date" th:text ="${#dates.format(bc.date, 'yyyy/MM/dd')}">
            
           </span>
         </div>
         <div class="ag-courses-item_date-box">
-          Montant:
-          <span class="ag-courses-item_date" th:text ="${bc.bcliv.montant}">
+          Adresse:
+          <span class="ag-courses-item_date" th:text ="${bc.addresse}">
             
           </span>
         </div>
@@ -171,18 +172,53 @@ function cancelBC(id){
     })
 }
 
-function delivreBC(id){
-	fetch('/ERPPro/user/delevreBC/'+id, {
-        method: 'POST',
+function downloadDocPDF(id){
+	   fetch('/ERPPro/user/BLdocPDF/'+id, {
+        method: 'GET',
         headers: {
-        	 'Authorization': `Bearer ${token}`
-        	    },
-       
+     	 	 'Authorization': `Bearer ${token}`
+     	 	    },             
     })
-    .then(response => response.json())
-    .then(data => {
-    	updateBCList(data)
-    })
+    .then(response => response.blob())
+    .then(blob => {
+        const pdfUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        
+        a.href = pdfUrl;
+        a.download = 'bl' + id + '.pdf';
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        document.body.removeChild(a);
+
+    });
+ }
+
+function downloadDocJPEG(id){
+ fetch('/ERPPro/user/BLJPEG/'+id, {
+     method: 'GET',
+     headers: {
+  	 	 'Authorization': `Bearer ${token}`
+  	 	    },             
+ })
+ .then(response => response.blob())
+ .then(blob => {
+ 	  const url = window.URL.createObjectURL(blob);
+       const a = document.createElement('a');
+       a.href = url;
+       a.download = 'bl' + id + '.jpg';
+       document.body.appendChild(a);
+       a.click();
+       document.body.removeChild(a);
+     
+    
+   
+
+  
+
+ });
 }
 </script>
 
