@@ -17,5 +17,6 @@ import tn.famytech.esprit.Entites.TypePayment;
 public class DepRealWithAdresse {
 	private DepenseReelle dep;
 	private String adresse;
+	private String bldoc;
 
 }
