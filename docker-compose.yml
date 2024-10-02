@@ -49,8 +49,8 @@ services:
     
     depends_on:
      - mysqldb
-     devices:
-      - /dev/video0:/dev/video0
+    devices:
+     - /dev/video0:/dev/video0
     
   spring_app:
     image: naderbessioud/nadfactspring:latest
