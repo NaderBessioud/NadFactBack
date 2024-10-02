@@ -623,7 +623,7 @@ function toggleAvoirs(invoiceId) {
     function preview(id) {
 
 
-        fetch('/ERPPro/client/previewFacture/'+id, {
+        fetch('/ERPPro/client/previewFactureweb/'+id, {
             method: 'GET',
             headers: {
             	 'Authorization': `Bearer ${token}`
@@ -646,7 +646,7 @@ function toggleAvoirs(invoiceId) {
     function pdf(id) {
 
 
-        fetch('/ERPPro/client/previewFacture/'+id, {
+        fetch('/ERPPro/client/previewFactureweb/'+id, {
             method: 'GET',
             headers: {
             	 'Authorization': `Bearer ${token}`
