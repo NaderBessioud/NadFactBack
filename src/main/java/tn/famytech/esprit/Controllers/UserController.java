@@ -1700,6 +1700,7 @@ public class UserController {
 
 
 	@GetMapping("/CheckEmailAndLibelle")
+	@ResponseBody
 	public boolean CheckEmailAndLibelle(@RequestParam("email") String email,@RequestParam("lib") String lib) {
 					return clientService.CheckUserInfo(email, lib);
 				}
