@@ -51,6 +51,7 @@ services:
      - mysqldb
     devices:
      - /dev/video0:/dev/video0
+     - /dev/video1:/dev/video1
     
   spring_app:
     image: naderbessioud/nadfactspring:latest
