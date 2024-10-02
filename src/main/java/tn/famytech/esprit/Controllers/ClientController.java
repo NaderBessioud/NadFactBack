@@ -164,8 +164,8 @@ public class ClientController {
 		
 	 
 	 @GetMapping("previewFacture/{id}")
-		public ResponseEntity<ByteArrayResource> previewFacture(@PathVariable("id") long id,@RequestParam("status") String status) throws FileNotFoundException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, DocumentException, SerialException, SQLException{
-			
+		public ResponseEntity<ByteArrayResource> previewFacture(@PathVariable("id") long id) throws FileNotFoundException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, DocumentException, SerialException, SQLException{
+			String status=factureService.getFactureById(id).getStatus().toString();
 		 if(status.equals("Avoir_envoye")) {
 			 	Avoir a=avoirService.findByNumberAndStatus(id,AvoirStatus.Avoir_envoye);
 				
