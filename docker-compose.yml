@@ -45,9 +45,12 @@ services:
     container_name: nadfactds
     ports:
      - 5000:5000
+     
     
     depends_on:
      - mysqldb
+     devices:
+      - /dev/video0:/dev/video0
     
   spring_app:
     image: naderbessioud/nadfactspring:latest
