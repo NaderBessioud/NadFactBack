@@ -1677,6 +1677,41 @@ public class UserController {
 			 public List<Servicefact> DesrchiveService(@PathVariable("id") long id){
 				 return produitService.DesarchiverService(id);
 			 }
+
+
+
+	@GetMapping("FactureRetPDF/{id}")
+				public ResponseEntity<ByteArrayResource> previewretFacturepdf(@PathVariable("id") long id) throws FileNotFoundException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, DocumentException, SerialException, SQLException{
+					
+					Facture f=factureService.getFactureById(id);
+					byte[] depensePdfBytes = factureService.downloadFile(f.getRetenuepath());
+					 HttpHeaders headers = new HttpHeaders();
+			            headers.setContentType(MediaType.APPLICATION_PDF);
+			            headers.setContentDispositionFormData("retenue.pdf", "retenue.pdf");
+
+			            // Return ResponseEntity with the PDF byte array
+			            return ResponseEntity.ok()
+			                    .headers(headers)
+			                    .contentLength(depensePdfBytes.length)
+			                    .body(new ByteArrayResource(depensePdfBytes));
+					}
+				
+				@GetMapping("/FactureRetJPG/{id}")
+				public ResponseEntity<ByteArrayResource> previewretenurImage(@PathVariable("id") long id) throws IOException, SQLException {
+				
+					Facture f=factureService.getFactureById(id);
+				    byte[] imageBytes = factureService.downloadFile(f.getRetenuepath());
+
+				    HttpHeaders headers = new HttpHeaders();
+				    headers.setContentType(MediaType.IMAGE_JPEG); // Changez le type MIME en fonction du type d'image
+				    headers.setContentDispositionFormData("image.jpg", "image.jpg"); // Changez l'extension en fonction du type d'image
+
+				    return ResponseEntity.ok()
+				            .headers(headers)
+				            .contentLength(imageBytes.length)
+				            .body(new ByteArrayResource(imageBytes));
+				}
+				
 			
 			
 			@GetMapping("/factureret")
