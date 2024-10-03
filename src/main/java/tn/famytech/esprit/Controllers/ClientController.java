@@ -215,11 +215,12 @@ public class ClientController {
 
 
 
-	@GetMapping("previewFactureweb/{id}")
+	
+	 @GetMapping("previewFactureweb/{id}")
 		public ResponseEntity<ByteArrayResource> previewFacture(@PathVariable("id") long id) throws FileNotFoundException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, DocumentException, SerialException, SQLException{
 			String status=factureService.getFactureById(id).getStatus().toString();
 		 if(status.equals("Avoir_envoye")) {
-			 	Avoir a=avoirService.findByNumberAndStatus(id,AvoirStatus.Avoir_envoye);
+			 	Avoir a=avoirService.getAvoirById(id);
 				
 				
 					byte[] facturePdfBytes = factureService.downloadFile(a.getPdfname());
@@ -236,7 +237,7 @@ public class ClientController {
 			 
 		 }
 		 else if(status.equals(FactureStatus.Proforma_envoyee.toString())) {
-			 Facture f=factureService.getbyNumberAndStatus(id,FactureStatus.Proforma_envoyee);
+			 Facture f=factureService.getFactureById(id);
 			 if(f.getType()==TypeFacture.National) {
 					return downloadFacture(f);
 				}
@@ -245,7 +246,7 @@ public class ClientController {
 				}
 		 }
 		 else {
-			 Facture f=factureService.getbyNumberAndStatus(id,FactureStatus.Facture_envoye);
+			 Facture f=factureService.getFactureById(id);
 				byte[] facturePdfBytes = factureService.downloadFile(f.getPdfname());
 				 HttpHeaders headers = new HttpHeaders();
 		            headers.setContentType(MediaType.APPLICATION_PDF);
