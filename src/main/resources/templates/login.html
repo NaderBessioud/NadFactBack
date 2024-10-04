@@ -602,6 +602,24 @@ function facialreco(){
 	            },
 	            body: formData
 	        })
+		     .then(response => response.json())
+	     	.then(data1 => {
+		     	if(data1.msg=="good"){
+		     		sessionStorage.setItem("email",data1.user.email);
+		        	sessionStorage.setItem("id",data1.user.idU);
+		        	sessionStorage.setItem("token",data1.token);
+		        	sessionStorage.setItem("image",data1.user.image);
+		     		window.location.href = '/ERPPro/user/dashbord'
+			     	}
+		     	else{
+		     	   alert.querySelector('strong').textContent="Attention!!!";
+	               
+	                alert.querySelector('.alert-text').textContent="Personnel n'existe pas";
+	                console.log(alert)
+	                alert.classList.add("show");
+			     	}
+
+		     	})
 	        
 	  })
 	  .catch(error => {
