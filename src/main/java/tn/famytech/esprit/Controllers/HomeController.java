@@ -194,10 +194,11 @@ public class HomeController {
 		 return "homepage";
 	 } 
 	
-	@PostMapping("/facialauthentication")
+		 @PostMapping("facialauthentication")
+	 @ResponseBody
 	 
-	 private String facialAuth(@RequestParam("email") String email) {
-		 return personelService.AuthenticateUser(email);
+	 private JwtAuthenticationResponse facialAuth(@RequestParam("email") String email,HttpServletResponse response) {
+		 return authenticationService.signinWithGoogle(email,response);
 	 }
 	
 	 @PostMapping("/google")
