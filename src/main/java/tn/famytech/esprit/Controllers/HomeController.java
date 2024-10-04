@@ -192,7 +192,9 @@ public class HomeController {
 	 @GetMapping("/NadFact")
 	 public String DisplayHomePage() {
 		 return "homepage";
-	 } @PostMapping("facialauthentication")
+	 } 
+	
+	@PostMapping("/facialauthentication")
 	 
 	 private String facialAuth(@RequestParam("email") String email) {
 		 return personelService.AuthenticateUser(email);
