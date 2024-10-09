@@ -595,7 +595,7 @@ function facialreco(){
 	  .then(data => {
 		  var formData = new FormData();
 		  formData.append('email', data);
-		  fetch('/ERPPro/facialauthentication', {
+		  fetch('/ERPPro/home/facialauthentication?email='+data, {
 	            method: 'POST',
 	            headers: {
 	                'Content-Type': 'application/json'
